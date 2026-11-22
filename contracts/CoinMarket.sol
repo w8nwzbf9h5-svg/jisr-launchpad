@@ -27,7 +27,9 @@ interface IPlatformWallet {
 }
 
 /// @title CoinMarket
-/// @notice The only place a launchpad coin is sold and bought back. It holds the coin's stablecoin reserve.
+/// @notice The only place a launchpad coin is sold and bought back. It holds the coin's reserve.
+///         "Stablecoin" below means the factory's reserve token: normally a dollar stablecoin, possibly
+///         another plain ERC-20 such as a tokenized stock.
 ///
 ///         Pricing is one line over "coins outstanding":
 ///           - the first 800M coins cost the floor price each (this is the fixed-price sale);
@@ -112,6 +114,7 @@ contract CoinMarket is Initializable, ReentrancyGuard {
     error ShortPayment();
     error RefundFailed();
     error OnlyRouter();
+    error NativeNotSupported();
 
     constructor() {
         _disableInitializers();
@@ -168,6 +171,7 @@ contract CoinMarket is Initializable, ReentrancyGuard {
         nonReentrant
         returns (uint256 total, uint256 nativeSpent)
     {
+        if (address(router) == address(0)) revert NativeNotSupported();
         BuyQuote memory q = _quoteBuy(coinsOut);
         total = q.total;
 
@@ -218,6 +222,7 @@ contract CoinMarket is Initializable, ReentrancyGuard {
         nonReentrant
         returns (uint256 nativeOut)
     {
+        if (address(router) == address(0)) revert NativeNotSupported();
         SellQuote memory q = _quoteSell(coinsIn);
 
         coin.safeTransferFrom(msg.sender, address(this), coinsIn);

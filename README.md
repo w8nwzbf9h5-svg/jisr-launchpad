@@ -18,7 +18,7 @@ Status: written and tested locally, end to end. **Not audited and not deployed.*
 
 | Contract | Job |
 |---|---|
-| `LaunchpadFactory` | Launches coins. Holds the one setting the team controls: the platform wallet. |
+| `LaunchpadFactory` | Launches coins. Holds the one setting the team controls: the platform wallet. One factory per reserve currency per network. |
 | `Coin` | The coin itself. 1 billion supply, minted once to its market. 2.5% wallet limit. |
 | `CoinMarket` | Sells the coin, buys it back, and holds its stablecoin reserve. One per coin. |
 
@@ -38,6 +38,14 @@ Status: written and tested locally, end to end. **Not audited and not deployed.*
 - `LaunchpadFactory`: `createCoin`, `setPlatformWallet`, ownership transfer
 
 Use a multisig as the factory owner and as the platform wallet.
+
+## Networks and reserve currencies
+
+- **Any EVM network.** The contracts use nothing network-specific. The web app names Ethereum, BNB Chain, Base, Arbitrum One, OP Mainnet, Polygon, Avalanche and Robinhood Chain in advance, plus their testnets; any other EVM network is described on the deploy page when you deploy there.
+- **Reserve currency.** Each factory is deployed with one reserve token and one number: what the whole 1B supply is worth at the sale price, in that token. With a dollar stablecoin and 100,000 that is the $0.0001 sale price. With a tokenized stock, use the number of shares worth the market cap you want (400 shares of a $250 stock for about $100K). The floor is then a number of shares, so its dollar value moves with the stock. Tokens that charge a transfer fee, rebase, or restrict who may hold them are not supported.
+- **Swap router is optional.** With a Uniswap V2 style router, buyers can pay and be paid in the network's own currency. Without one, trading is in the reserve token only.
+
+Solana is a separate program (`solana/`). Other non-EVM networks would each need their own.
 
 ## How pricing works
 
@@ -68,7 +76,7 @@ npm install
 npx hardhat test
 ```
 
-23 tests. Each market test runs twice, with a 6-decimal stablecoin (Ethereum) and an 18-decimal one (BNB Chain). The suite includes:
+35 tests. Each market test runs three times: with a 6-decimal stablecoin, an 18-decimal one, and a stock token with the supply priced at 400 shares. The suite includes:
 
 - **Random trading.** About 450 random buys, sells and transfers across 57 wallets. After every step: the contract holds everything it owes, the floor reserve covers every coin, the floor has not fallen, the price is not under the floor. At the end every holder sells everything and every sale succeeds.
 - **Attacks.** A 12-wallet attacker makes 260 seeded moves (size, dust, donations, shuffling coins between wallets) against other people's money, during the sale and after graduation. The attacker never ends with a profit, and every victim can still exit in full.
@@ -76,7 +84,8 @@ npx hardhat test
 ## Deploy
 
 ```
-STABLE_ADDRESS=0x... ROUTER_ADDRESS=0x... PLATFORM_WALLET=0x... OWNER_ADDRESS=0x... \
+STABLE_ADDRESS=0x... PLATFORM_WALLET=0x... OWNER_ADDRESS=0x... \
+ROUTER_ADDRESS=0x... SALE_MARKET_CAP=100000 \
 DEPLOYER_KEY=0x... SEPOLIA_RPC_URL=https://... \
 npx hardhat run scripts/deploy.js --network sepolia
 ```
@@ -122,7 +131,7 @@ In your wallet, add the network `http://127.0.0.1:8545` (chain id 31337) and imp
 npm run e2e
 ```
 
-Starts a local chain, deploys, serves the app, and drives it in headless Chrome with a stand-in wallet. 19 steps. They cover launching with a photo, description and social links, hostile coin details that must not inject anything into the page, trading, fees, and the deploy page (deploy the test kit, check and deploy with chosen addresses, change the platform wallet, offer two currencies on one network, paste the snippet and trade on the newly linked site). The trading steps: the board loads, the wallet connects, a coin is launched, bought with the stablecoin and with the native currency, sold into both, fees are paid out, the wallet limit trims a large buy, a graduated coin trades above its floor. After each step the test reads the chain and compares.
+Starts a local chain, deploys, serves the app, and drives it in headless Chrome with a stand-in wallet. 20 steps. They cover launching with a photo, description and social links, hostile coin details that must not inject anything into the page, trading, fees, and the deploy page (deploy the test kit, check and deploy with chosen addresses, change the platform wallet, offer two currencies on one network, deploy and trade a factory priced in a stock token with no router, paste the snippet and trade on the newly linked site). The trading steps: the board loads, the wallet connects, a coin is launched, bought with the stablecoin and with the native currency, sold into both, fees are paid out, the wallet limit trims a large buy, a graduated coin trades above its floor. After each step the test reads the chain and compares.
 
 ### Putting it on a testnet, then a mainnet
 

@@ -6,8 +6,8 @@
 <title>Jisr Launchpad</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=647b0e3b">
 </head>
 <body>
 
@@ -32,10 +32,11 @@
 
 <section id="v-board">
   <div class="hero">
-    <h1>One coin.<br>One price.<br><em>Floor covered 100%.</em></h1>
-    <p>Every coin is sold at one fixed price, and the money stays in a stablecoin reserve that nobody can withdraw. Any holder can sell back at the floor price at any time.</p>
+    <h1>Launch a coin with a floor that is <em>covered 100%.</em></h1>
+    <p>Every coin is sold at one fixed price, and the money stays in a reserve that nobody can withdraw. Any holder can sell back at the floor price at any time.</p>
+    <div class="cta"><button class="btn primary" data-act="nav" data-v="launch">Launch a coin</button><button class="btn" data-act="nav" data-v="how">How it works</button></div>
     <div class="spec">
-      <div><span class="label">Sale price</span><strong>Fixed, $100K market cap</strong><small>Same price for everyone. No early discount.</small></div>
+      <div><span class="label">Sale price</span><strong id="specPrice">One fixed price</strong><small>Same price for everyone. No early discount.</small></div>
       <div><span class="label">Trading fee</span><strong>5% per trade</strong><small>Creator 1 · floor reserve 2 · launchpad 2</small></div>
       <div><span class="label">Pay with</span><strong id="specPay">Stablecoin or native</strong><small id="specNet">Choose a network to begin</small></div>
       <div><span class="label">Wallet limit</span><strong>2.5% of supply</strong><small>For every wallet, the creator included</small></div>
@@ -79,7 +80,8 @@
         <span class="label">Launch terms, fixed for every coin</span>
         <div class="kv"><span>Total supply</span><b class="num">1,000,000,000</b></div>
         <div class="kv"><span>Sold in the sale</span><b class="num">800,000,000</b></div>
-        <div class="kv"><span>Sale price, same for everyone</span><b class="num">$0.0001</b></div>
+        <div class="kv"><span>Sale price, same for everyone</span><b class="num" id="tPrice">One fixed price</b></div>
+        <div class="kv"><span>Market cap at the sale price</span><b class="num" id="tCap">—</b></div>
         <div class="kv"><span>Graduation</span><b class="num">When the sale sells out</b></div>
         <div class="kv"><span>Trading fee</span><b class="num">5%</b></div>
         <div class="kv"><span>Your creator share</span><b class="num">1% of every trade</b></div>
@@ -97,9 +99,9 @@
     <h1>How it works</h1>
     <div class="how">
       <div class="card"><h2><span>01</span>One fixed price for everyone</h2>
-        <p>Supply is 1 billion. 800 million are sold at one price, $0.0001 a coin, which is a $100K market cap from the first minute. The creator, the first buyer and the last buyer all pay the same.</p></div>
+        <p>Supply is 1 billion. 800 million are sold at one price. With a dollar stablecoin that is $0.0001 a coin, a $100K market cap from the first minute. The creator, the first buyer and the last buyer all pay the same.</p></div>
       <div class="card"><h2><span>02</span>A reserve nobody can withdraw</h2>
-        <p>The money that buys coins goes into the coin's own contract, in a stablecoin. The contract has no owner and no withdrawal function. It pays sellers by formula, the creator 1% and the launchpad 2%. Nothing else can leave.</p></div>
+        <p>The money that buys coins goes into the coin's own contract, in the network's reserve currency: a dollar stablecoin, or on some networks a stock token. The contract has no owner and no withdrawal function. It pays sellers by formula, the creator 1% and the launchpad 2%. Nothing else can leave.</p></div>
       <div class="card"><h2><span>03</span>A floor covered 100%</h2>
         <p>Every coin that leaves the contract puts one floor price into the reserve, so the reserve can buy back every coin at the floor price at any time.</p>
         <ul><li>Buy with $1,000 and you hold $950 of coins after the buy fee.</li><li>Sell them back at the floor and you receive about $902.</li><li>That 9.75% is the most a sale buyer loses by selling at the floor.</li></ul></div>
@@ -108,9 +110,9 @@
       <div class="card"><h2><span>05</span>After the sale sells out</h2>
         <p>The last 200 million coins trade above the floor. New demand pushes the price up. If buyers leave, the price falls back to the floor and stops there.</p></div>
       <div class="card"><h2><span>06</span>Paying and getting paid</h2>
-        <p>Pay with the stablecoin, or with the network's own currency, which is swapped to the stablecoin on the way in. When you sell, choose either one.</p></div>
+        <p>Pay with the reserve currency, or, where the network has a swap route, with the network's own currency, which is swapped on the way in. When you sell, choose either one.</p></div>
       <div class="card"><h2><span>07</span>What it cannot do</h2>
-        <div class="flag">A buyer who pays more than the floor can lose the difference. A stablecoin can lose its peg or freeze an address. A bug in a contract can lose funds, and nobody can pause or patch a live market. The 2.5% limit is per address. This is a capped loss, never a guarantee.</div></div>
+        <div class="flag">A buyer who pays more than the floor can lose the difference. When the reserve is a stock token, the floor is a number of those tokens, so its dollar value moves with the stock. A stablecoin can lose its peg or freeze an address. A bug in a contract can lose funds, and nobody can pause or patch a live market. The 2.5% limit is per address. This is a capped loss, never a guarantee.</div></div>
     </div>
   </div>
 </section>
@@ -120,9 +122,17 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="vendor/ethers.umd.min.js"></script>
-<script src="deployments.js"></script>
-<script src="config.js"></script>
-<script src="app.js"></script>
+<script>
+/* Load the scripts in order. deployments.js is always fetched fresh, so a newly linked contract shows at once. */
+(function () {
+  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=478cb376", "app.js?v=3206759c"];
+  (function next(i) {
+    if (i >= files.length) return;
+    var s = document.createElement("script");
+    s.src = files[i]; s.onload = s.onerror = function () { next(i + 1); };
+    document.body.appendChild(s);
+  })(0);
+})();
+</script>
 </body>
 </html>

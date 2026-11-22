@@ -7,8 +7,8 @@
 <title>Jisr · صفحة النشر</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=647b0e3b">
 <style>
 body{font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;line-height:1.7}
 .adm{max-width:720px;margin:0 auto;padding:18px 16px 60px;display:grid;gap:14px}
@@ -16,7 +16,7 @@ body{font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahom
 .adm h2{font-size:18px;font-weight:700;margin:0 0 6px}
 .adm p{margin:0 0 8px}
 .adm .muted{color:var(--muted);font-size:14px}
-.adm input[type=text]{width:100%;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:10px 12px;font-family:var(--mono);font-size:13.5px;direction:ltr;text-align:left}
+.adm input[type=text]{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--raise);padding:10px 12px;font-family:var(--mono);font-size:13.5px;direction:ltr;text-align:left}
 .adm textarea{width:100%;min-height:150px;border:1px solid var(--line);border-radius:8px;background:var(--raise);padding:10px 12px;font-family:var(--mono);font-size:12.5px;direction:ltr;text-align:left}
 .adm label{font-size:14px;font-weight:600;display:block;margin:8px 0 4px}
 .adm .ltr{direction:ltr;unicode-bidi:embed;font-family:var(--mono);font-size:13px;overflow-wrap:anywhere}
@@ -42,23 +42,38 @@ body{font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahom
     <div class="kv"><span>الشبكة</span><b id="aNet">—</b></div>
     <div class="kv"><span>الرصيد</span><b class="ltr" id="aBal">—</b></div>
     <div class="row2"><button class="btn primary" id="aConnect">اربط المحفظة</button></div>
-    <p class="muted" style="margin-top:8px">لتغيير الشبكة، غيّرها من داخل المحفظة ثم أعد فتح الصفحة.</p>
+    <p class="muted" style="margin-top:8px">تعمل الصفحة على أي شبكة متوافقة مع إيثيريوم (EVM): إيثيريوم، BNB، Base، Arbitrum، Optimism، Polygon، Avalanche، Robinhood Chain وغيرها. لتغيير الشبكة، غيّرها من داخل المحفظة ثم أعد فتح الصفحة.</p>
+    <div id="aNewNet" hidden>
+      <div class="flag" style="margin-top:8px">هذه الشبكة غير مسمّاة مسبقاً في الموقع. عرّفها هنا لتظهر باسمها للزوار.</div>
+      <label for="aNetName">اسم الشبكة</label>
+      <input type="text" id="aNetName" placeholder="My Network" autocomplete="off">
+      <label for="aNetNative">رمز عملة الشبكة</label>
+      <input type="text" id="aNetNative" placeholder="ETH" autocomplete="off">
+      <label class="check"><input type="checkbox" id="aNetTest"><span>هذه شبكة تجريبية بلا أموال حقيقية</span></label>
+    </div>
   </section>
 
   <section class="card">
     <h2>2. تجربة على شبكة تجريبية</h2>
-    <p>ينشر عملة مستقرة تجريبية، ومحوّل عملات تجريبي، والمصنع. كل شيء بلا قيمة مالية ومخصص للتجربة فقط. يحتاج 3 توقيعات.</p>
-    <div class="row2"><button class="btn primary" id="aTestKit" disabled>انشر العدّة التجريبية</button></div>
-    <p class="muted" style="margin-top:8px">هذا الزر لا يعمل على إيثيريوم أو BNB الحقيقيتين.</p>
+    <p>ينشر عملة احتياط تجريبية، ومحوّل عملات تجريبي، والمصنع. كل شيء بلا قيمة مالية ومخصص للتجربة فقط. يحتاج 3 توقيعات.</p>
+    <div class="row2">
+      <button class="btn primary" id="aTestKit" disabled>انشر العدّة التجريبية (دولار تجريبي)</button>
+      <button class="btn" id="aTestKitStock" disabled>انشر عدّة تجريبية مسعّرة بسهم تجريبي</button>
+    </div>
+    <p class="muted" style="margin-top:8px">هذان الزران يعملان على الشبكات التجريبية فقط.</p>
   </section>
 
   <section class="card">
     <h2>3. نشر المصنع بعناوين حقيقية</h2>
-    <p class="muted">هذه العناوين نهائية ولا يمكن تغييرها بعد النشر، ما عدا محفظة المنصة.</p>
-    <label for="aStable">عنوان العملة المستقرة (USDC أو USDT)</label>
+    <p class="muted">هذه القيم نهائية ولا يمكن تغييرها بعد النشر، ما عدا محفظة المنصة. كل مصنع يسعّر عملاته بعملة احتياط واحدة؛ لعملة ثانية انشر مصنعاً ثانياً.</p>
+    <label for="aStable">عنوان عملة الاحتياط: عملة مستقرة (USDC أو USDT) أو عملة سهم</label>
     <input type="text" id="aStable" placeholder="0x…" autocomplete="off">
-    <label for="aRouter">عنوان محوّل العملات (Uniswap V2 أو PancakeSwap V2)</label>
-    <input type="text" id="aRouter" placeholder="0x…" autocomplete="off">
+    <label for="aCap">القيمة السوقية عند سعر البيع، بعدد وحدات عملة الاحتياط</label>
+    <input type="text" id="aCap" value="100000" inputmode="decimal" autocomplete="off">
+    <p class="muted">للعملة المستقرة اتركها 100000، أي قيمة سوقية 100 ألف دولار. لعملة سهم اكتب عدد الأسهم التي تساوي القيمة التي تريدها: مثلاً 400 إذا كان السهم بـ250 دولاراً.</p>
+    <label for="aRouter">عنوان محوّل العملات من نوع Uniswap V2، اختياري</label>
+    <input type="text" id="aRouter" placeholder="0x… أو اتركه فارغاً" autocomplete="off">
+    <p class="muted">بدونه يكون الشراء والبيع بعملة الاحتياط فقط، دون الدفع بعملة الشبكة.</p>
     <label for="aPlatform">محفظة المنصة، تستلم 2%</label>
     <input type="text" id="aPlatform" placeholder="0x…" autocomplete="off">
     <label for="aOwner">المالك، يستطيع تغيير محفظة المنصة فقط</label>
@@ -97,10 +112,17 @@ body{font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahom
   <p class="muted"><a href="index.html">الرجوع إلى الموقع</a></p>
 </main>
 
-<script src="vendor/ethers.umd.min.js"></script>
-<script src="deployments.js"></script>
-<script src="config.js"></script>
-<script src="contracts.js"></script>
-<script src="admin.js"></script>
+<script>
+/* Load the scripts in order. deployments.js is always fetched fresh, so a newly linked contract shows at once. */
+(function () {
+  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=478cb376", "contracts.js?v=608eda7b", "admin.js?v=bb53b788"];
+  (function next(i) {
+    if (i >= files.length) return;
+    var s = document.createElement("script");
+    s.src = files[i]; s.onload = s.onerror = function () { next(i + 1); };
+    document.body.appendChild(s);
+  })(0);
+})();
+</script>
 </body>
 </html>

@@ -20,16 +20,20 @@ async function reverts(promise, name) {
   throw new Error("expected revert: " + name);
 }
 
-async function setup(decimals) {
+/// `capTokens` is what the whole supply is worth at the sale price, in whole reserve tokens:
+/// 100,000 for a dollar stablecoin, or for example 400 for a stock token worth about $250.
+/// `unit` is then one hundred-thousandth of that: "one dollar's worth" of the reserve token.
+async function setup(decimals, capTokens = 100000n, opts = {}) {
   const signers = await ethers.getSigners();
   const [owner, platform, creator, ...users] = signers;
-  const unit = 10n ** BigInt(decimals); // one dollar
-  const stable = await (await ethers.getContractFactory("MockStable")).deploy(decimals);
+  const cap = capTokens * 10n ** BigInt(decimals);
+  const unit = cap / 100000n;
+  const stable = await (await ethers.getContractFactory("MockStable")).deploy(opts.symbol || "Mock USD", opts.symbol || "mUSD", decimals);
   const weth = ethers.Wallet.createRandom().address;
   const router = await (await ethers.getContractFactory("MockRouter")).deploy(weth, stable.target, 3200n * unit);
   await ethers.provider.send("hardhat_setBalance", [router.target, "0x" + (100000n * E18).toString(16)]);
   const factory = await (await ethers.getContractFactory("LaunchpadFactory")).deploy(
-    stable.target, router.target, platform.address, owner.address
+    stable.target, opts.noRouter ? ethers.ZeroAddress : router.target, platform.address, owner.address, cap
   );
   const tx = await factory.connect(creator).createCoin("Camel Cash", "HUMP", "ipfs://meta");
   const rc = await tx.wait();
@@ -41,7 +45,7 @@ async function setup(decimals) {
     await stable.connect(u).approve(market.target, MAXU);
     await coin.connect(u).approve(market.target, MAXU);
   }
-  return { owner, platform, creator, users, stable, router, factory, coin, market, unit };
+  return { owner, platform, creator, users, stable, router, factory, coin, market, unit, cap, decimals };
 }
 
 /// Every wallet buys 20M coins until the 800M sale is sold out.
@@ -49,10 +53,17 @@ async function sellOut(ctx) {
   for (let i = 0; i < 40; i++) await ctx.market.connect(ctx.users[i]).buy(20n * M, MAXU, FAR);
 }
 
-for (const decimals of [6, 18]) {
-  describe(`CoinMarket with a ${decimals}-decimal stablecoin`, function () {
+const RESERVES = [
+  { label: "a 6-decimal stablecoin", decimals: 6, capTokens: 100000n },
+  { label: "an 18-decimal stablecoin", decimals: 18, capTokens: 100000n },
+  { label: "a stock token (18 decimals, supply priced at 400 tokens)", decimals: 18, capTokens: 400n, opts: { symbol: "mTSLA" } },
+];
+for (const R of RESERVES) {
+  const decimals = R.decimals;
+  const setupR = () => setup(R.decimals, R.capTokens, R.opts);
+  describe(`CoinMarket with ${R.label}`, function () {
     it("launches with the whole supply in the market and no coins for the creator", async function () {
-      const { coin, market, creator, factory, unit } = await setup(decimals);
+      const { coin, market, creator, factory, unit } = await setupR();
       expect(await coin.balanceOf(market.target)).to.equal(1000n * M);
       expect(await coin.balanceOf(creator.address)).to.equal(0n);
       expect(await market.creator()).to.equal(creator.address);
@@ -62,7 +73,7 @@ for (const decimals of [6, 18]) {
     });
 
     it("sells at one fixed price and buys back at that price: $1,000 in, $902.50 out", async function () {
-      const { market, stable, coin, users, unit } = await setup(decimals);
+      const { market, stable, coin, users, unit } = await setupR();
       const [a, b] = users;
       const coins = (95n * M) / 10n; // 9.5M coins = $950 at the sale price
       const before = await stable.balanceOf(a.address);
@@ -83,7 +94,7 @@ for (const decimals of [6, 18]) {
     });
 
     it("enforces the 2.5% wallet limit on buys and on transfers", async function () {
-      const { market, coin, users } = await setup(decimals);
+      const { market, coin, users } = await setupR();
       const [a, b] = users;
       await reverts(market.connect(a).buy(25n * M + 1n, MAXU, FAR), "WalletLimit");
       await market.connect(a).buy(25n * M, MAXU, FAR);
@@ -94,7 +105,7 @@ for (const decimals of [6, 18]) {
     });
 
     it("respects the buyer's price limit and deadline", async function () {
-      const { market, users, unit } = await setup(decimals);
+      const { market, users, unit } = await setupR();
       await reverts(market.connect(users[0]).buy(10n * M, 1000n * unit, FAR), "Slippage");
       await reverts(market.connect(users[0]).buy(10n * M, MAXU, 1n), "Expired");
       await reverts(market.connect(users[0]).buy(0n, MAXU, FAR), "ZeroAmount");
@@ -103,7 +114,7 @@ for (const decimals of [6, 18]) {
     });
 
     it("graduates when the sale sells out, lifts the floor, then prices new coins above it", async function () {
-      const ctx = await setup(decimals);
+      const ctx = await setupR();
       const { market, users, unit } = ctx;
       await sellOut(ctx);
       expect(await market.graduated()).to.equal(true);
@@ -129,7 +140,7 @@ for (const decimals of [6, 18]) {
     });
 
     it("takes ETH or BNB in and pays ETH or BNB out through the swap router", async function () {
-      const { market, coin, users, unit } = await setup(decimals);
+      const { market, coin, users, unit } = await setupR();
       const a = users[0];
       const coins = (95n * M) / 10n; // costs $1,000 = 0.3125 native at the mock rate of $3,200
       const bal0 = await ethers.provider.getBalance(a.address);
@@ -151,7 +162,7 @@ for (const decimals of [6, 18]) {
     });
 
     it("pays fees only to the creator and to the platform wallet", async function () {
-      const { market, stable, factory, owner, platform, creator, users, unit } = await setup(decimals);
+      const { market, stable, factory, owner, platform, creator, users, unit } = await setupR();
       await market.connect(users[0]).buy((95n * M) / 10n, MAXU, FAR);
       await market.connect(users[5]).claimCreatorFees(); // anyone can trigger; the creator is paid
       expect(await stable.balanceOf(creator.address)).to.equal(10n * unit);
@@ -168,7 +179,7 @@ for (const decimals of [6, 18]) {
     });
 
     it("turns stray stablecoins into extra floor reserve", async function () {
-      const ctx = await setup(decimals);
+      const ctx = await setupR();
       const { market, stable, users, unit } = ctx;
       await sellOut(ctx);
       const floor = await market.floorPrice();
@@ -179,7 +190,7 @@ for (const decimals of [6, 18]) {
     });
 
     it("stays fully covered through random trading, and lets every holder exit at the end", async function () {
-      const ctx = await setup(decimals);
+      const ctx = await setupR();
       const { market, coin, stable, users, creator, unit } = ctx;
       let seed = 20261122 + decimals;
       const rnd = () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
@@ -329,6 +340,42 @@ describe("Attacks", function () {
     for (let i = 1; i < 40; i++) await market.connect(users[i]).sell(20n * M, 0n, users[i].address, FAR);
     expect(await market.outstanding()).to.equal(20n * M); // the lost coins stay counted, and stay covered
     gte(await market.floorReserve(), await market.floorLiability());
+  });
+});
+
+describe("Options", function () {
+  it("works without a swap router: reserve-token trading only, native functions switched off", async function () {
+    const { market, coin, users, unit, factory } = await setup(6, 100000n, { noRouter: true });
+    expect(await factory.wrappedNative()).to.equal(ethers.ZeroAddress);
+    const coins = (95n * M) / 10n;
+    await market.connect(users[0]).buy(coins, 1000n * unit, FAR);
+    await reverts(market.connect(users[0]).buyWithNative(coins, FAR, { value: E18 }), "NativeNotSupported");
+    await reverts(market.connect(users[0]).sellForNative(coins, 0n, users[0].address, FAR), "NativeNotSupported");
+    await market.connect(users[0]).sell(coins, 0n, users[0].address, FAR);
+    expect(await coin.balanceOf(users[0].address)).to.equal(0n);
+  });
+
+  it("prices the supply at the market cap it was deployed with", async function () {
+    const stock = await setup(18, 400n, { symbol: "mTSLA" });
+    expect(await stock.factory.saleMarketCap()).to.equal(400n * E18);
+    // all 1B coins at the sale price cost exactly the market cap, before fees
+    expect((1000n * M * (await stock.factory.salePrice())) / 10n ** 36n).to.equal(400n * E18);
+    const q = await stock.market.quoteBuy(25n * M); // 2.5% of supply = 10 tokens, plus the 5% fee
+    expect(q.floorPart).to.equal(10n * E18);
+  });
+
+  it("refuses a market cap that is absurdly small or large, a non-token reserve, and oversized coin details", async function () {
+    const [owner, platform] = await ethers.getSigners();
+    const F = await ethers.getContractFactory("LaunchpadFactory");
+    const stable = await (await ethers.getContractFactory("MockStable")).deploy("Mock USD", "mUSD", 6);
+    await reverts(F.deploy(stable.target, ethers.ZeroAddress, platform.address, owner.address, 999_999n), "BadMarketCap");
+    await reverts(F.deploy(stable.target, ethers.ZeroAddress, platform.address, owner.address, 10n ** 41n), "BadMarketCap");
+    let failed = false;
+    try { await F.deploy(owner.address, ethers.ZeroAddress, platform.address, owner.address, 10n ** 11n); } catch (_) { failed = true; }
+    expect(failed).to.equal(true);
+    const f = await F.deploy(stable.target, ethers.ZeroAddress, platform.address, owner.address, 10n ** 11n);
+    await reverts(f.createCoin("Big", "BIG", "x".repeat(16385)), "BadName");
+    await f.createCoin("Big", "BIG", "x".repeat(16384));
   });
 });
 

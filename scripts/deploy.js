@@ -1,8 +1,11 @@
 // Deploys the LaunchpadFactory on one chain.
 //
-//   STABLE_ADDRESS    the stablecoin every coin on this chain is priced and reserved in (USDC or USDT)
-//   ROUTER_ADDRESS    a Uniswap V2 style router with deep native/stable liquidity
-//                     (Uniswap V2 Router02 on Ethereum, PancakeSwap V2 router on BNB Chain)
+//   STABLE_ADDRESS    the reserve token every coin from this factory is priced and reserved in
+//                     (USDC or USDT; or another plain ERC-20 such as a tokenized stock)
+//   ROUTER_ADDRESS    optional: a Uniswap V2 style router with deep native/reserve liquidity.
+//                     Leave unset to switch native-currency payments off.
+//   SALE_MARKET_CAP   optional: what the whole 1B supply is worth at the sale price, in whole reserve
+//                     tokens. Default 100000 (a $100,000 market cap with a dollar stablecoin).
 //   PLATFORM_WALLET   receives the launchpad's 2% fee; the only wallet the team controls
 //   OWNER_ADDRESS     may change PLATFORM_WALLET and nothing else; use a multisig
 //
@@ -13,17 +16,21 @@
 const { ethers, network } = require("hardhat");
 
 async function main() {
-  const need = ["STABLE_ADDRESS", "ROUTER_ADDRESS", "PLATFORM_WALLET", "OWNER_ADDRESS"];
+  const need = ["STABLE_ADDRESS", "PLATFORM_WALLET", "OWNER_ADDRESS"];
   for (const k of need) {
     if (!ethers.isAddress(process.env[k] || "")) throw new Error(`Set ${k} to a valid address`);
   }
-  const { STABLE_ADDRESS, ROUTER_ADDRESS, PLATFORM_WALLET, OWNER_ADDRESS } = process.env;
+  const { STABLE_ADDRESS, PLATFORM_WALLET, OWNER_ADDRESS } = process.env;
+  const ROUTER_ADDRESS = process.env.ROUTER_ADDRESS || ethers.ZeroAddress;
+  if (!ethers.isAddress(ROUTER_ADDRESS)) throw new Error("ROUTER_ADDRESS is not a valid address");
+  const token = await ethers.getContractAt("IERC20Metadata", STABLE_ADDRESS);
+  const cap = ethers.parseUnits(process.env.SALE_MARKET_CAP || "100000", await token.decimals());
 
   const [deployer] = await ethers.getSigners();
   console.log(`Network ${network.name}, deployer ${deployer.address}`);
 
   const Factory = await ethers.getContractFactory("LaunchpadFactory");
-  const factory = await Factory.deploy(STABLE_ADDRESS, ROUTER_ADDRESS, PLATFORM_WALLET, OWNER_ADDRESS);
+  const factory = await Factory.deploy(STABLE_ADDRESS, ROUTER_ADDRESS, PLATFORM_WALLET, OWNER_ADDRESS, cap);
   await factory.waitForDeployment();
 
   console.log("LaunchpadFactory:", factory.target);

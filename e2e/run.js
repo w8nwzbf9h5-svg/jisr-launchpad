@@ -95,6 +95,7 @@ function waitFor(child, text, ms) {
     const board = await text("#rows");
     assert(board.includes("Camel Cash") && board.includes("Karak Chai"), "board should list the two demo coins");
     assert(board.includes("40% sold") && board.includes("Graduated"), "board should show sale progress and graduation: " + board);
+    assert.equal(await text("#specPrice"), "Fixed, $100.0K market cap");
     step("board lists coins read from the chain");
 
     // 2. Connect the wallet and take test money.
@@ -330,6 +331,43 @@ function waitFor(child, text, ms) {
     await page.waitForFunction(() => document.querySelector("#rows").textContent.includes("No coins yet"));
     assert((await text("#foot")).includes(realFactory));
     step("two currencies on one network: each factory is offered separately with its own coins");
+
+    // 16b. A factory priced in a stock token, with no swap router: deploy it, link it, launch and buy with it.
+    await page.goto(WEB + "/admin.html", { waitUntil: "networkidle0" });
+    await click("#aConnect"); await aStatus("المحفظة مرتبطة");
+    await type("#aStable", dep.stock); await type("#aRouter", ""); await type("#aCap", "400");
+    await click("#aCheck"); await aStatus("العناوين سليمة");
+    const stockCheck = await text("#aCheckOut");
+    assert(stockCheck.includes("mTSLA") && stockCheck.includes("ليست عملة مستقرة") && stockCheck.includes("بدون"), "the check explains a non-dollar reserve and the missing router: " + stockCheck);
+    await click("#aDeploy"); await aStatus("تم نشر المصنع");
+    const stockFactory = await text("#aFactoryOut");
+    const stockF = new ethers.Contract(stockFactory, facAbi, provider);
+    assert.equal(await stockF.saleMarketCap(), 400n * 10n ** 18n);
+    assert.equal(await stockF.router(), ethers.ZeroAddress);
+    fs.writeFileSync(DEPLOYMENTS, await page.$eval("#aOut", (el) => el.value));
+    const stockToken = new ethers.Contract(dep.stock, require(path.join(ROOT, "artifacts/contracts/mocks/MockStable.sol/MockStable.json")).abi, await provider.getSigner(accounts[0]));
+    await (await stockToken.mint(account, 1000n * 10n ** 18n)).wait();
+    await page.goto(WEB + "/#board", { waitUntil: "networkidle0" });
+    await page.waitForFunction(() => document.querySelectorAll("#netSel option").length === 3);
+    await page.select("#netSel", "31337:2");
+    await page.waitForFunction(() => document.querySelector("#specPrice").textContent.includes("mTSLA"));
+    assert.equal(await text("#specPrice"), "Fixed, 400 mTSLA market cap");
+    assert.equal(await text("#specPay"), "mTSLA", "no native currency without a router");
+    await click("#walletBtn");
+    await page.waitForFunction(() => document.querySelector("#walletTxt").textContent.includes("0x"));
+    await click("#nav-launch");
+    assert((await text("#lNetHint")).includes("not a dollar stablecoin"));
+    await type("#lName", "Stock Coin"); await type("#lTicker", "STK");
+    await hush(); await click("#launchBtn"); await toast("is live"); await settle();
+    assert.equal(await page.$("[data-act=payWith][data-v=native]"), null, "the native option is hidden");
+    await type("#buyAmt", "4"); await quoteReady();
+    const stockQuote = await text("#quote");
+    assert(stockQuote.includes("9.50M STK") && stockQuote.includes("mTSLA") && !stockQuote.includes("$"), "quotes are in the stock token: " + stockQuote);
+    await hush(); await click("#goBtn"); await toast("Bought"); await settle();
+    const stockMarket = new ethers.Contract(await stockF.marketOf(await stockF.coins(0)), art("CoinMarket"), provider);
+    assert(near(await stockMarket.floorReserve(), 388n * 10n ** 16n, 10n ** 10n), "4 mTSLA in: 3.8 for coins plus 0.08 kept, held as mTSLA");
+    await page.screenshot({ path: path.join(__dirname, "stock.png"), fullPage: true });
+    step("a factory priced in a stock token with no router: deploys, links, launches and trades in that token");
 
     // 16. Paste the snippet into deployments.js and the public site is linked to the new factory.
     fs.writeFileSync(DEPLOYMENTS, "window.JISR_DEPLOYMENTS = " + JSON.stringify({ 31337: { factory: dep.factory, faucet: true } }) + ";\n");

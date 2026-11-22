@@ -6,11 +6,12 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "e2e": "hardhat compile && node scripts/export-web.js && node e2e/run.js",
+    "e2e": "hardhat compile && node scripts/export-web.js && node scripts/stamp-web.js && node e2e/run.js",
     "chain": "hardhat node",
     "demo:deploy": "hardhat run scripts/local-demo.js --network localhost",
     "web": "node scripts/serve.js",
-    "web:artifacts": "hardhat compile && node scripts/export-web.js"
+    "web:artifacts": "hardhat compile && node scripts/export-web.js && node scripts/stamp-web.js",
+    "web:stamp": "node scripts/stamp-web.js"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.8",

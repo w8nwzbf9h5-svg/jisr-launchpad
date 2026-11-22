@@ -18,6 +18,7 @@
     "function router() view returns (address)",
     "function wrappedNative() view returns (address)",
     "function platformWallet() view returns (address)",
+    "function saleMarketCap() view returns (uint256)",
     "function createCoin(string name, string symbol, string metadataURI) returns (address coin, address market)",
     "event CoinCreated(address indexed creator, address indexed coin, address indexed market, string name, string symbol, string metadataURI)",
     "error BadName()"
@@ -44,7 +45,7 @@
     "event Bought(address indexed buyer, uint256 coins, uint256 stablePaid, bool paidInNative)",
     "event Sold(address indexed seller, address indexed to, uint256 coins, uint256 stableOut, bool paidInNative)",
     "error ZeroAmount()", "error Expired()", "error Slippage()", "error SoldOut()", "error NotOutstanding()",
-    "error ShortPayment()", "error RefundFailed()", "error OnlyRouter()", "error WalletLimit()"
+    "error ShortPayment()", "error RefundFailed()", "error OnlyRouter()", "error WalletLimit()", "error NativeNotSupported()"
   ];
   const COIN_ABI = [
     "function name() view returns (string)",
@@ -76,7 +77,8 @@
     ShortPayment: "The payment arrived short. Nothing was bought.",
     BadName: "The name needs 2 to 32 characters and the ticker 2 to 10.",
     NotOutstanding: "Those coins cannot be sold here.",
-    RefundFailed: "Your wallet refused the refund of unused funds."
+    RefundFailed: "Your wallet refused the refund of unused funds.",
+    NativeNotSupported: "This network has no swap route, so pay and receive in the reserve currency."
   };
 
   /* ---------- pricing, mirrored from CoinMarket.sol so quotes need one read ---------- */
@@ -134,8 +136,19 @@
 
   /* ---------- formatting ---------- */
   const usdNum = v => Number(ethers.formatUnits(v, S.stable.dec));
+  function fQuote(n) {
+    const a = Math.abs(n); let t;
+    if (a === 0) t = "0";
+    else if (a >= 1e6) t = (n / 1e6).toFixed(2) + "M";
+    else if (a >= 1e4) t = (n / 1e3).toFixed(1) + "K";
+    else if (a >= 1) t = n.toLocaleString("en-US", { maximumFractionDigits: 2 });
+    else t = String(Number(n.toPrecision(3)));
+    return t + " " + S.stable.symbol;
+  }
+  /* A value in the reserve currency: "$1,234" for a dollar stablecoin, "4.2 mTSLA" for anything else. */
   function fUsd(v) {
     const n = typeof v === "bigint" ? usdNum(v) : v, a = Math.abs(n);
+    if (S.stable && !S.stable.isUsd) return fQuote(n);
     if (a < 0.005) return "$0";
     if (a >= 1e6) return "$" + (n / 1e6).toFixed(2) + "M";
     if (a >= 1e4) return "$" + (n / 1e3).toFixed(1) + "K";
@@ -143,7 +156,10 @@
     return "$" + n.toFixed(2);
   }
   const priceNum = p => Number(ethers.formatUnits(p, 18 + S.stable.dec));
-  function fPrice(p) { const n = priceNum(p); const d = Math.max(2, Math.ceil(-Math.log10(n)) + 3); return "$" + n.toFixed(Math.min(12, d)); }
+  function fPrice(p) {
+    const n = priceNum(p), d = Math.max(2, Math.ceil(-Math.log10(n)) + 2), t = n.toFixed(Math.min(14, d));
+    return S.stable && !S.stable.isUsd ? t + " " + S.stable.symbol : "$" + t;
+  }
   function fTok(v) {
     const n = Number(ethers.formatUnits(v, 18));
     if (n >= 1e9) return (n / 1e9).toFixed(2) + "B";
@@ -254,16 +270,22 @@
     S.board = []; S.m = null; S.signer = null;
     if (!S.ro) { strip("Connect a wallet on " + S.cfg.name + " to load this network."); renderAll(); return; }
     S.factory = new ethers.Contract(S.cfg.factory, FACTORY_ABI, S.ro);
-    const [stableAddr, routerAddr, weth] = await Promise.all([S.factory.stable(), S.factory.router(), S.factory.wrappedNative()]);
+    const [stableAddr, routerAddr, weth, cap] = await Promise.all([S.factory.stable(), S.factory.router(), S.factory.wrappedNative(), S.factory.saleMarketCap()]);
     const st = new ethers.Contract(stableAddr, ERC20_ABI, S.ro);
     const [symbol, dec] = await Promise.all([st.symbol(), st.decimals()]);
-    S.stable = { addr: stableAddr, symbol, dec: Number(dec), c: st };
-    S.router = new ethers.Contract(routerAddr, ROUTER_ABI, S.ro); S.weth = weth;
-    $("#specPay").textContent = symbol + " or " + S.cfg.native;
+    S.stable = { addr: stableAddr, symbol, dec: Number(dec), c: st, isUsd: /usd|dai/i.test(symbol) };
+    S.hasNative = routerAddr !== ethers.ZeroAddress && weth !== ethers.ZeroAddress;
+    S.router = S.hasNative ? new ethers.Contract(routerAddr, ROUTER_ABI, S.ro) : null; S.weth = weth;
+    if (!S.hasNative) { S.payWith = "stable"; S.recvIn = "stable"; }
+    $("#specPrice").textContent = "Fixed, " + fUsd(cap) + " market cap";
+    $("#specPay").textContent = S.hasNative ? symbol + " or " + S.cfg.native : symbol;
     $("#specNet").textContent = "On " + S.cfg.name;
+    $("#tPrice").textContent = fPrice(cap * 10n ** 9n);
+    $("#tCap").textContent = fUsd(cap);
     setLabel(S.marketKey, S.cfg.name + " · " + symbol);
     $("#lNet").value = S.marketKey; $("#netSel").value = S.marketKey;
-    $("#lNetHint").textContent = "This coin will live on " + S.cfg.name + " only, priced and reserved in " + symbol + ".";
+    $("#lNetHint").textContent = "This coin will live on " + S.cfg.name + " only, priced and reserved in " + symbol + "." +
+      (S.stable.isUsd ? "" : " " + symbol + " is not a dollar stablecoin: the floor is a number of " + symbol + ", so its dollar value moves with it.");
     if (S.account) await bindSigner();
     strip(S.cfg.test ? "Test network. Coins and money here have no value." : "");
     await refresh();
@@ -420,6 +442,7 @@
           '<div class="kv"><span>Needed to buy back every coin</span><b class="num">' + fUsd(m.liability) + "</b></div>" +
           '<div class="kv"><span>Cover</span><b class="num">' + (cover === null ? "No coins sold yet" : Math.floor(cover * 10) / 10 + "%") + "</b></div>" +
           '<div class="kv"><span>Floor price</span><b class="num">' + fPrice(m.floorPrice) + (rise > 0.005 ? " · up " + rise.toFixed(2) + "%" : "") + "</b></div>" +
+          (S.stable.isUsd ? "" : '<div class="flag">Priced in ' + esc(S.stable.symbol) + ", not in dollars. The floor is a number of " + esc(S.stable.symbol) + ", so its dollar value moves with it.</div>") +
           '<p class="note">The contract that holds this reserve has no owner and no withdrawal function. <span class="addr">' + esc(m.marketAddr) + "</span></p></div></div>" +
         '<div class="card"><span class="label">Fees waiting to be paid out</span>' +
           '<div class="kv"><span>Creator, 1%</span><b class="num">' + fUsd(m.creatorFees) + "</b></div>" +
@@ -434,7 +457,7 @@
     renderTrade();
   }
   function payChips(act, sel) {
-    return [["stable", S.stable.symbol], ["native", S.cfg.native]].map(([v, l]) => '<button class="chip" data-act="' + act + '" data-v="' + v + '" aria-pressed="' + (sel === v) + '">' + esc(l) + "</button>").join("");
+    return [["stable", S.stable.symbol]].concat(S.hasNative ? [["native", S.cfg.native]] : []).map(([v, l]) => '<button class="chip" data-act="' + act + '" data-v="' + v + '" aria-pressed="' + (sel === v) + '">' + esc(l) + "</button>").join("");
   }
   function renderTrade() {
     const m = S.m, el = $("#trade"); if (!m || !el) return;

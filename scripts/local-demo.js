@@ -15,13 +15,17 @@ async function main() {
   const [owner, platform, creator] = signers;
   const unit = 10n ** 6n;
 
-  const stable = await (await ethers.getContractFactory("MockStable")).deploy(6);
+  const stable = await (await ethers.getContractFactory("MockStable")).deploy("Mock USD", "mUSD", 6);
   await stable.waitForDeployment();
   const weth = ethers.Wallet.createRandom().address;
   const router = await (await ethers.getContractFactory("MockRouter")).deploy(weth, stable.target, 3200n * unit);
   await router.waitForDeployment();
   await (await owner.sendTransaction({ to: router.target, value: 50_000n * E18 })).wait();
-  const factory = await (await ethers.getContractFactory("LaunchpadFactory")).deploy(stable.target, router.target, platform.address, owner.address);
+  const factory = await (await ethers.getContractFactory("LaunchpadFactory")).deploy(stable.target, router.target, platform.address, owner.address, 100000n * unit);
+  await factory.waitForDeployment();
+  // a second reserve token that stands in for a tokenized stock, for the "priced in a stock" tests
+  const stock = await (await ethers.getContractFactory("MockStable")).deploy("Mock Tesla Stock", "mTSLA", 18);
+  await stock.waitForDeployment();
   await factory.waitForDeployment();
 
   async function launch(name, symbol) {
@@ -47,7 +51,7 @@ async function main() {
   const out = { [chainId]: { factory: factory.target, faucet: true } };
   const file = path.join(__dirname, "..", "web", "deployments.js");
   fs.writeFileSync(file, "// Written by scripts/local-demo.js. Maps a chain id to the LaunchpadFactory deployed there.\nwindow.JISR_DEPLOYMENTS = " + JSON.stringify(out, null, 2) + ";\n");
-  console.log(JSON.stringify({ network: network.name, chainId, factory: factory.target, stable: stable.target, router: router.target, coins: [a.coin.target, b.coin.target] }));
+  console.log(JSON.stringify({ network: network.name, chainId, factory: factory.target, stable: stable.target, router: router.target, coins: [a.coin.target, b.coin.target], stock: stock.target }));
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
