@@ -75,6 +75,7 @@ body{font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahom
     <label for="aRpc">رابط قراءة للشبكة (RPC)، اختياري لكنه مهم</label>
     <input type="text" id="aRpc" placeholder="https://…" autocomplete="off">
     <p class="muted">بدونه لا تظهر العملات للزائر إلا بعد ربط محفظته. خذه من مزوّد RPC باسم حسابك.</p>
+    <label class="check" id="aReplaceWrap" hidden><input type="checkbox" id="aReplace"><span>هذه الشبكة مربوطة بمصنع سابق. بدون تعليم هذا المربع يُضاف المصنع الجديد بجانبه كعملة ثانية على نفس الشبكة. علّم المربع لاستبدال المصنع السابق.</span></label>
     <label for="aOut">انسخ هذا النص كاملاً وضعه مكان محتوى الملف deployments.js</label>
     <textarea id="aOut" readonly></textarea>
     <div class="row2"><button class="btn primary" id="aCopy">انسخ النص</button></div>

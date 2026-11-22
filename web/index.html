@@ -56,12 +56,21 @@
 <section id="v-launch" hidden>
   <div class="page">
     <h1>Launch a coin</h1>
-    <p>Every coin launches on the same terms, so buyers know what they are getting. You choose the name and the ticker. Launching sends one transaction from your wallet.</p>
+    <p>Every coin launches on the same terms, so buyers know what they are getting. You choose the network, the name, the picture and the links. Launching sends one transaction from your wallet.</p>
     <div class="lgrid">
       <form class="form card" id="launchForm" novalidate>
         <div class="field"><label for="lName">Coin name</label><input type="text" id="lName" maxlength="32" placeholder="Desert Rocket" autocomplete="off"></div>
         <div class="field"><label for="lTicker">Ticker</label><input type="text" id="lTicker" maxlength="10" placeholder="DRKT" autocomplete="off" style="text-transform:uppercase;font-family:var(--mono)"></div>
-        <div class="field"><label for="lUri">Link to its picture or details, optional</label><input type="text" id="lUri" maxlength="200" placeholder="https://… or ipfs://…" autocomplete="off"></div>
+        <div class="field"><label for="lNet">Network and currency</label><select id="lNet" class="netsel" style="max-width:none;border-radius:8px;padding:10px 12px"></select><div class="hint" id="lNetHint"></div></div>
+        <div class="field"><label for="lImgFile">Picture, optional</label>
+          <input type="file" id="lImgFile" accept="image/png,image/jpeg,image/webp">
+          <div id="lImgPrev" class="imgprev"></div>
+          <input type="text" id="lImgUrl" maxlength="300" placeholder="or paste a picture link: https://…" autocomplete="off">
+          <div class="hint">A photo is shrunk to a small square and stored on the network with the coin, which adds to the launch fee. A link costs almost nothing.</div></div>
+        <div class="field"><label for="lDesc">Description, optional</label><textarea id="lDesc" maxlength="280" placeholder="What is this coin about?"></textarea></div>
+        <div class="field"><label for="l-x">X (Twitter) link, optional</label><input type="text" id="l-x" maxlength="200" placeholder="https://x.com/yourcoin" autocomplete="off"></div>
+        <div class="field"><label for="l-telegram">Telegram link, optional</label><input type="text" id="l-telegram" maxlength="200" placeholder="https://t.me/yourcoin" autocomplete="off"></div>
+        <div class="field"><label for="l-website">Website, optional</label><input type="text" id="l-website" maxlength="200" placeholder="https://yourcoin.com" autocomplete="off"></div>
         <div class="err" id="lErr" role="alert"></div>
         <button class="btn primary wide" type="submit" id="launchBtn">Launch the coin</button>
         <div class="hint">You pay the network fee for one transaction. You receive no coins: you buy at the sale price like everyone else.</div>

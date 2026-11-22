@@ -99,7 +99,11 @@ Measured locally: factory deployment 3.63M gas, `createCoin` 548K, `buy` 231K, `
 
 `web/` is a static site: `index.html`, `app.js`, `styles.css`, the ethers library, and two small config files. It reads everything from the chain and keeps nothing on a server. Host the folder on any static host.
 
-It does: connect a wallet, list coins, show a coin's price, floor and reserve cover, buy with the stablecoin or the native currency, sell into either, launch a coin, and pay out creator and launchpad fees. Quotes are computed in the page with the same formulas as the contract; the browser test checks they match the contract to the last unit.
+It does: connect a wallet, list coins, show a coin's price, floor and reserve cover, buy with the stablecoin or the native currency, sell into either, launch a coin, and pay out creator and launchpad fees.
+
+**Coin details.** When launching, the creator picks the network and currency and can add a photo, a description and X, Telegram and website links. They are stored on-chain with the coin as a small JSON text, so there is no server and no upload service. A photo is shrunk in the browser to a small square first. Because anyone can launch a coin with any text, the app treats what it reads back as untrusted: text is escaped, pictures must be https links or small PNG/JPEG/WebP data, links must be https and on the expected site.
+
+**Several currencies on one network.** Each factory prices coins in one stablecoin. To offer a second currency on a network, deploy a second factory; the deploy page adds it beside the first (`extraFactories` in `web/deployments.js`) and the app lists each as its own choice. Quotes are computed in the page with the same formulas as the contract; the browser test checks they match the contract to the last unit.
 
 ### Try it on your own computer
 
@@ -118,7 +122,7 @@ In your wallet, add the network `http://127.0.0.1:8545` (chain id 31337) and imp
 npm run e2e
 ```
 
-Starts a local chain, deploys, serves the app, and drives it in headless Chrome with a stand-in wallet. 16 steps, the last four on the deploy page (deploy the test kit, check and deploy with chosen addresses, change the platform wallet, paste the snippet and trade on the newly linked site). The first twelve: the board loads, the wallet connects, a coin is launched, bought with the stablecoin and with the native currency, sold into both, fees are paid out, the wallet limit trims a large buy, a graduated coin trades above its floor. After each step the test reads the chain and compares.
+Starts a local chain, deploys, serves the app, and drives it in headless Chrome with a stand-in wallet. 19 steps. They cover launching with a photo, description and social links, hostile coin details that must not inject anything into the page, trading, fees, and the deploy page (deploy the test kit, check and deploy with chosen addresses, change the platform wallet, offer two currencies on one network, paste the snippet and trade on the newly linked site). The trading steps: the board loads, the wallet connects, a coin is launched, bought with the stablecoin and with the native currency, sold into both, fees are paid out, the wallet limit trims a large buy, a graduated coin trades above its floor. After each step the test reads the chain and compares.
 
 ### Putting it on a testnet, then a mainnet
 

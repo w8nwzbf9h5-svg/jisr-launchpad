@@ -225,3 +225,14 @@ footer{color:var(--muted);font-size:13px;padding:26px 0 40px}
 .empty{padding:22px 14px;color:var(--muted)}
 .linkbtn{background:none;border:0;padding:0;color:var(--accent);font-weight:600;text-decoration:underline}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+
+/* coin pictures, description and links */
+.ava{overflow:hidden}
+.ava img{width:100%;height:100%;object-fit:cover;display:block}
+.ava.big{width:72px;height:72px}
+.about{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;display:grid;gap:8px}
+.about p{margin:0;overflow-wrap:anywhere}
+.about a.chip{text-decoration:none;color:var(--ink)}
+.imgprev{display:flex;gap:12px;align-items:center}
+.imgprev:empty{display:none}
+.form input[type=file]{font-size:14px}

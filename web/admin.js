@@ -77,7 +77,16 @@
   }
   function writeSnippet() {
     const cur = JSON.parse(JSON.stringify(window.JISR_DEPLOYMENTS || {}));
-    const entry = Object.assign({}, cur[S.chainId], { factory: S.factoryOut });
+    const prev = cur[S.chainId] || {}, entry = Object.assign({}, prev);
+    const hasOther = ethers.isAddress(prev.factory || "") && prev.factory.toLowerCase() !== S.factoryOut.toLowerCase();
+    $("aReplaceWrap").hidden = !hasOther;
+    if (hasOther && !$("aReplace").checked) {
+      // keep the factory already linked and add this one beside it, as another currency on the same network
+      entry.extraFactories = (prev.extraFactories || []).filter((f) => f.toLowerCase() !== S.factoryOut.toLowerCase()).concat([S.factoryOut]);
+    } else {
+      entry.factory = S.factoryOut;
+      if (entry.extraFactories) entry.extraFactories = entry.extraFactories.filter((f) => f.toLowerCase() !== S.factoryOut.toLowerCase());
+    }
     if (S.testKit) entry.faucet = true; else delete entry.faucet;
     const rpc = val("aRpc");
     if (/^https?:\/\//.test(rpc)) entry.rpcUrl = rpc;
@@ -161,6 +170,7 @@
   $("aLoad").addEventListener("click", load);
   $("aSetWallet").addEventListener("click", setWallet);
   $("aRpc").addEventListener("input", writeSnippet);
+  $("aReplace").addEventListener("change", writeSnippet);
   ["aStable", "aRouter", "aPlatform", "aOwner"].forEach((id) => $(id).addEventListener("input", () => { S.checked = null; $("aCheckOut").innerHTML = ""; sync(); }));
   $("aCopy").addEventListener("click", async () => {
     try { await navigator.clipboard.writeText($("aOut").value); status("تم نسخ النص.", "good"); }

@@ -14,6 +14,20 @@ const RPC = "http://127.0.0.1:8545", WEB = "http://127.0.0.1:4173";
 const E18 = 10n ** 18n, M = 1_000_000n * E18;
 const DEPLOYMENTS = path.join(ROOT, "web", "deployments.js");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const zlib = require("zlib");
+const os = require("os");
+/** A real 300x180 PNG (orange with a blue square), written to a temp file for the upload test. */
+function makePng() {
+  const w = 300, h = 180, raw = Buffer.alloc((w * 4 + 1) * h);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const o = y * (w * 4 + 1) + 1 + x * 4, blue = x > 110 && x < 190 && y > 50 && y < 130;
+    raw[o] = blue ? 39 : 242; raw[o + 1] = blue ? 66 : 89; raw[o + 2] = blue ? 245 : 13; raw[o + 3] = 255;
+  }
+  const chunk = (type, data) => { const len = Buffer.alloc(4); len.writeUInt32BE(data.length); const td = Buffer.concat([Buffer.from(type), data]); const crc = Buffer.alloc(4); crc.writeUInt32BE(zlib.crc32(td) >>> 0); return Buffer.concat([len, td, crc]); };
+  const ihdr = Buffer.alloc(13); ihdr.writeUInt32BE(w, 0); ihdr.writeUInt32BE(h, 4); ihdr[8] = 8; ihdr[9] = 6;
+  const png = Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk("IHDR", ihdr), chunk("IDAT", zlib.deflateSync(raw)), chunk("IEND", Buffer.alloc(0))]);
+  const file = path.join(os.tmpdir(), "jisr-e2e-coin.png"); fs.writeFileSync(file, png); return file;
+}
 const near = (a, b, tol) => (a > b ? a - b : b - a) <= tol;
 
 function waitFor(child, text, ms) {
@@ -94,6 +108,18 @@ function waitFor(child, text, ms) {
     // 3. Launch a coin.
     await click("#nav-launch");
     await type("#lName", "E2E Coin"); await type("#lTicker", "e2e");
+    assert((await text("#lNetHint")).includes("Local test chain") && (await text("#lNetHint")).includes("mUSD"), "the form says which network and currency the coin gets");
+    // links that are not what they claim are refused before anything is sent
+    await type("#l-x", "https://evil.example/yourcoin"); await click("#launchBtn");
+    await page.waitForFunction(() => document.querySelector("#lErr").textContent.includes("X link is not valid"));
+    await type("#l-x", "x.com/e2ecoin");
+    await type("#l-website", "javascript:alert(1)"); await click("#launchBtn");
+    await page.waitForFunction(() => document.querySelector("#lErr").textContent.includes("Website link is not valid"));
+    await type("#l-website", "https://e2ecoin.example");
+    await type("#l-telegram", "https://t.me/e2ecoin");
+    await type("#lDesc", "A coin launched by the browser test.");
+    await (await page.$("#lImgFile")).uploadFile(makePng());
+    await page.waitForSelector("#lImgPrev img");
     await hush(); await click("#launchBtn");
     await toast("is live"); await settle();
     await page.waitForFunction(() => { const h = document.querySelector("#v-coin h1"); return h && h.textContent === "E2E Coin"; });
@@ -103,6 +129,41 @@ function waitFor(child, text, ms) {
     assert.equal(await market.creator(), account);
     assert.equal(await coin.balanceOf(account), 0n, "the creator gets no coins");
     step("launching a coin creates it on chain with no coins for the creator");
+
+    // 3b. Picture, description and links are stored with the coin and shown on its page.
+    const meta = JSON.parse(await coin.metadataURI());
+    assert.equal(meta.description, "A coin launched by the browser test.");
+    assert.equal(meta.x, "https://x.com/e2ecoin");
+    assert.equal(meta.telegram, "https://t.me/e2ecoin");
+    assert.equal(meta.website, "https://e2ecoin.example/");
+    assert(/^data:image\/(webp|jpeg);base64,/.test(meta.image) && meta.image.length < 9500, "the photo was shrunk to a small picture: " + meta.image.length + " chars");
+    assert.equal(await page.$eval(".chead .ava img", (el) => el.getAttribute("src")), meta.image);
+    assert.equal(await text("#cDesc"), "A coin launched by the browser test.");
+    const hrefs = await page.$$eval("#cLinks a", (els) => els.map((a) => a.getAttribute("href") + "|" + a.getAttribute("rel")));
+    assert.deepEqual(hrefs, ["https://x.com/e2ecoin|noopener noreferrer nofollow", "https://t.me/e2ecoin|noopener noreferrer nofollow", "https://e2ecoin.example/|noopener noreferrer nofollow"]);
+    step("picture upload, description and social links are saved with the coin and shown (photo " + meta.image.length + " chars)");
+
+    // 3c. A coin launched outside the app with hostile details cannot inject anything into the page.
+    const attacker = await provider.getSigner(accounts[8]);
+    const evil = JSON.stringify({ description: '<img src=x onerror="window.__pwned=1"><script>window.__pwned=1</script>', image: "data:image/svg+xml;base64,PHN2ZyBvbmxvYWQ9IndpbmRvdy5fX3B3bmVkPTEiLz4=", x: "javascript:window.__pwned=1", telegram: "https://t.me.evil.example/x", website: "http://insecure.example" });
+    await (await factory.connect(attacker).createCoin("<b id=inj>Evil</b><script>", "EVIL", evil)).wait();
+    const evilCoin = await factory.coins(Number(await factory.coinCount()) - 1);
+    await page.goto(WEB + "/#coin-" + evilCoin, { waitUntil: "networkidle0" });
+    await page.waitForFunction(() => { const h = document.querySelector("#v-coin h1"); return h && h.textContent.includes("Evil"); });
+    assert.equal(await page.evaluate(() => window.__pwned), undefined, "hostile coin details must not run");
+    assert.equal(await page.$("#v-coin h1 b"), null, "the name is shown as text, not as markup");
+    assert.equal(await page.$("#cLinks"), null, "bad links are dropped");
+    assert.equal(await page.$(".chead .ava img"), null, "an SVG picture is refused");
+    assert((await text("#cDesc")).includes("<img src=x"), "the description is shown as plain text");
+    await page.goto(WEB + "/#board", { waitUntil: "networkidle0" });
+    await page.waitForSelector("#rows .row");
+    assert.equal(await page.evaluate(() => window.__pwned), undefined);
+    await page.goto(WEB + "/#coin-" + coinAddr, { waitUntil: "networkidle0" });
+    await page.waitForFunction(() => { const h = document.querySelector("#v-coin h1"); return h && h.textContent === "E2E Coin"; });
+    await click("#walletBtn");
+    await page.waitForFunction(() => document.querySelector("#walletTxt").textContent.includes("0x"));
+    await settle();
+    step("hostile coin details from another launcher are shown as plain text and cannot inject anything");
 
     // 4. Buy with the stablecoin: $1,000 buys 9.5M coins.
     await type("#buyAmt", "1000"); await quoteReady();
@@ -221,8 +282,11 @@ function waitFor(child, text, ms) {
     assert((await text("#aNet")).includes("31337"));
     await click("#aTestKit"); await aStatus("تم نشر العدّة التجريبية");
     const kitSnippet = await page.$eval("#aOut", (el) => el.value);
-    const kitFactory = kitSnippet.match(/"factory": "(0x[0-9a-fA-F]{40})"/)[1];
-    assert(kitSnippet.includes('"faucet": true'), "the test kit snippet turns the faucet on");
+    const kitFactory = await text("#aFactoryOut");
+    const kitObj = JSON.parse(kitSnippet.split("window.JISR_DEPLOYMENTS =")[1].replace(/;\s*$/, ""));
+    assert.equal(kitObj["31337"].factory, dep.factory, "the factory already linked is kept");
+    assert.deepEqual(kitObj["31337"].extraFactories, [kitFactory], "the new one is added beside it as another currency");
+    assert.equal(kitObj["31337"].faucet, true, "the test kit snippet turns the faucet on");
     const kit = new ethers.Contract(kitFactory, facAbi, provider);
     assert.equal(await kit.owner(), account);
     assert.equal(await kit.platformWallet(), account);
@@ -252,23 +316,48 @@ function waitFor(child, text, ms) {
     assert.equal(await real.platformWallet(), newWallet);
     step("deploy page: the owner changes the platform wallet");
 
+    // 16a. Two currencies on one network: the site offers each factory separately, with its own coins.
+    const both = await page.$eval("#aOut", (el) => el.value);
+    const bothObj = JSON.parse(both.split("window.JISR_DEPLOYMENTS =")[1].replace(/;\s*$/, ""));
+    assert.equal(bothObj["31337"].factory, dep.factory);
+    assert.deepEqual(bothObj["31337"].extraFactories, [realFactory]);
+    fs.writeFileSync(DEPLOYMENTS, both);
+    await page.goto(WEB + "/#board", { waitUntil: "networkidle0" });
+    await page.waitForSelector("#rows .row");
+    assert.equal(await page.$$eval("#netSel option", (o) => o.length), 2, "both factories are offered in the menu");
+    assert((await text("#rows")).includes("Camel Cash"), "the first currency shows its own coins");
+    await page.select("#netSel", "31337:1");
+    await page.waitForFunction(() => document.querySelector("#rows").textContent.includes("No coins yet"));
+    assert((await text("#foot")).includes(realFactory));
+    step("two currencies on one network: each factory is offered separately with its own coins");
+
     // 16. Paste the snippet into deployments.js and the public site is linked to the new factory.
-    await type("#aFactory", realFactory);
+    fs.writeFileSync(DEPLOYMENTS, "window.JISR_DEPLOYMENTS = " + JSON.stringify({ 31337: { factory: dep.factory, faucet: true } }) + ";\n");
+    await page.goto(WEB + "/admin.html", { waitUntil: "networkidle0" });
+    await click("#aConnect"); await aStatus("المحفظة مرتبطة");
+    await type("#aStable", dep.stable); await type("#aRouter", dep.router);
+    await click("#aCheck"); await aStatus("العناوين سليمة");
+    await click("#aDeploy"); await aStatus("تم نشر المصنع");
+    const realFactory2 = await text("#aFactoryOut");
+    await click("#aReplace");
     const snippet = await page.$eval("#aOut", (el) => el.value);
-    assert(snippet.includes(realFactory));
+    const replaced = JSON.parse(snippet.split("window.JISR_DEPLOYMENTS =")[1].replace(/;\s*$/, ""));
+    assert.equal(replaced["31337"].factory, realFactory2, "ticking replace makes the new factory the linked one");
+    assert.equal(replaced["31337"].extraFactories, undefined);
     fs.writeFileSync(DEPLOYMENTS, snippet);
     await page.goto(WEB + "/#board", { waitUntil: "networkidle0" });
     await page.waitForFunction(() => document.querySelector("#rows").textContent.includes("No coins yet"));
-    assert((await text("#foot")).includes(realFactory), "the site now points at the new factory");
+    assert((await text("#foot")).includes(realFactory2), "the site now points at the new factory");
     await click("#walletBtn");
     await page.waitForFunction(() => document.querySelector("#walletTxt").textContent.includes("0x"));
     await click("#nav-launch");
     await type("#lName", "Linked Coin"); await type("#lTicker", "LINK2");
     await hush(); await click("#launchBtn"); await toast("is live"); await settle();
-    assert.equal(Number(await real.coinCount()), 1);
+    const real2 = new ethers.Contract(realFactory2, facAbi, provider);
+    assert.equal(Number(await real2.coinCount()), 1);
     await type("#buyAmt", "100"); await quoteReady();
     await hush(); await click("#goBtn"); await toast("Bought"); await settle();
-    const linkedMarket = new ethers.Contract(await real.marketOf(await real.coins(0)), art("CoinMarket"), provider);
+    const linkedMarket = new ethers.Contract(await real2.marketOf(await real2.coins(0)), art("CoinMarket"), provider);
     assert.equal(await linkedMarket.floorReserve(), 97n * 10n ** 6n);
     await page.goto(WEB + "/admin.html", { waitUntil: "networkidle0" });
     await page.setViewport({ width: 390, height: 844 });

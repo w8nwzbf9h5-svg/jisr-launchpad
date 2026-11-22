@@ -155,6 +155,63 @@
   function fStable(v) { return usdNum(v).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " " + S.stable.symbol; }
   const mcap = p => priceNum(p) * 1e9;
 
+  /* ---------- coin details stored with the coin ----------
+     The contract keeps one text field per coin. The app writes a small JSON object into it: description,
+     picture and links. Anyone can launch a coin, so everything read back is treated as untrusted:
+     text is escaped, pictures must be https links or small PNG/JPEG/WebP data, links must be https. */
+  const MAX_IMAGE_CHARS = 24000;
+  function cleanImage(v) {
+    if (typeof v !== "string") return "";
+    if (/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(v) && v.length <= MAX_IMAGE_CHARS) return v;
+    if (/^https:\/\/[^\s"'<>]{4,300}$/.test(v)) return v;
+    return "";
+  }
+  function cleanLink(v, hosts) {
+    if (typeof v !== "string") return "";
+    let u; try { u = new URL(v.trim()); } catch (_) { return ""; }
+    if (u.protocol !== "https:" || u.username || u.password) return "";
+    const host = u.hostname.toLowerCase().replace(/^www\./, "");
+    if (hosts && !hosts.includes(host)) return "";
+    return u.href.length <= 200 ? u.href : "";
+  }
+  const LINKS = [["x", "X", ["x.com", "twitter.com"]], ["telegram", "Telegram", ["t.me", "telegram.me"]], ["website", "Website", null]];
+  function parseMeta(uri) {
+    const out = { description: "", image: "", links: [] };
+    if (typeof uri !== "string" || !uri) return out;
+    let o = null;
+    if (uri[0] === "{") { try { o = JSON.parse(uri); } catch (_) { o = null; } }
+    if (!o || typeof o !== "object") { out.image = cleanImage(uri); return out; }
+    if (typeof o.description === "string") out.description = o.description.slice(0, 280);
+    out.image = cleanImage(o.image);
+    for (const [key, label, hosts] of LINKS) { const href = cleanLink(o[key], hosts); if (href) out.links.push({ label, href }); }
+    return out;
+  }
+  function ava(m, cls) {
+    const img = m.meta && m.meta.image;
+    return img
+      ? '<span class="ava ' + (cls || "") + '"><img src="' + esc(img) + '" alt="" loading="lazy" referrerpolicy="no-referrer"></span>'
+      : '<span class="ava ' + (cls || "") + '" aria-hidden="true">' + esc(m.symbol.slice(0, 2)) + "</span>";
+  }
+  /* Shrink a chosen photo to a small centred square so it can be stored with the coin. */
+  async function shrinkPhoto(file) {
+    if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type)) throw new Error("Choose a PNG, JPEG or WebP picture.");
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error("That file could not be read as a picture.")); i.src = url; });
+      const side = Math.min(img.naturalWidth, img.naturalHeight);
+      if (!side) throw new Error("That picture is empty.");
+      for (const [px, q] of [[128, 0.8], [112, 0.7], [96, 0.65], [80, 0.6], [64, 0.55]]) {
+        const c = document.createElement("canvas"); c.width = px; c.height = px;
+        const g = c.getContext("2d");
+        g.fillStyle = "#ffffff"; g.fillRect(0, 0, px, px);
+        g.drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, px, px);
+        let data = c.toDataURL("image/webp", q);
+        if (!data.startsWith("data:image/webp")) data = c.toDataURL("image/jpeg", q);
+        if (data.length <= 9000 || px === 64) return data;
+      }
+    } finally { URL.revokeObjectURL(url); }
+  }
+
   /* ---------- toast + errors ---------- */
   let toastTimer;
   function toast(msg, ms) { const el = $("#toast"); el.textContent = msg; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms || 5000); }
@@ -180,10 +237,19 @@
   }
 
   /* ---------- network + wallet ---------- */
-  function usableChains() { return Object.keys(CFG.chains).filter(id => ethers.isAddress(CFG.chains[id].factory || "")); }
-  async function setChain(id) {
-    S.chainId = String(id); S.cfg = CFG.chains[S.chainId];
-    try { localStorage.setItem("jisr.chain", S.chainId); } catch (_) { /* optional */ }
+  /* One entry per factory. A network can have several, one for each currency coins can be priced in. */
+  function markets() {
+    const out = [];
+    for (const id of Object.keys(CFG.chains)) {
+      const c = CFG.chains[id];
+      [c.factory].concat(c.extraFactories || []).filter(f => ethers.isAddress(f || "")).forEach((f, i) => out.push({ key: id + ":" + i, id, factory: f }));
+    }
+    return out;
+  }
+  async function setChain(key) {
+    const mk = markets().find(x => x.key === key) || markets()[0];
+    S.marketKey = mk.key; S.chainId = mk.id; S.cfg = Object.assign({}, CFG.chains[mk.id], { factory: mk.factory });
+    try { localStorage.setItem("jisr.market", mk.key); } catch (_) { /* optional */ }
     S.ro = S.cfg.rpcUrl ? new ethers.JsonRpcProvider(S.cfg.rpcUrl, Number(S.chainId), { staticNetwork: true }) : S.wallet;
     S.board = []; S.m = null; S.signer = null;
     if (!S.ro) { strip("Connect a wallet on " + S.cfg.name + " to load this network."); renderAll(); return; }
@@ -195,9 +261,25 @@
     S.router = new ethers.Contract(routerAddr, ROUTER_ABI, S.ro); S.weth = weth;
     $("#specPay").textContent = symbol + " or " + S.cfg.native;
     $("#specNet").textContent = "On " + S.cfg.name;
+    setLabel(S.marketKey, S.cfg.name + " · " + symbol);
+    $("#lNet").value = S.marketKey; $("#netSel").value = S.marketKey;
+    $("#lNetHint").textContent = "This coin will live on " + S.cfg.name + " only, priced and reserved in " + symbol + ".";
     if (S.account) await bindSigner();
     strip(S.cfg.test ? "Test network. Coins and money here have no value." : "");
     await refresh();
+  }
+  function setLabel(key, text) { document.querySelectorAll('option[value="' + key + '"]').forEach(o => { o.textContent = text; }); }
+  /* Fill in each network's currency name in the menus, in the background. */
+  async function labelMarkets() {
+    for (const mk of markets()) {
+      const c = CFG.chains[mk.id];
+      if (!c.rpcUrl || mk.key === S.marketKey) continue;
+      try {
+        const ro = new ethers.JsonRpcProvider(c.rpcUrl, Number(mk.id), { staticNetwork: true });
+        const st = await new ethers.Contract(mk.factory, FACTORY_ABI, ro).stable();
+        setLabel(mk.key, c.name + " · " + await new ethers.Contract(st, ERC20_ABI, ro).symbol());
+      } catch (_) { /* leave the plain name */ }
+    }
   }
   function strip(msg) { $("#strip").hidden = !msg; $("#stripTxt").innerHTML = msg ? "<b>" + esc(S.cfg && S.cfg.name ? S.cfg.name : "Notice") + ".</b> " + esc(msg) : ""; }
   async function bindSigner() {
@@ -229,12 +311,12 @@
   async function readMarket(coinAddr, full) {
     const marketAddr = await S.factory.marketOf(coinAddr);
     const mk = new ethers.Contract(marketAddr, MARKET_ABI, S.ro), coin = new ethers.Contract(coinAddr, COIN_ABI, S.ro);
-    const base = await Promise.all([coin.name(), coin.symbol(), mk.salePrice(), mk.floorPrice(), mk.floorOut(), mk.curveOut(), mk.graduated(), mk.currentPrice()]);
-    const m = { coinAddr, marketAddr, name: base[0], symbol: base[1], salePrice: base[2], floorPrice: base[3], floorOut: base[4], curveOut: base[5], graduated: base[6], price: base[7] };
+    const base = await Promise.all([coin.name(), coin.symbol(), mk.salePrice(), mk.floorPrice(), mk.floorOut(), mk.curveOut(), mk.graduated(), mk.currentPrice(), coin.metadataURI()]);
+    const m = { coinAddr, marketAddr, name: base[0], symbol: base[1], salePrice: base[2], floorPrice: base[3], floorOut: base[4], curveOut: base[5], graduated: base[6], price: base[7], meta: parseMeta(base[8]) };
     if (!full) return m;
-    const more = await Promise.all([mk.creator(), mk.floorReserve(), mk.premiumReserve(), mk.creatorFees(), mk.platformFees(), mk.floorLiability(), coin.metadataURI(),
+    const more = await Promise.all([mk.creator(), mk.floorReserve(), mk.premiumReserve(), mk.creatorFees(), mk.platformFees(), mk.floorLiability(),
       S.account ? coin.balanceOf(S.account) : 0n]);
-    Object.assign(m, { creator: more[0], floorReserve: more[1], premiumReserve: more[2], creatorFees: more[3], platformFees: more[4], liability: more[5], uri: more[6], held: more[7] });
+    Object.assign(m, { creator: more[0], floorReserve: more[1], premiumReserve: more[2], creatorFees: more[3], platformFees: more[4], liability: more[5], held: more[6] });
     return m;
   }
   async function loadBoard() {
@@ -306,7 +388,7 @@
     if (!S.board.length) { el.innerHTML = '<div class="empty">No coins yet on ' + esc(S.cfg.name) + '. <button class="linkbtn" data-act="nav" data-v="launch">Launch the first one</button>.</div>'; return; }
     el.innerHTML = S.board.map(m =>
       '<button class="row" data-act="open" data-v="' + esc(m.coinAddr) + '">' +
-      '<span class="ava" aria-hidden="true">' + esc(m.symbol.slice(0, 2)) + "</span>" +
+      ava(m) +
       '<span><span class="name">' + esc(m.name) + '</span><br><span class="tick">$' + esc(m.symbol) + " · " + short(m.coinAddr) + "</span></span>" +
       '<span class="mc">' + fUsd(mcap(m.price)) + "<small>MARKET CAP</small></span>" +
       '<span class="prog"><span class="runway' + (m.graduated ? " done" : "") + '" role="img" aria-label="' + Math.floor(progressPct(m)) + ' percent of the sale sold"><i style="width:' + progressPct(m) + '%"></i></span></span>' +
@@ -322,8 +404,12 @@
     const isCreator = S.account && S.account.toLowerCase() === m.creator.toLowerCase();
     el.innerHTML =
       '<button class="back" data-act="nav" data-v="board">← All coins</button>' +
-      '<div class="chead"><span class="ava" aria-hidden="true">' + esc(m.symbol.slice(0, 2)) + "</span><div><h1>" + esc(m.name) + "</h1>" +
-      '<p><span class="num">$' + esc(m.symbol) + '</span> · created by <span class="num">' + short(m.creator) + "</span>" + (isCreator ? " (you)" : "") + (m.uri ? " · " + esc(m.uri.slice(0, 80)) : "") + "</p></div></div>" +
+      '<div class="chead">' + ava(m) + "<div><h1>" + esc(m.name) + "</h1>" +
+      '<p><span class="num">$' + esc(m.symbol) + '</span> · created by <span class="num">' + short(m.creator) + "</span>" + (isCreator ? " (you)" : "") + " · " + esc(S.cfg.name) + "</p></div></div>" +
+      (m.meta.description || m.meta.links.length ? '<div class="about">' +
+        (m.meta.description ? '<p id="cDesc">' + esc(m.meta.description) + "</p>" : "") +
+        (m.meta.links.length ? '<div class="chips" id="cLinks">' + m.meta.links.map(l => '<a class="chip sm" href="' + esc(l.href) + '" target="_blank" rel="noopener noreferrer nofollow">' + esc(l.label) + " ↗</a>").join("") + "</div>" : "") +
+        '<p class="hint">Written by the coin\'s creator. The launchpad does not check it.</p></div>' : "") +
       '<div class="cgrid"><div class="col">' +
         '<div class="card stats o1"><div><strong id="sMc">' + fUsd(mcap(m.price)) + "</strong><small>Market cap</small></div><div><strong>" + fPrice(m.price) + "</strong><small>" + (m.graduated ? "Price" : "Fixed sale price") + "</small></div>" + third + "</div>" +
         '<div class="card o2"><div class="gradline"><span class="label">' + (m.graduated ? "Graduated" : "Sale progress") + '</span><span class="pills">' + pills(m) + "</span></div>" +
@@ -487,9 +573,22 @@
     });
   }
   async function doLaunch() {
-    const name = $("#lName").value.trim(), symbol = $("#lTicker").value.trim().toUpperCase(), uri = $("#lUri").value.trim(), err = $("#lErr");
+    const name = $("#lName").value.trim(), symbol = $("#lTicker").value.trim().toUpperCase(), err = $("#lErr");
     if (name.length < 2 || name.length > 32) { err.textContent = "Give the coin a name of 2 to 32 characters."; return; }
     if (!/^[A-Z0-9]{2,10}$/.test(symbol)) { err.textContent = "The ticker needs 2 to 10 letters or numbers, with no spaces."; return; }
+    const meta = {};
+    const desc = $("#lDesc").value.trim();
+    if (desc) meta.description = desc.slice(0, 280);
+    const imgLink = $("#lImgUrl").value.trim();
+    if (S.photo) meta.image = S.photo;
+    else if (imgLink) { if (!cleanImage(imgLink)) { err.textContent = "The picture link must start with https://"; return; } meta.image = imgLink; }
+    for (const [key, label, hosts] of LINKS) {
+      const v = $("#l-" + key).value.trim(); if (!v) continue;
+      const href = cleanLink(/^https?:\/\//i.test(v) ? v : "https://" + v, hosts);
+      if (!href) { err.textContent = "The " + label + " link is not valid." + (hosts ? " It should be on " + hosts[0] + "." : " It must start with https://"); return; }
+      meta[key] = href;
+    }
+    const uri = Object.keys(meta).length ? JSON.stringify(meta) : "";
     err.textContent = "";
     await run("Launch", async () => {
       const f = new ethers.Contract(S.cfg.factory, FACTORY_ABI, S.signer);
@@ -498,10 +597,15 @@
       const rc = await tx.wait();
       let coin = null;
       for (const l of rc.logs) { try { const p = f.interface.parseLog(l); if (p && p.name === "CoinCreated") coin = p.args.coin; } catch (_) { /* other contract's log */ } }
-      $("#launchForm").reset();
+      $("#launchForm").reset(); setPhoto(null);
       toast("$" + symbol + " is live on " + S.cfg.name + ".");
       if (coin) { S.cur = coin; S.view = "coin"; S.tab = "buy"; try { location.hash = "coin-" + coin; } catch (_) { /* optional */ } }
     });
+  }
+  function setPhoto(data) {
+    S.photo = data || null;
+    $("#lImgPrev").innerHTML = data ? '<span class="ava big"><img src="' + esc(data) + '" alt="Chosen picture"></span><button type="button" class="linkbtn" data-act="clearPhoto">Remove the picture</button>' : "";
+    $("#lImgUrl").disabled = !!data;
   }
   async function simpleTx(label, method, done) {
     await run(label, async () => {
@@ -536,7 +640,14 @@
     else if (a === "claimCreator") simpleTx("Pay the creator", "claimCreatorFees", "Creator fees paid to the creator.");
     else if (a === "sweepPlatform") simpleTx("Pay the launchpad", "sweepPlatformFees", "Launchpad fees paid to the launchpad wallet.");
     else if (a === "faucet") faucet();
+    else if (a === "clearPhoto") { $("#lImgFile").value = ""; setPhoto(null); }
   });
+  $("#lImgFile").addEventListener("change", async e => {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    try { setPhoto(await shrinkPhoto(f)); $("#lErr").textContent = ""; }
+    catch (err) { setPhoto(null); e.target.value = ""; $("#lErr").textContent = err.message; }
+  });
+  $("#lNet").addEventListener("change", e => { $("#netSel").value = e.target.value; setChain(e.target.value).catch(err => toast(explain(err))); });
   document.addEventListener("input", e => {
     if (e.target.id === "buyAmt") S.buyAmt = e.target.value; else if (e.target.id === "sellAmt") S.sellAmt = e.target.value; else return;
     clearTimeout(quoteTimer); quoteTimer = setTimeout(updateQuote, 200);
@@ -551,17 +662,20 @@
 
   /* ---------- start ---------- */
   async function start() {
-    const ids = usableChains(), sel = $("#netSel");
-    sel.innerHTML = ids.map(id => '<option value="' + id + '">' + esc(CFG.chains[id].name) + "</option>").join("") || "<option>No network</option>";
+    const list = markets(), ids = list.map(x => x.key), sel = $("#netSel");
+    const many = id => list.filter(x => x.id === id).length > 1;
+    const opts = list.map((x, i) => '<option value="' + x.key + '">' + esc(CFG.chains[x.id].name + (many(x.id) ? " · currency " + (Number(x.key.split(":")[1]) + 1) : "")) + "</option>").join("") || "<option>No network</option>";
+    sel.innerHTML = opts; $("#lNet").innerHTML = opts;
     const h = location.hash.replace("#", "");
     if (h.startsWith("coin-") && ethers.isAddress(h.slice(5))) { S.view = "coin"; S.cur = h.slice(5); }
     else if (VIEWS.includes(h) && h !== "coin") S.view = h;
     if (!ids.length) { strip("No network is set up yet."); renderAll(); return; }
-    let saved = null; try { saved = localStorage.getItem("jisr.chain"); } catch (_) { /* optional */ }
+    let saved = null; try { saved = localStorage.getItem("jisr.market"); } catch (_) { /* optional */ }
     const id = ids.includes(saved) ? saved : ids[0];
     sel.value = id;
     renderAll();
-    try { await setChain(id); } catch (e) { toast("Could not reach " + CFG.chains[id].name + ". " + explain(e), 9000); renderAll(); }
+    try { await setChain(id); } catch (e) { toast("Could not reach " + CFG.chains[id.split(":")[0]].name + ". " + explain(e), 9000); renderAll(); }
+    labelMarkets();
     // Background refresh. Skipped while someone is typing or has a trade half entered, so the page never moves under a finger.
     setInterval(() => {
       const typing = document.activeElement && ["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName);
