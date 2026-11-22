@@ -1,5 +1,5 @@
-// Builds web/whitepaper.html from WHITEPAPER.md (English) and WHITEPAPER-AR.md (Arabic).
-// Edit the two Markdown files, then run:  node scripts/build-whitepaper.js && node scripts/stamp-web.js
+// Builds web/whitepaper.html from WHITEPAPER.md (English, the reference) and its translations WHITEPAPER-XX.md.
+// Edit the Markdown files, then run:  node scripts/build-whitepaper.js && node scripts/stamp-web.js
 const fs = require("fs");
 const path = require("path");
 const { marked } = require("marked");
@@ -8,6 +8,23 @@ const root = path.join(__dirname, "..");
 const html = (file) => marked.parse(fs.readFileSync(path.join(root, file), "utf8"), { gfm: true })
   .replace(/<table>/g, '<div class="tw"><table>').replace(/<\/table>/g, "</table></div>")
   .replace(/<a href="http/g, '<a rel="noopener" href="http');
+
+// English is the reference text. To add a language: add its Markdown file and one line here.
+const LANGS = [
+  { code: "en", file: "WHITEPAPER.md", name: "English", title: "Jisr Launchpad: White Paper", back: "Open the launchpad" },
+  { code: "ar", file: "WHITEPAPER-AR.md", name: "العربية", title: "منصة جسر: الورقة البيضاء", back: "افتح المنصة", rtl: true },
+  { code: "zh", file: "WHITEPAPER-ZH.md", name: "中文", title: "Jisr Launchpad：白皮书", back: "打开平台" },
+  { code: "es", file: "WHITEPAPER-ES.md", name: "Español", title: "Jisr Launchpad: Libro blanco", back: "Abrir la plataforma" },
+  { code: "hi", file: "WHITEPAPER-HI.md", name: "हिन्दी", title: "Jisr Launchpad: श्वेत पत्र", back: "प्लेटफ़ॉर्म खोलें" },
+  { code: "fr", file: "WHITEPAPER-FR.md", name: "Français", title: "Jisr Launchpad : livre blanc", back: "Ouvrir la plateforme" },
+  { code: "ru", file: "WHITEPAPER-RU.md", name: "Русский", title: "Jisr Launchpad: Белая книга", back: "Открыть площадку" },
+  { code: "pt", file: "WHITEPAPER-PT.md", name: "Português", title: "Jisr Launchpad: White Paper", back: "Abrir a plataforma" },
+  { code: "tr", file: "WHITEPAPER-TR.md", name: "Türkçe", title: "Jisr Launchpad: Teknik Doküman", back: "Platformu aç" },
+  { code: "id", file: "WHITEPAPER-ID.md", name: "Bahasa Indonesia", title: "Jisr Launchpad: Buku Putih", back: "Buka platform" },
+];
+const articles = LANGS.map((l) => `<article id="paper-${l.code}" lang="${l.code}"${l.rtl ? ' dir="rtl"' : ""}${l.code === "en" ? "" : " hidden"}>\n${html(l.file)}\n</article>`).join("\n");
+const options = LANGS.map((l) => `<option value="${l.code}">${l.name}</option>`).join("");
+const meta = JSON.stringify(LANGS.reduce((m, l) => { m[l.code] = { title: l.title, back: l.back }; return m; }, {}));
 
 const page = `<!DOCTYPE html>
 <html lang="en">
@@ -41,11 +58,12 @@ const page = `<!DOCTYPE html>
 .paper th{color:var(--muted);font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:var(--raise)}
 .paper tr:last-child td{border-bottom:0}
 .paper article[lang=ar]{font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
-.paper article[lang=ar] th{letter-spacing:0;text-transform:none;font-size:13.5px}
+.paper article:not([lang=en]) th{letter-spacing:0;text-transform:none;font-size:13.5px}
+.ptop .acts select{max-width:150px}
 .ptop{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;padding-bottom:12px}
 .ptop a.brand{text-decoration:none}
 .ptop .acts{display:flex;gap:8px;align-items:center}
-.ptop .acts a,.ptop .acts button{border:1px solid var(--line);background:var(--raise);color:var(--ink);border-radius:10px;padding:8px 12px;font-size:13.5px;font-weight:600;text-decoration:none;cursor:pointer}
+.ptop .acts a,.ptop .acts select{border:1px solid var(--line);background:var(--raise);color:var(--ink);border-radius:10px;padding:8px 12px;font-size:13.5px;font-weight:600;text-decoration:none;cursor:pointer}
 @media print{body{background:#fff;color:#000}.top{display:none}.paper .tw,.paper blockquote,.paper code,.paper th{background:#fff;border-color:#999}.paper a{color:#000}}
 </style>
 </head>
@@ -55,34 +73,30 @@ const page = `<!DOCTYPE html>
     <a class="brand" href="./" aria-label="Jisr Launchpad, back to the launchpad"><b>JISR</b><i></i><span>launchpad</span></a>
     <div class="acts">
       <a href="./" id="backLink">Open the launchpad</a>
-      <button type="button" id="langBtn" aria-label="Switch language">العربية</button>
+      <select id="langSel" aria-label="Language">${options}</select>
     </div>
   </div>
 </header>
 <main class="paper">
-<article id="paper-en" lang="en">
-${html("WHITEPAPER.md")}
-</article>
-<article id="paper-ar" lang="ar" dir="rtl" hidden>
-${html("WHITEPAPER-AR.md")}
-</article>
+${articles}
 </main>
 <script>
 (function () {
-  var en = document.getElementById("paper-en"), ar = document.getElementById("paper-ar"), btn = document.getElementById("langBtn"), back = document.getElementById("backLink");
+  var META = ${meta}, sel = document.getElementById("langSel"), back = document.getElementById("backLink");
   function show(lang) {
-    var isAr = lang === "ar";
-    en.hidden = isAr; ar.hidden = !isAr;
-    btn.textContent = isAr ? "English" : "العربية";
-    back.textContent = isAr ? "افتح المنصة" : "Open the launchpad";
-    document.documentElement.lang = isAr ? "ar" : "en";
-    document.title = isAr ? "منصة جسر: الورقة البيضاء" : "Jisr Launchpad: White Paper";
+    if (!META[lang]) lang = "en";
+    for (var code in META) document.getElementById("paper-" + code).hidden = code !== lang;
+    sel.value = lang;
+    back.textContent = META[lang].back;
+    document.documentElement.lang = lang;
+    document.title = META[lang].title;
     try { localStorage.setItem("jisr.paperLang", lang); } catch (_) {}
   }
-  var q = /[?&]lang=(ar|en)/.exec(location.search), saved = null;
+  var q = /[?&]lang=([a-z]{2})/.exec(location.search), saved = null;
   try { saved = localStorage.getItem("jisr.paperLang"); } catch (_) {}
-  show(q ? q[1] : saved === "ar" || saved === "en" ? saved : /^ar/i.test(navigator.language || "") ? "ar" : "en");
-  btn.addEventListener("click", function () { show(ar.hidden ? "ar" : "en"); });
+  var nav = String(navigator.language || "").slice(0, 2).toLowerCase();
+  show(q && META[q[1]] ? q[1] : META[saved] ? saved : META[nav] ? nav : "en");
+  sel.addEventListener("change", function () { show(sel.value); window.scrollTo(0, 0); });
 })();
 </script>
 </body>

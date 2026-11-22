@@ -109,13 +109,22 @@ function waitFor(child, text, ms) {
     await page.goto(WEB + "/whitepaper.html?lang=en", { waitUntil: "networkidle0" });
     assert((await text("#paper-en h1")).includes("White Paper"));
     assert.equal(await page.$eval("#paper-ar", (el) => el.hidden), true);
-    await click("#langBtn");
+    assert.equal(await page.$$eval("#langSel option", (o) => o.length), 10, "ten languages are offered");
+    await page.select("#langSel", "ar");
     assert.equal(await page.$eval("#paper-en", (el) => el.hidden), true);
     assert((await text("#paper-ar h1")).includes("الورقة البيضاء"));
+    assert.equal(await page.$eval("#paper-ar", (el) => el.dir), "rtl");
+    for (const code of ["zh", "es", "hi", "fr", "ru", "pt", "tr", "id"]) {
+      await page.select("#langSel", code);
+      assert.equal(await page.$eval("#paper-" + code, (el) => el.hidden), false);
+      assert((await text("#paper-" + code)).includes("0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647"), code + " carries the same facts");
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true, code + " fits a phone screen");
+    }
+    await page.select("#langSel", "ar");
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true, "the paper fits a phone screen");
     await page.goto(WEB, { waitUntil: "networkidle0" });
     await page.waitForSelector("#rows .row");
-    step("white paper: linked from the site, English and Arabic, fits a phone");
+    step("white paper: linked from the site, ten languages, fits a phone");
 
     // 2. Connect the wallet and take test money.
     await click("#walletBtn");

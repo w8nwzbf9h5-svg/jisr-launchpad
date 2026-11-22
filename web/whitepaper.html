@@ -30,11 +30,12 @@
 .paper th{color:var(--muted);font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:var(--raise)}
 .paper tr:last-child td{border-bottom:0}
 .paper article[lang=ar]{font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
-.paper article[lang=ar] th{letter-spacing:0;text-transform:none;font-size:13.5px}
+.paper article:not([lang=en]) th{letter-spacing:0;text-transform:none;font-size:13.5px}
+.ptop .acts select{max-width:150px}
 .ptop{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;padding-bottom:12px}
 .ptop a.brand{text-decoration:none}
 .ptop .acts{display:flex;gap:8px;align-items:center}
-.ptop .acts a,.ptop .acts button{border:1px solid var(--line);background:var(--raise);color:var(--ink);border-radius:10px;padding:8px 12px;font-size:13.5px;font-weight:600;text-decoration:none;cursor:pointer}
+.ptop .acts a,.ptop .acts select{border:1px solid var(--line);background:var(--raise);color:var(--ink);border-radius:10px;padding:8px 12px;font-size:13.5px;font-weight:600;text-decoration:none;cursor:pointer}
 @media print{body{background:#fff;color:#000}.top{display:none}.paper .tw,.paper blockquote,.paper code,.paper th{background:#fff;border-color:#999}.paper a{color:#000}}
 </style>
 </head>
@@ -44,7 +45,7 @@
     <a class="brand" href="./" aria-label="Jisr Launchpad, back to the launchpad"><b>JISR</b><i></i><span>launchpad</span></a>
     <div class="acts">
       <a href="./" id="backLink">Open the launchpad</a>
-      <button type="button" id="langBtn" aria-label="Switch language">العربية</button>
+      <select id="langSel" aria-label="Language"><option value="en">English</option><option value="ar">العربية</option><option value="zh">中文</option><option value="es">Español</option><option value="hi">हिन्दी</option><option value="fr">Français</option><option value="ru">Русский</option><option value="pt">Português</option><option value="tr">Türkçe</option><option value="id">Bahasa Indonesia</option></select>
     </div>
   </div>
 </header>
@@ -543,25 +544,2019 @@
 </ul>
 <h2>8. تنبيه</h2>
 <p>هذه الورقة تصف برنامجاً. ليست عرضاً لأي عملة وليست نصيحة مالية. العملات التي تُطلق على جسر ينشئها مطوّروها وليست المنصة. كل من يستخدم المنصة مسؤول عن قراراته.</p>
+<p>هذه ترجمة. النسخة الإنجليزية هي المرجع، وعند أي اختلاف يُعتمد النص الإنجليزي.</p>
+
+</article>
+<article id="paper-zh" lang="zh" hidden>
+<h1>Jisr Launchpad：白皮书</h1>
+<p>版本 0.1 · 2026年11月22日 · 测试网阶段</p>
+<p>Jisr（جسر，意为“桥”）是一个迷因币发行平台。平台上的每个代币都有一个底价，由存放在合约中的资金全额覆盖，任何人都无法从该合约中提款。本文说明它如何运作、能防范什么、不能防范什么，以及目前已经建成的部分。</p>
+<h2>1. 问题</h2>
+<p>大多数迷因币的发行结局都一样。早期买家和创建者手里的代币几乎没有成本，他们把代币卖给后来的买家。在传统的联合曲线中，池子里的资金只占市值的一小部分，所以一旦开始抛售，价格下面没有任何支撑。常见的防护手段（锁仓、分期释放、卖出税）要么依赖某人信守承诺，要么依赖一条可以被修改的规则。</p>
+<p>Jisr 取消了早期的低价代币，并在每个代币下面放入真实资金。</p>
+<h2>2. 代币如何运作</h2>
+<p>在 Jisr 上发行的每个代币条款完全相同。创建者只选择名称、代号、图片、简介和链接。</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>条款</th>
+<th>数值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>总供应量</td>
+<td>1,000,000,000 枚，一次性创建</td>
+</tr>
+<tr>
+<td>发售</td>
+<td>前 800,000,000 枚按同一个固定价格出售</td>
+</tr>
+<tr>
+<td>发售价（美元储备）</td>
+<td>每枚 $0.0001，即市值 $100,000</td>
+</tr>
+<tr>
+<td>底价之上</td>
+<td>最后 200,000,000 枚，按上升曲线定价</td>
+</tr>
+<tr>
+<td>交易手续费</td>
+<td>每次买入和卖出收取 5%</td>
+</tr>
+<tr>
+<td>钱包上限</td>
+<td>每个钱包最多持有供应量的 2.5%（25,000,000 枚）</td>
+</tr>
+<tr>
+<td>分配给创建者的代币</td>
+<td>无</td>
+</tr>
+</tbody></table></div>
+<h3>2.1 所有人同一个价格</h3>
+<p>前 8 亿枚代币以同样的价格卖给所有人，包括创建者。没有低价的早期轮次，所以没有人持有成本比你更低的代币。</p>
+<h3>2.2 全额覆盖的底价</h3>
+<p>每一枚离开市场的代币，都会向该代币的<strong>底价储备</strong>存入一份底价。因此储备中始终有足够的资金，按底价回购所有流通中的代币。任何持有者都可以随时把代币卖回给市场，收到底价扣除 5% 手续费后的金额。</p>
+<p>以美元储备为例：</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>金额</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>你支付</td>
+<td>$1,000.00</td>
+</tr>
+<tr>
+<td>买入手续费（5%）</td>
+<td>$50.00</td>
+</tr>
+<tr>
+<td>你收到的代币</td>
+<td>9,500,000 枚</td>
+</tr>
+<tr>
+<td>按底价全部卖回</td>
+<td>扣费前 $950.00</td>
+</tr>
+<tr>
+<td>卖出手续费（5%）</td>
+<td>$47.50</td>
+</tr>
+<tr>
+<td>你收到</td>
+<td>$902.50</td>
+</tr>
+</tbody></table></div>
+<p>按底价买入再卖出，手续费合计 9.75%。这是按底价买入的人因机制本身可能损失的最大比例。第 6 节中的风险另当别论。</p>
+<h3>2.3 毕业与上升的底价</h3>
+<p>当 8 亿枚发售代币全部售出后，该代币即为<strong>毕业</strong>。此后，每笔交易中留在储备里的 2% 会使储备超过所需金额，底价随之上调：</p>
+<blockquote>
+<p>底价 = 底价储备 ÷（流通代币数量 与 800,000,000 两者中的较大值）</p>
+</blockquote>
+<p>底价永不下调。毕业时，一个市值 $100,000 的代币的储备约为 $81,684，所以底价一开始就比发售价高约 2.1%，并随交易量继续上升。</p>
+<h3>2.4 底价之上</h3>
+<p>最后 2 亿枚代币的价格是底价加上一份溢价，溢价随着这部分代币售出而增长。溢价存放在单独的<strong>溢价储备</strong>中，当代币沿同一条线卖回时返还。</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>已售出的曲线代币</th>
+<th>下一枚代币的价格</th>
+<th>按此价格计算的市值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>$0.0001</td>
+<td>$100,000</td>
+</tr>
+<tr>
+<td>100,000,000</td>
+<td>约 $0.0004</td>
+<td>约 $400,000</td>
+</tr>
+<tr>
+<td>150,000,000</td>
+<td>约 $0.0016</td>
+<td>约 $1,600,000</td>
+</tr>
+<tr>
+<td>190,000,000（曲线终点）</td>
+<td>约 $0.04</td>
+<td>约 $40,000,000</td>
+</tr>
+</tbody></table></div>
+<p>底价只覆盖底价本身。在底价之上支付了溢价的买家，如果其他人先卖出，可能损失这部分溢价。</p>
+<h3>2.5 5% 的去向</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>比例</th>
+<th>去向</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1%</td>
+<td>代币的创建者</td>
+<td>只有在有人交易该代币时才支付</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>该代币的底价储备</td>
+<td>毕业后为所有持有者抬高底价</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>平台钱包</td>
+<td>维持平台运营</td>
+</tr>
+</tbody></table></div>
+<h3>2.6 钱包上限</h3>
+<p>任何钱包持有的数量都不能超过某个代币供应量的 2.5%。这适用于所有钱包，包括创建者的钱包。它限制了单个地址一次能卖出的数量。它无法阻止一个人使用多个钱包：区块链无法判断两个地址是否属于同一个人。</p>
+<h2>3. 谁控制什么</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>对象</th>
+<th>谁能动用其资金或修改它</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>代币的储备</td>
+<td>没有任何人。资金只会按公式付给卖出者、作为 1% 手续费付给创建者，或作为 2% 手续费付给平台钱包</td>
+</tr>
+<tr>
+<td>代币</td>
+<td>只有其持有者。不能增发、不能暂停、没有黑名单、不能更改费率</td>
+</tr>
+<tr>
+<td>平台钱包</td>
+<td>平台团队。它收取 2% 手续费</td>
+</tr>
+<tr>
+<td>工厂合约的所有者</td>
+<td>可以更改哪个地址是平台钱包。除此之外没有任何权限</td>
+</tr>
+</tbody></table></div>
+<p>代币合约和市场合约没有所有者、不能升级、不能暂停，也没有提款函数。发行之后，创建者没有任何特殊权限。测试套件固定了所有能改变状态的函数清单，因此添加任何管理函数都会导致构建失败。</p>
+<p>这种设计的代价是：如果发行后发现漏洞，没有人能够暂停或修补正在运行的市场。</p>
+<h2>4. 给创建者</h2>
+<ul>
+<li>发行只需一笔链上交易，没有上币费。</li>
+<li>创建者不会收到任何代币。如果想持有，需要和其他人一样按发售价购买，并受同样的 2.5% 上限约束。</li>
+<li>创建者可获得其代币每笔交易的 1%，可随时领取。</li>
+<li>创建者购买的代币不锁仓、不分期释放，因为他支付的价格与其他买家完全相同。</li>
+</ul>
+<h2>5. 网络与储备货币</h2>
+<ul>
+<li><strong>网络。</strong> 合约可在任何 EVM 网络上运行：Ethereum、BNB Chain、Base、Arbitrum、Optimism、Polygon、Avalanche、Robinhood Chain 等。代币存在于它被发行的那个网络上。</li>
+<li><strong>储备货币。</strong> 平台的每次部署都用同一种代币为其代币定价并提供储备：美元稳定币（USDT 或 USDC），或其他标准代币，例如代币化股票。使用代币化股票时，底价是一定数量的股份，因此其美元价值随股价变动。</li>
+<li><strong>用网络原生货币支付。</strong> 在接入了兑换路由的地方，买家可以用 ETH 或 BNB 支付和收款。款项在进出时自动兑换；储备中只持有储备代币。</li>
+</ul>
+<h2>6. 风险</h2>
+<p>在用任何有价值的资产使用本平台之前，请阅读本节。</p>
+<ul>
+<li><strong>未经审计。</strong> 合约已通过自身的测试，包括随机交易和攻击模拟，但尚未经过独立安全审计机构的审查。漏洞可能导致资金损失。</li>
+<li><strong>无法救援。</strong> 没有人能暂停或修复正在运行的市场。这保护了储备不受人为干预，但也去掉了应对漏洞的安全网。</li>
+<li><strong>手续费。</strong> 按底价买入再卖出，合计成本为 9.75%。</li>
+<li><strong>溢价风险。</strong> 底价保护的是底价。在底价之上支付的资金不受保护。</li>
+<li><strong>储备代币风险。</strong> 稳定币可能脱锚，其发行方可以冻结地址。代币化股票跟随其股票价格，并且可能限制谁可以持有。合约无法防范这些情况。</li>
+<li><strong>兑换风险。</strong> 用网络原生货币支付取决于路由及其流动性，成本可能高于用储备代币支付。</li>
+<li><strong>关联钱包。</strong> 2.5% 的上限按地址计算。</li>
+<li><strong>以普通转账方式（而不是通过卖出）发送到市场合约的代币</strong>，发送者将无法取回。</li>
+<li><strong>底价是一种机制。</strong> 它是合约愿意用储备代币为一枚代币支付的金额。它不是盈利承诺，也不是保险。</li>
+</ul>
+<h2>7. 现状</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>部分</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EVM 合约</td>
+<td>已建成并通过测试（35 项合约测试）</td>
+</tr>
+<tr>
+<td>网页应用和部署页面</td>
+<td>已建成并通过测试（22 项浏览器测试），已上线</td>
+</tr>
+<tr>
+<td>测试部署</td>
+<td>已在 Sepolia 测试网上线，使用没有价值的测试资金</td>
+</tr>
+<tr>
+<td>独立安全审计</td>
+<td>尚未进行</td>
+</tr>
+<tr>
+<td>在正式网络上部署</td>
+<td>尚未进行。将在审计之后</td>
+</tr>
+<tr>
+<td>Solana</td>
+<td>程序已编写并在本地测试。尚未部署，尚未接入网页应用</td>
+</tr>
+<tr>
+<td>在另一个网络上卖出代币（跨链桥）</td>
+<td>已规划，尚未建成</td>
+</tr>
+</tbody></table></div>
+<p>Sepolia 上的测试部署：</p>
+<ul>
+<li>平台工厂合约：<code>0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647</code></li>
+<li>网站：<a rel="noopener" href="https://w8nwzbf9h5-svg.github.io/jisr-launchpad/">https://w8nwzbf9h5-svg.github.io/jisr-launchpad/</a></li>
+<li>代码：<a rel="noopener" href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad">https://github.com/w8nwzbf9h5-svg/jisr-launchpad</a></li>
+</ul>
+<h2>8. 声明</h2>
+<p>本文描述的是一款软件。它不是任何代币的发售要约，也不是财务建议。在 Jisr 上发行的代币由其创建者创建，而不是由平台创建。使用本平台的任何人都应对自己的决定负责。</p>
+<p>本文为译文。以英文版为准；如有差异，以英文文本为准。</p>
+
+</article>
+<article id="paper-es" lang="es" hidden>
+<h1>Jisr Launchpad: Libro blanco</h1>
+<p>Versión 0.1 · 22 de noviembre de 2026 · Etapa de red de pruebas</p>
+<p>Jisr (جسر, «puente») es una plataforma de lanzamiento de meme coins en la que cada moneda tiene un precio mínimo respaldado por dinero guardado en un contrato del que nadie puede retirar. Este documento explica cómo funciona, de qué protege, de qué no protege y qué está construido hoy.</p>
+<h2>1. El problema</h2>
+<p>La mayoría de los lanzamientos de meme coins terminan igual. Los primeros compradores y el creador tienen monedas que casi no les costaron nada y las venden a quienes llegan después. En una curva de vinculación clásica, el dinero del fondo es solo una fracción del valor de mercado, así que el precio no tiene nada debajo cuando empiezan las ventas. Las defensas habituales (bloqueos, liberación gradual, impuestos de venta) dependen de que alguien cumpla una promesa o de una regla que se puede cambiar.</p>
+<p>Jisr elimina las monedas baratas del inicio y pone dinero real debajo de cada moneda.</p>
+<h2>2. Cómo funciona una moneda</h2>
+<p>Todas las monedas lanzadas en Jisr tienen las mismas condiciones. El creador solo elige el nombre, el símbolo, la imagen, la descripción y los enlaces.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Condición</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Suministro total</td>
+<td>1,000,000,000 monedas, creadas una sola vez</td>
+</tr>
+<tr>
+<td>Venta</td>
+<td>Las primeras 800,000,000 monedas a un único precio fijo</td>
+</tr>
+<tr>
+<td>Precio de venta (reserva en dólares)</td>
+<td>$0.0001 por moneda, una capitalización de $100,000</td>
+</tr>
+<tr>
+<td>Por encima del mínimo</td>
+<td>Las últimas 200,000,000 monedas, con precio en una curva ascendente</td>
+</tr>
+<tr>
+<td>Comisión de operación</td>
+<td>5% de cada compra y de cada venta</td>
+</tr>
+<tr>
+<td>Límite por billetera</td>
+<td>2.5% del suministro (25,000,000 monedas) por billetera</td>
+</tr>
+<tr>
+<td>Monedas entregadas al creador</td>
+<td>Ninguna</td>
+</tr>
+</tbody></table></div>
+<h3>2.1 Un solo precio para todos</h3>
+<p>Las primeras 800 millones de monedas se venden al mismo precio a todo el mundo, incluido el creador. No hay ronda inicial barata, así que nadie tiene monedas que le hayan costado menos que a ti.</p>
+<h3>2.2 El mínimo cubierto</h3>
+<p>Cada moneda que sale del mercado deposita un precio mínimo en la <strong>reserva del mínimo</strong> de esa moneda. Por eso la reserva siempre tiene lo suficiente para recomprar todas las monedas en circulación al precio mínimo. Cualquier titular puede vender al mercado en cualquier momento y recibir el precio mínimo, menos la comisión del 5%.</p>
+<p>Ejemplo con reserva en dólares:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Paso</th>
+<th>Importe</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Pagas</td>
+<td>$1,000.00</td>
+</tr>
+<tr>
+<td>Comisión de la compra (5%)</td>
+<td>$50.00</td>
+</tr>
+<tr>
+<td>Monedas que recibes</td>
+<td>9,500,000</td>
+</tr>
+<tr>
+<td>Las vendes todas al precio mínimo</td>
+<td>$950.00 antes de la comisión</td>
+</tr>
+<tr>
+<td>Comisión de la venta (5%)</td>
+<td>$47.50</td>
+</tr>
+<tr>
+<td>Recibes</td>
+<td>$902.50</td>
+</tr>
+</tbody></table></div>
+<p>Comprar y luego vender al precio mínimo cuesta un 9.75% en comisiones. Eso es lo máximo que un comprador al precio mínimo puede perder por el mecanismo en sí. Los riesgos de la sección 6 son aparte.</p>
+<h3>2.3 Graduación y mínimo ascendente</h3>
+<p>Cuando se han vendido las 800 millones de monedas de la venta, la moneda se ha <strong>graduado</strong>. A partir de ahí, el 2% de cada operación que se queda en la reserva la hace mayor de lo necesario, y el precio mínimo se sube para igualarla:</p>
+<blockquote>
+<p>precio mínimo = reserva del mínimo ÷ el mayor entre (monedas en circulación, 800,000,000)</p>
+</blockquote>
+<p>El precio mínimo nunca baja. En la graduación la reserva tiene unos $81,684 para una moneda de $100,000, así que el mínimo empieza alrededor de un 2.1% por encima del precio de venta y sube con el volumen de operaciones.</p>
+<h3>2.4 Por encima del mínimo</h3>
+<p>Las últimas 200 millones de monedas cuestan el precio mínimo más una prima que crece a medida que se agotan. La prima se guarda en una <strong>reserva de primas</strong> separada y se devuelve cuando las monedas se venden recorriendo la misma línea.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Monedas de la curva vendidas</th>
+<th>Precio de la siguiente moneda</th>
+<th>Valor de mercado a ese precio</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>$0.0001</td>
+<td>$100,000</td>
+</tr>
+<tr>
+<td>100,000,000</td>
+<td>aprox. $0.0004</td>
+<td>aprox. $400,000</td>
+</tr>
+<tr>
+<td>150,000,000</td>
+<td>aprox. $0.0016</td>
+<td>aprox. $1,600,000</td>
+</tr>
+<tr>
+<td>190,000,000 (fin de la curva)</td>
+<td>aprox. $0.04</td>
+<td>aprox. $40,000,000</td>
+</tr>
+</tbody></table></div>
+<p>El mínimo cubre solo el precio mínimo. Quien paga una prima por encima del mínimo puede perder esa prima si otros venden antes.</p>
+<h3>2.5 A dónde va el 5%</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Parte</th>
+<th>Destino</th>
+<th>Finalidad</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1%</td>
+<td>El creador de la moneda</td>
+<td>Se paga solo cuando la gente opera con la moneda</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>La reserva del mínimo de la moneda</td>
+<td>Sube el mínimo para todos los titulares tras la graduación</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>La billetera de la plataforma</td>
+<td>Mantiene la plataforma</td>
+</tr>
+</tbody></table></div>
+<h3>2.6 El límite por billetera</h3>
+<p>Ninguna billetera puede tener más del 2.5% del suministro de una moneda. Se aplica a todas las billeteras, incluida la del creador. Limita cuánto puede vender de golpe una dirección. No puede impedir que una persona use varias billeteras: una blockchain no sabe que dos direcciones pertenecen a la misma persona.</p>
+<h2>3. Quién controla qué</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Elemento</th>
+<th>Quién puede mover sus fondos o cambiarlo</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Las reservas de una moneda</td>
+<td>Nadie. El dinero sale solo hacia un vendedor según la fórmula, hacia el creador como comisión del 1% o hacia la billetera de la plataforma como comisión del 2%</td>
+</tr>
+<tr>
+<td>Una moneda</td>
+<td>Solo sus titulares. Sin nuevas emisiones, sin pausa, sin lista negra, sin cambio de comisiones</td>
+</tr>
+<tr>
+<td>La billetera de la plataforma</td>
+<td>El equipo de la plataforma. Recibe la comisión del 2%</td>
+</tr>
+<tr>
+<td>El propietario de la fábrica</td>
+<td>Puede cambiar qué dirección es la billetera de la plataforma. Nada más</td>
+</tr>
+</tbody></table></div>
+<p>Los contratos de la moneda y del mercado no tienen propietario, ni actualización, ni pausa, ni función de retiro. El creador no tiene derechos especiales después del lanzamiento. Las pruebas fijan la lista completa de funciones que pueden cambiar el estado, de modo que añadir una función de administración hace fallar la compilación.</p>
+<p>El coste de este diseño: si se encuentra un error después del lanzamiento, nadie puede pausar ni corregir un mercado en marcha.</p>
+<h2>4. Para creadores</h2>
+<ul>
+<li>Lanzar cuesta una transacción de red. No hay comisión de listado.</li>
+<li>El creador no recibe monedas. Para tener la moneda, compra al precio de venta como todos, dentro del mismo límite del 2.5%.</li>
+<li>El creador gana el 1% de cada operación con su moneda y puede cobrarlo en cualquier momento.</li>
+<li>Nada de lo que compra el creador queda bloqueado ni se libera por etapas, porque pagó el mismo precio que cualquier otro comprador.</li>
+</ul>
+<h2>5. Redes y monedas de reserva</h2>
+<ul>
+<li><strong>Redes.</strong> Los contratos funcionan en cualquier red EVM: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain y otras. Una moneda vive en la red en la que se lanzó.</li>
+<li><strong>Moneda de reserva.</strong> Cada despliegue de la plataforma valora y respalda sus monedas en un solo token: una stablecoin en dólares (USDT o USDC) u otro token estándar, como una acción tokenizada. Con una acción tokenizada, el mínimo es un número de acciones, así que su valor en dólares se mueve con la acción.</li>
+<li><strong>Pagar con la moneda propia de la red.</strong> Donde hay un enrutador de intercambio conectado, los compradores pueden pagar y cobrar en ETH o BNB. El pago se convierte al entrar y al salir; la reserva solo contiene el token de reserva.</li>
+</ul>
+<h2>6. Riesgos</h2>
+<p>Lee esta sección antes de usar la plataforma con algo de valor.</p>
+<ul>
+<li><strong>Sin auditoría.</strong> Los contratos han superado sus propias pruebas, incluidas operaciones aleatorias y simulaciones de ataques. No han sido revisados por un auditor de seguridad independiente. Un error podría causar pérdida de fondos.</li>
+<li><strong>Sin rescate.</strong> Nadie puede pausar ni arreglar un mercado en marcha. Esto protege la reserva de las personas y elimina la red de seguridad frente a errores.</li>
+<li><strong>Comisiones.</strong> Comprar y vender al precio mínimo cuesta un 9.75% en total.</li>
+<li><strong>Riesgo de la prima.</strong> El mínimo protege el precio mínimo. El dinero pagado por encima del mínimo no está protegido.</li>
+<li><strong>Riesgo del token de reserva.</strong> Una stablecoin puede perder su paridad y su emisor puede congelar una dirección. Una acción tokenizada sigue a su acción y puede restringir quién puede tenerla. Los contratos no pueden defender contra nada de esto.</li>
+<li><strong>Riesgo de intercambio.</strong> Pagar con la moneda propia de la red depende del enrutador y de su liquidez, y puede costar más que pagar con el token de reserva.</li>
+<li><strong>Billeteras vinculadas.</strong> El límite del 2.5% es por dirección.</li>
+<li><strong>Las monedas enviadas al mercado por transferencia simple</strong>, en lugar de mediante una venta, se pierden para quien las envía.</li>
+<li><strong>El mínimo es un mecanismo.</strong> Es el importe que el contrato pagará, en el token de reserva, por una moneda. No es una promesa de ganancia y no es un seguro.</li>
+</ul>
+<h2>7. Estado</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Parte</th>
+<th>Estado</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Contratos EVM</td>
+<td>Construidos y probados (35 pruebas de contratos)</td>
+</tr>
+<tr>
+<td>Aplicación web y página de despliegue</td>
+<td>Construidas y probadas (22 pruebas en navegador), en línea</td>
+</tr>
+<tr>
+<td>Despliegue de prueba</td>
+<td>En línea en la red de pruebas Sepolia, con dinero de prueba sin valor</td>
+</tr>
+<tr>
+<td>Auditoría de seguridad independiente</td>
+<td>No realizada</td>
+</tr>
+<tr>
+<td>Despliegue en redes reales</td>
+<td>No realizado. Va después de la auditoría</td>
+</tr>
+<tr>
+<td>Solana</td>
+<td>Programa escrito y probado localmente. No desplegado, aún no está en la aplicación web</td>
+</tr>
+<tr>
+<td>Vender una moneda en otra red (puente)</td>
+<td>Planificado. No construido</td>
+</tr>
+</tbody></table></div>
+<p>Despliegue de prueba en Sepolia:</p>
+<ul>
+<li>Fábrica de la plataforma: <code>0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647</code></li>
+<li>Sitio: <a rel="noopener" href="https://w8nwzbf9h5-svg.github.io/jisr-launchpad/">https://w8nwzbf9h5-svg.github.io/jisr-launchpad/</a></li>
+<li>Código: <a rel="noopener" href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad">https://github.com/w8nwzbf9h5-svg/jisr-launchpad</a></li>
+</ul>
+<h2>8. Aviso</h2>
+<p>Este documento describe un software. No es una oferta de ninguna moneda ni asesoramiento financiero. Las monedas lanzadas en Jisr las crean sus creadores, no la plataforma. Quien use la plataforma es responsable de sus propias decisiones.</p>
+<p>Esta es una traducción. La versión en inglés es la de referencia; si hay alguna diferencia, vale el texto en inglés.</p>
+
+</article>
+<article id="paper-hi" lang="hi" hidden>
+<h1>Jisr Launchpad: श्वेत पत्र</h1>
+<p>संस्करण 0.1 · 22 नवंबर 2026 · टेस्ट नेटवर्क चरण</p>
+<p>Jisr (جسر, यानी &quot;पुल&quot;) मीम कॉइन लॉन्च करने का एक प्लेटफ़ॉर्म है। यहाँ हर कॉइन की एक न्यूनतम कीमत (फ़्लोर) होती है, जिसके पीछे एक ऐसे कॉन्ट्रैक्ट में रखा पैसा होता है जिससे कोई भी पैसा निकाल नहीं सकता। यह दस्तावेज़ बताता है कि यह कैसे काम करता है, किससे बचाता है, किससे नहीं बचाता, और आज क्या बन चुका है।</p>
+<h2>1. समस्या</h2>
+<p>ज़्यादातर मीम कॉइन लॉन्च का अंत एक जैसा होता है। शुरुआती ख़रीदारों और कॉइन बनाने वाले के पास ऐसे कॉइन होते हैं जिन पर उनका लगभग कुछ ख़र्च नहीं हुआ, और वे उन्हें बाद में आने वालों को बेच देते हैं। पारंपरिक बॉन्डिंग कर्व में पूल का पैसा बाज़ार मूल्य का बस एक छोटा हिस्सा होता है, इसलिए बिकवाली शुरू होने पर कीमत के नीचे कुछ नहीं होता। आम बचाव (लॉक, किस्तों में रिलीज़, बिक्री पर टैक्स) या तो किसी के वादा निभाने पर टिके होते हैं या ऐसे नियम पर जिसे बदला जा सकता है।</p>
+<p>Jisr शुरुआती सस्ते कॉइन ख़त्म करता है और हर कॉइन के नीचे असली पैसा रखता है।</p>
+<h2>2. एक कॉइन कैसे काम करता है</h2>
+<p>Jisr पर लॉन्च होने वाले हर कॉइन की शर्तें एक जैसी हैं। बनाने वाला सिर्फ़ नाम, टिकर, तस्वीर, विवरण और लिंक चुनता है।</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>शर्त</th>
+<th>मान</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>कुल सप्लाई</td>
+<td>1,000,000,000 कॉइन, एक ही बार बनते हैं</td>
+</tr>
+<tr>
+<td>बिक्री</td>
+<td>पहले 800,000,000 कॉइन एक ही तय कीमत पर</td>
+</tr>
+<tr>
+<td>बिक्री कीमत (डॉलर रिज़र्व)</td>
+<td>$0.0001 प्रति कॉइन, यानी $100,000 मार्केट कैप</td>
+</tr>
+<tr>
+<td>फ़्लोर से ऊपर</td>
+<td>आख़िरी 200,000,000 कॉइन, बढ़ती कर्व पर कीमत</td>
+</tr>
+<tr>
+<td>ट्रेडिंग शुल्क</td>
+<td>हर ख़रीद और हर बिक्री पर 5%</td>
+</tr>
+<tr>
+<td>वॉलेट सीमा</td>
+<td>प्रति वॉलेट सप्लाई का 2.5% (25,000,000 कॉइन)</td>
+</tr>
+<tr>
+<td>बनाने वाले को दिए गए कॉइन</td>
+<td>कोई नहीं</td>
+</tr>
+</tbody></table></div>
+<h3>2.1 सबके लिए एक कीमत</h3>
+<p>पहले 80 करोड़ कॉइन सबको एक ही कीमत पर बेचे जाते हैं, बनाने वाले को भी। कोई सस्ता शुरुआती दौर नहीं है, इसलिए किसी के पास आपसे कम लागत वाले कॉइन नहीं होते।</p>
+<h3>2.2 पूरी तरह कवर किया गया फ़्लोर</h3>
+<p>बाज़ार से बाहर जाने वाला हर कॉइन उस कॉइन के <strong>फ़्लोर रिज़र्व</strong> में एक फ़्लोर कीमत जमा करता है। इसलिए रिज़र्व में हमेशा इतना पैसा रहता है कि चलन में मौजूद हर कॉइन को फ़्लोर कीमत पर वापस ख़रीदा जा सके। कोई भी धारक किसी भी समय कॉइन बाज़ार को वापस बेच सकता है और 5% शुल्क घटाकर फ़्लोर कीमत पा सकता है।</p>
+<p>डॉलर रिज़र्व के साथ उदाहरण:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>चरण</th>
+<th>राशि</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>आप चुकाते हैं</td>
+<td>$1,000.00</td>
+</tr>
+<tr>
+<td>ख़रीद पर शुल्क (5%)</td>
+<td>$50.00</td>
+</tr>
+<tr>
+<td>आपको मिलने वाले कॉइन</td>
+<td>9,500,000</td>
+</tr>
+<tr>
+<td>आप सब कॉइन फ़्लोर कीमत पर वापस बेचते हैं</td>
+<td>शुल्क से पहले $950.00</td>
+</tr>
+<tr>
+<td>बिक्री पर शुल्क (5%)</td>
+<td>$47.50</td>
+</tr>
+<tr>
+<td>आपको मिलता है</td>
+<td>$902.50</td>
+</tr>
+</tbody></table></div>
+<p>फ़्लोर कीमत पर ख़रीदकर फिर बेचने में कुल 9.75% शुल्क लगता है। फ़्लोर कीमत पर ख़रीदने वाला सिर्फ़ इस व्यवस्था की वजह से अधिकतम इतना ही खो सकता है। खंड 6 के जोखिम अलग हैं।</p>
+<h3>2.3 ग्रेजुएशन और बढ़ता फ़्लोर</h3>
+<p>जब बिक्री के सभी 80 करोड़ कॉइन बिक जाते हैं, तो कॉइन <strong>ग्रेजुएट</strong> हो जाता है। इसके बाद हर ट्रेड का जो 2% रिज़र्व में रह जाता है, वह रिज़र्व को ज़रूरत से बड़ा कर देता है, और फ़्लोर कीमत उसी के हिसाब से बढ़ा दी जाती है:</p>
+<blockquote>
+<p>फ़्लोर कीमत = फ़्लोर रिज़र्व ÷ (चलन में कॉइन और 800,000,000 में से जो बड़ा हो)</p>
+</blockquote>
+<p>फ़्लोर कीमत कभी घटाई नहीं जाती। ग्रेजुएशन के समय $100,000 के कॉइन के लिए रिज़र्व में लगभग $81,684 होते हैं, इसलिए फ़्लोर बिक्री कीमत से लगभग 2.1% ऊपर शुरू होता है और ट्रेडिंग वॉल्यूम के साथ बढ़ता है।</p>
+<h3>2.4 फ़्लोर से ऊपर</h3>
+<p>आख़िरी 20 करोड़ कॉइन की कीमत फ़्लोर कीमत और एक प्रीमियम का जोड़ होती है, और यह प्रीमियम इन कॉइन के बिकने के साथ बढ़ता जाता है। प्रीमियम एक अलग <strong>प्रीमियम रिज़र्व</strong> में रखा जाता है और जब कॉइन उसी रेखा पर वापस बेचे जाते हैं तो लौटा दिया जाता है।</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>कर्व के बिके कॉइन</th>
+<th>अगले कॉइन की कीमत</th>
+<th>उस कीमत पर बाज़ार मूल्य</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>$0.0001</td>
+<td>$100,000</td>
+</tr>
+<tr>
+<td>100,000,000</td>
+<td>लगभग $0.0004</td>
+<td>लगभग $400,000</td>
+</tr>
+<tr>
+<td>150,000,000</td>
+<td>लगभग $0.0016</td>
+<td>लगभग $1,600,000</td>
+</tr>
+<tr>
+<td>190,000,000 (कर्व का अंत)</td>
+<td>लगभग $0.04</td>
+<td>लगभग $40,000,000</td>
+</tr>
+</tbody></table></div>
+<p>फ़्लोर सिर्फ़ फ़्लोर कीमत को कवर करता है। जो ख़रीदार फ़्लोर से ऊपर प्रीमियम चुकाता है, वह वह प्रीमियम खो सकता है अगर दूसरे लोग उससे पहले बेच दें।</p>
+<h3>2.5 5% कहाँ जाता है</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>हिस्सा</th>
+<th>किसे जाता है</th>
+<th>उद्देश्य</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1%</td>
+<td>कॉइन बनाने वाला</td>
+<td>तभी मिलता है जब लोग कॉइन में ट्रेड करते हैं</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>कॉइन का फ़्लोर रिज़र्व</td>
+<td>ग्रेजुएशन के बाद सभी धारकों के लिए फ़्लोर बढ़ाता है</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>प्लेटफ़ॉर्म का वॉलेट</td>
+<td>प्लेटफ़ॉर्म चलाने के लिए</td>
+</tr>
+</tbody></table></div>
+<h3>2.6 वॉलेट सीमा</h3>
+<p>कोई भी वॉलेट किसी कॉइन की सप्लाई का 2.5% से ज़्यादा नहीं रख सकता। यह हर वॉलेट पर लागू है, बनाने वाले के वॉलेट पर भी। यह सीमा तय करती है कि एक पता एक बार में कितना बेच सकता है। यह किसी एक व्यक्ति को कई वॉलेट इस्तेमाल करने से नहीं रोक सकती: ब्लॉकचेन यह नहीं जान सकता कि दो पते एक ही व्यक्ति के हैं।</p>
+<h2>3. किसका नियंत्रण किस पर है</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>चीज़</th>
+<th>कौन इसका पैसा हिला सकता है या इसे बदल सकता है</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>कॉइन के रिज़र्व</td>
+<td>कोई नहीं। पैसा सिर्फ़ फ़ॉर्मूले के अनुसार बेचने वाले को, 1% शुल्क के रूप में बनाने वाले को, या 2% शुल्क के रूप में प्लेटफ़ॉर्म वॉलेट को जाता है</td>
+</tr>
+<tr>
+<td>कॉइन</td>
+<td>सिर्फ़ उसके धारक। नए कॉइन नहीं बनते, रोक नहीं लगती, ब्लैकलिस्ट नहीं है, शुल्क नहीं बदलता</td>
+</tr>
+<tr>
+<td>प्लेटफ़ॉर्म वॉलेट</td>
+<td>प्लेटफ़ॉर्म की टीम। इसे 2% शुल्क मिलता है</td>
+</tr>
+<tr>
+<td>फ़ैक्टरी का मालिक</td>
+<td>यह बदल सकता है कि प्लेटफ़ॉर्म वॉलेट कौन-सा पता है। इसके अलावा कुछ नहीं</td>
+</tr>
+</tbody></table></div>
+<p>कॉइन और मार्केट कॉन्ट्रैक्ट का कोई मालिक नहीं है, न अपग्रेड है, न रोकने का विकल्प, न पैसा निकालने का फ़ंक्शन। लॉन्च के बाद बनाने वाले के पास कोई विशेष अधिकार नहीं रहता। टेस्ट उन सभी फ़ंक्शन की पूरी सूची तय रखते हैं जो स्थिति बदल सकते हैं, इसलिए कोई एडमिन फ़ंक्शन जोड़ने पर बिल्ड फ़ेल हो जाता है।</p>
+<p>इस डिज़ाइन की कीमत: अगर लॉन्च के बाद कोई बग मिलता है, तो कोई भी चालू मार्केट को रोक या ठीक नहीं कर सकता।</p>
+<h2>4. बनाने वालों के लिए</h2>
+<ul>
+<li>लॉन्च में एक नेटवर्क ट्रांज़ैक्शन का ख़र्च आता है। कोई लिस्टिंग शुल्क नहीं है।</li>
+<li>बनाने वाले को कोई कॉइन नहीं मिलता। कॉइन रखना हो तो वह बाकी सबकी तरह बिक्री कीमत पर, उसी 2.5% सीमा के भीतर ख़रीदता है।</li>
+<li>बनाने वाला अपने कॉइन के हर ट्रेड का 1% कमाता है और इसे कभी भी ले सकता है।</li>
+<li>बनाने वाला जो ख़रीदता है वह न लॉक होता है, न किस्तों में रिलीज़ होता है, क्योंकि उसने हर दूसरे ख़रीदार जितनी ही कीमत चुकाई है।</li>
+</ul>
+<h2>5. नेटवर्क और रिज़र्व मुद्राएँ</h2>
+<ul>
+<li><strong>नेटवर्क।</strong> कॉन्ट्रैक्ट किसी भी EVM नेटवर्क पर चलते हैं: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain और अन्य। कॉइन उसी नेटवर्क पर रहता है जिस पर वह लॉन्च हुआ।</li>
+<li><strong>रिज़र्व मुद्रा।</strong> प्लेटफ़ॉर्म का हर डिप्लॉयमेंट अपने कॉइन की कीमत और रिज़र्व एक ही टोकन में रखता है: डॉलर स्टेबलकॉइन (USDT या USDC), या कोई दूसरा मानक टोकन जैसे टोकनाइज़्ड शेयर। टोकनाइज़्ड शेयर के साथ फ़्लोर शेयरों की एक संख्या होता है, इसलिए उसका डॉलर मूल्य शेयर के साथ बदलता है।</li>
+<li><strong>नेटवर्क की अपनी मुद्रा से भुगतान।</strong> जहाँ स्वैप राउटर जुड़ा है, वहाँ ख़रीदार ETH या BNB में भुगतान कर सकते हैं और पा सकते हैं। भुगतान आते और जाते समय बदला जाता है; रिज़र्व में सिर्फ़ रिज़र्व टोकन रहता है।</li>
+</ul>
+<h2>6. जोखिम</h2>
+<p>किसी भी मूल्यवान चीज़ के साथ प्लेटफ़ॉर्म इस्तेमाल करने से पहले यह खंड पढ़ें।</p>
+<ul>
+<li><strong>ऑडिट नहीं हुआ।</strong> कॉन्ट्रैक्ट अपने टेस्ट पास कर चुके हैं, जिनमें रैंडम ट्रेडिंग और हमलों के सिमुलेशन शामिल हैं। किसी स्वतंत्र सुरक्षा ऑडिटर ने इनकी समीक्षा नहीं की है। कोई बग पैसे का नुकसान करा सकता है।</li>
+<li><strong>बचाव का रास्ता नहीं।</strong> कोई भी चालू मार्केट को रोक या ठीक नहीं कर सकता। इससे रिज़र्व लोगों से सुरक्षित रहता है, और बग के ख़िलाफ़ सुरक्षा जाल हट जाता है।</li>
+<li><strong>शुल्क।</strong> फ़्लोर कीमत पर ख़रीदने और बेचने में कुल 9.75% लगता है।</li>
+<li><strong>प्रीमियम का जोखिम।</strong> फ़्लोर सिर्फ़ फ़्लोर कीमत की रक्षा करता है। फ़्लोर से ऊपर चुकाया गया पैसा सुरक्षित नहीं है।</li>
+<li><strong>रिज़र्व टोकन का जोखिम।</strong> स्टेबलकॉइन अपना पेग खो सकता है, और उसका जारीकर्ता किसी पते को फ़्रीज़ कर सकता है। टोकनाइज़्ड शेयर अपने शेयर के साथ चलता है और यह सीमित कर सकता है कि उसे कौन रख सकता है। कॉन्ट्रैक्ट इनमें से किसी से बचाव नहीं कर सकते।</li>
+<li><strong>स्वैप का जोखिम।</strong> नेटवर्क की अपनी मुद्रा से भुगतान राउटर और उसकी लिक्विडिटी पर निर्भर है, और रिज़र्व टोकन से भुगतान करने से महँगा पड़ सकता है।</li>
+<li><strong>जुड़े हुए वॉलेट।</strong> 2.5% की सीमा प्रति पता है।</li>
+<li><strong>बिक्री के बजाय सीधे ट्रांसफ़र से मार्केट को भेजे गए कॉइन</strong> भेजने वाले के लिए खो जाते हैं।</li>
+<li><strong>फ़्लोर एक व्यवस्था है।</strong> यह वह राशि है जो कॉन्ट्रैक्ट एक कॉइन के बदले रिज़र्व टोकन में चुकाएगा। यह मुनाफ़े का वादा नहीं है और बीमा नहीं है।</li>
+</ul>
+<h2>7. स्थिति</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>हिस्सा</th>
+<th>स्थिति</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EVM कॉन्ट्रैक्ट</td>
+<td>बन चुके हैं और टेस्ट हो चुके हैं (35 कॉन्ट्रैक्ट टेस्ट)</td>
+</tr>
+<tr>
+<td>वेब ऐप और डिप्लॉय पेज</td>
+<td>बन चुके हैं और टेस्ट हो चुके हैं (22 ब्राउज़र टेस्ट), लाइव हैं</td>
+</tr>
+<tr>
+<td>टेस्ट डिप्लॉयमेंट</td>
+<td>Sepolia टेस्ट नेटवर्क पर लाइव, ऐसे टेस्ट पैसे के साथ जिसका कोई मूल्य नहीं</td>
+</tr>
+<tr>
+<td>स्वतंत्र सुरक्षा ऑडिट</td>
+<td>नहीं हुआ</td>
+</tr>
+<tr>
+<td>असली नेटवर्क पर डिप्लॉयमेंट</td>
+<td>नहीं हुआ। यह ऑडिट के बाद होगा</td>
+</tr>
+<tr>
+<td>Solana</td>
+<td>प्रोग्राम लिखा जा चुका है और लोकल पर टेस्ट हो चुका है। डिप्लॉय नहीं हुआ, अभी वेब ऐप में नहीं है</td>
+</tr>
+<tr>
+<td>कॉइन को दूसरे नेटवर्क पर बेचना (ब्रिज)</td>
+<td>योजना में है। बना नहीं है</td>
+</tr>
+</tbody></table></div>
+<p>Sepolia पर टेस्ट डिप्लॉयमेंट:</p>
+<ul>
+<li>प्लेटफ़ॉर्म फ़ैक्टरी: <code>0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647</code></li>
+<li>साइट: <a rel="noopener" href="https://w8nwzbf9h5-svg.github.io/jisr-launchpad/">https://w8nwzbf9h5-svg.github.io/jisr-launchpad/</a></li>
+<li>कोड: <a rel="noopener" href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad">https://github.com/w8nwzbf9h5-svg/jisr-launchpad</a></li>
+</ul>
+<h2>8. सूचना</h2>
+<p>यह दस्तावेज़ एक सॉफ़्टवेयर का वर्णन करता है। यह किसी कॉइन की पेशकश नहीं है और वित्तीय सलाह नहीं है। Jisr पर लॉन्च होने वाले कॉइन उनके बनाने वाले बनाते हैं, प्लेटफ़ॉर्म नहीं। प्लेटफ़ॉर्म इस्तेमाल करने वाला हर व्यक्ति अपने फ़ैसलों के लिए ख़ुद ज़िम्मेदार है।</p>
+<p>यह एक अनुवाद है। अंग्रेज़ी संस्करण ही मान्य आधार है; कोई अंतर हो तो अंग्रेज़ी पाठ लागू होगा।</p>
+
+</article>
+<article id="paper-fr" lang="fr" hidden>
+<h1>Jisr Launchpad : livre blanc</h1>
+<p>Version 0.1 · 22 novembre 2026 · Phase de réseau de test</p>
+<p>Jisr (جسر, « pont ») est une plateforme de lancement de meme coins où chaque jeton a un prix plancher couvert par de l&#39;argent conservé dans un contrat dont personne ne peut retirer les fonds. Ce document explique son fonctionnement, ce qu&#39;elle protège, ce qu&#39;elle ne protège pas, et ce qui est construit aujourd&#39;hui.</p>
+<h2>1. Le problème</h2>
+<p>La plupart des lancements de meme coins finissent de la même manière. Les premiers acheteurs et le créateur détiennent des jetons qui ne leur ont presque rien coûté, et ils les vendent à ceux qui arrivent ensuite. Sur une courbe de liaison classique, l&#39;argent du pool ne représente qu&#39;une fraction de la valeur de marché : le prix n&#39;a donc rien sous lui quand les ventes commencent. Les protections habituelles (blocages, libération progressive, taxes à la vente) reposent sur une promesse à tenir ou sur une règle qui peut être modifiée.</p>
+<p>Jisr supprime les jetons bon marché du début et place de l&#39;argent réel sous chaque jeton.</p>
+<h2>2. Fonctionnement d&#39;un jeton</h2>
+<p>Tous les jetons lancés sur Jisr ont les mêmes conditions. Le créateur choisit seulement le nom, le symbole, l&#39;image, la description et les liens.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Offre totale</td>
+<td>1,000,000,000 jetons, créés une seule fois</td>
+</tr>
+<tr>
+<td>Vente</td>
+<td>Les 800,000,000 premiers jetons à un prix fixe unique</td>
+</tr>
+<tr>
+<td>Prix de vente (réserve en dollars)</td>
+<td>$0.0001 par jeton, soit une capitalisation de $100,000</td>
+</tr>
+<tr>
+<td>Au-dessus du plancher</td>
+<td>Les 200,000,000 derniers jetons, sur une courbe de prix croissante</td>
+</tr>
+<tr>
+<td>Frais de transaction</td>
+<td>5 % de chaque achat et de chaque vente</td>
+</tr>
+<tr>
+<td>Limite par portefeuille</td>
+<td>2.5 % de l&#39;offre (25,000,000 jetons) par portefeuille</td>
+</tr>
+<tr>
+<td>Jetons donnés au créateur</td>
+<td>Aucun</td>
+</tr>
+</tbody></table></div>
+<h3>2.1 Un seul prix pour tous</h3>
+<p>Les 800 premiers millions de jetons sont vendus au même prix à tout le monde, créateur compris. Il n&#39;y a pas de tour initial à bas prix : personne ne détient de jetons qui lui ont coûté moins cher que les vôtres.</p>
+<h3>2.2 Le plancher couvert</h3>
+<p>Chaque jeton qui sort du marché dépose un prix plancher dans la <strong>réserve du plancher</strong> de ce jeton. La réserve contient donc toujours de quoi racheter tous les jetons en circulation au prix plancher. Tout détenteur peut revendre au marché à tout moment et recevoir le prix plancher, moins les frais de 5 %.</p>
+<p>Exemple avec une réserve en dollars :</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Étape</th>
+<th>Montant</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Vous payez</td>
+<td>$1,000.00</td>
+</tr>
+<tr>
+<td>Frais à l&#39;achat (5 %)</td>
+<td>$50.00</td>
+</tr>
+<tr>
+<td>Jetons reçus</td>
+<td>9,500,000</td>
+</tr>
+<tr>
+<td>Vous les revendez tous au prix plancher</td>
+<td>$950.00 avant frais</td>
+</tr>
+<tr>
+<td>Frais à la vente (5 %)</td>
+<td>$47.50</td>
+</tr>
+<tr>
+<td>Vous recevez</td>
+<td>$902.50</td>
+</tr>
+</tbody></table></div>
+<p>Un achat suivi d&#39;une vente au prix plancher coûte 9.75 % de frais. C&#39;est le maximum qu&#39;un acheteur au prix plancher peut perdre du fait du mécanisme lui-même. Les risques de la section 6 sont distincts.</p>
+<h3>2.3 Graduation et plancher croissant</h3>
+<p>Quand les 800 millions de jetons de la vente sont vendus, le jeton est <strong>gradué</strong>. À partir de là, les 2 % de chaque transaction qui restent dans la réserve la rendent plus grande que nécessaire, et le prix plancher est relevé en conséquence :</p>
+<blockquote>
+<p>prix plancher = réserve du plancher ÷ le plus grand de (jetons en circulation, 800,000,000)</p>
+</blockquote>
+<p>Le prix plancher ne baisse jamais. À la graduation, la réserve contient environ $81,684 pour un jeton à $100,000 : le plancher démarre donc environ 2.1 % au-dessus du prix de vente et monte avec le volume des échanges.</p>
+<h3>2.4 Au-dessus du plancher</h3>
+<p>Les 200 derniers millions de jetons coûtent le prix plancher plus une prime qui augmente à mesure qu&#39;ils s&#39;épuisent. La prime est conservée dans une <strong>réserve de primes</strong> distincte et elle est restituée quand les jetons sont revendus le long de la même ligne.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Jetons de la courbe vendus</th>
+<th>Prix du jeton suivant</th>
+<th>Valeur de marché à ce prix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>$0.0001</td>
+<td>$100,000</td>
+</tr>
+<tr>
+<td>100,000,000</td>
+<td>environ $0.0004</td>
+<td>environ $400,000</td>
+</tr>
+<tr>
+<td>150,000,000</td>
+<td>environ $0.0016</td>
+<td>environ $1,600,000</td>
+</tr>
+<tr>
+<td>190,000,000 (fin de la courbe)</td>
+<td>environ $0.04</td>
+<td>environ $40,000,000</td>
+</tr>
+</tbody></table></div>
+<p>Le plancher ne couvre que le prix plancher. Un acheteur qui paie une prime au-dessus du plancher peut perdre cette prime si d&#39;autres vendent avant lui.</p>
+<h3>2.5 Où vont les 5 %</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Destinataire</th>
+<th>But</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1 %</td>
+<td>Le créateur du jeton</td>
+<td>Versé seulement quand le jeton est échangé</td>
+</tr>
+<tr>
+<td>2 %</td>
+<td>La réserve du plancher du jeton</td>
+<td>Relève le plancher pour tous les détenteurs après la graduation</td>
+</tr>
+<tr>
+<td>2 %</td>
+<td>Le portefeuille de la plateforme</td>
+<td>Fait fonctionner la plateforme</td>
+</tr>
+</tbody></table></div>
+<h3>2.6 La limite par portefeuille</h3>
+<p>Aucun portefeuille ne peut détenir plus de 2.5 % de l&#39;offre d&#39;un jeton. Cela s&#39;applique à tous les portefeuilles, celui du créateur compris. La limite restreint ce qu&#39;une adresse peut vendre d&#39;un coup. Elle ne peut pas empêcher une personne d&#39;utiliser plusieurs portefeuilles : une blockchain ne sait pas que deux adresses appartiennent à la même personne.</p>
+<h2>3. Qui contrôle quoi</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Élément</th>
+<th>Qui peut déplacer ses fonds ou le modifier</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Les réserves d&#39;un jeton</td>
+<td>Personne. L&#39;argent ne sort que vers un vendeur selon la formule, vers le créateur au titre des frais de 1 %, ou vers le portefeuille de la plateforme au titre des frais de 2 %</td>
+</tr>
+<tr>
+<td>Un jeton</td>
+<td>Ses détenteurs uniquement. Pas de nouvelle émission, pas de pause, pas de liste noire, pas de changement de frais</td>
+</tr>
+<tr>
+<td>Le portefeuille de la plateforme</td>
+<td>L&#39;équipe de la plateforme. Il reçoit les frais de 2 %</td>
+</tr>
+<tr>
+<td>Le propriétaire de la fabrique</td>
+<td>Peut changer l&#39;adresse du portefeuille de la plateforme. Rien d&#39;autre</td>
+</tr>
+</tbody></table></div>
+<p>Les contrats du jeton et du marché n&#39;ont ni propriétaire, ni mise à jour, ni pause, ni fonction de retrait. Le créateur n&#39;a aucun droit particulier après le lancement. Les tests figent la liste complète des fonctions qui peuvent modifier l&#39;état : ajouter une fonction d&#39;administration fait échouer la compilation.</p>
+<p>Le coût de cette conception : si un bug est découvert après le lancement, personne ne peut mettre en pause ni corriger un marché en service.</p>
+<h2>4. Pour les créateurs</h2>
+<ul>
+<li>Lancer un jeton coûte une transaction réseau. Il n&#39;y a pas de frais de listing.</li>
+<li>Le créateur ne reçoit aucun jeton. Pour en détenir, il achète au prix de vente comme tout le monde, dans la même limite de 2.5 %.</li>
+<li>Le créateur gagne 1 % de chaque transaction sur son jeton et peut l&#39;encaisser à tout moment.</li>
+<li>Rien de ce que le créateur achète n&#39;est bloqué ni libéré par étapes, puisqu&#39;il a payé le même prix que tout autre acheteur.</li>
+</ul>
+<h2>5. Réseaux et monnaies de réserve</h2>
+<ul>
+<li><strong>Réseaux.</strong> Les contrats fonctionnent sur tout réseau EVM : Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain et d&#39;autres. Un jeton vit sur le réseau où il a été lancé.</li>
+<li><strong>Monnaie de réserve.</strong> Chaque déploiement de la plateforme fixe le prix de ses jetons et les couvre dans un seul token : un stablecoin en dollars (USDT ou USDC) ou un autre token standard, comme une action tokenisée. Avec une action tokenisée, le plancher est un nombre d&#39;actions : sa valeur en dollars suit donc l&#39;action.</li>
+<li><strong>Payer avec la monnaie du réseau.</strong> Là où un routeur d&#39;échange est connecté, les acheteurs peuvent payer et être payés en ETH ou en BNB. Le paiement est converti à l&#39;entrée et à la sortie ; la réserve ne contient que le token de réserve.</li>
+</ul>
+<h2>6. Risques</h2>
+<p>Lisez cette section avant d&#39;utiliser la plateforme avec quoi que ce soit de valeur.</p>
+<ul>
+<li><strong>Non audité.</strong> Les contrats ont passé leurs propres tests, dont des échanges aléatoires et des simulations d&#39;attaques. Ils n&#39;ont pas été examinés par un auditeur de sécurité indépendant. Un bug pourrait entraîner une perte de fonds.</li>
+<li><strong>Pas de secours.</strong> Personne ne peut mettre en pause ni réparer un marché en service. Cela protège la réserve contre les personnes et supprime le filet de sécurité contre les bugs.</li>
+<li><strong>Frais.</strong> Acheter puis vendre au prix plancher coûte 9.75 % au total.</li>
+<li><strong>Risque de prime.</strong> Le plancher protège le prix plancher. L&#39;argent payé au-dessus du plancher n&#39;est pas protégé.</li>
+<li><strong>Risque du token de réserve.</strong> Un stablecoin peut perdre sa parité et son émetteur peut geler une adresse. Une action tokenisée suit son action et peut restreindre qui a le droit de la détenir. Les contrats ne peuvent se défendre contre rien de cela.</li>
+<li><strong>Risque d&#39;échange.</strong> Payer avec la monnaie du réseau dépend du routeur et de sa liquidité, et peut coûter plus cher que payer avec le token de réserve.</li>
+<li><strong>Portefeuilles liés.</strong> La limite de 2.5 % s&#39;applique par adresse.</li>
+<li><strong>Les jetons envoyés au marché par simple transfert</strong>, au lieu d&#39;une vente, sont perdus pour l&#39;expéditeur.</li>
+<li><strong>Le plancher est un mécanisme.</strong> C&#39;est le montant que le contrat paiera, en token de réserve, pour un jeton. Ce n&#39;est pas une promesse de gain ni une assurance.</li>
+</ul>
+<h2>7. État d&#39;avancement</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Partie</th>
+<th>État</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Contrats EVM</td>
+<td>Construits et testés (35 tests de contrats)</td>
+</tr>
+<tr>
+<td>Application web et page de déploiement</td>
+<td>Construites et testées (22 tests dans le navigateur), en ligne</td>
+</tr>
+<tr>
+<td>Déploiement de test</td>
+<td>En ligne sur le réseau de test Sepolia, avec de l&#39;argent de test sans valeur</td>
+</tr>
+<tr>
+<td>Audit de sécurité indépendant</td>
+<td>Non réalisé</td>
+</tr>
+<tr>
+<td>Déploiement sur des réseaux réels</td>
+<td>Non réalisé. Il vient après l&#39;audit</td>
+</tr>
+<tr>
+<td>Solana</td>
+<td>Programme écrit et testé en local. Non déployé, pas encore dans l&#39;application web</td>
+</tr>
+<tr>
+<td>Vendre un jeton sur un autre réseau (pont)</td>
+<td>Prévu. Non construit</td>
+</tr>
+</tbody></table></div>
+<p>Déploiement de test sur Sepolia :</p>
+<ul>
+<li>Fabrique de la plateforme : <code>0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647</code></li>
+<li>Site : <a rel="noopener" href="https://w8nwzbf9h5-svg.github.io/jisr-launchpad/">https://w8nwzbf9h5-svg.github.io/jisr-launchpad/</a></li>
+<li>Code : <a rel="noopener" href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad">https://github.com/w8nwzbf9h5-svg/jisr-launchpad</a></li>
+</ul>
+<h2>8. Avertissement</h2>
+<p>Ce document décrit un logiciel. Ce n&#39;est ni une offre d&#39;un jeton ni un conseil financier. Les jetons lancés sur Jisr sont créés par leurs créateurs, pas par la plateforme. Toute personne qui utilise la plateforme est responsable de ses propres décisions.</p>
+<p>Ceci est une traduction. La version anglaise fait référence ; en cas de différence, le texte anglais s&#39;applique.</p>
+
+</article>
+<article id="paper-ru" lang="ru" hidden>
+<h1>Jisr Launchpad: Белая книга</h1>
+<p>Версия 0.1 · 22 ноября 2026 г. · Этап тестовой сети</p>
+<p>Jisr (جسر, «мост») — площадка для запуска мем-коинов, где у каждой монеты есть нижняя граница цены, обеспеченная деньгами в контракте, из которого никто не может их вывести. В этом документе описано, как это работает, от чего защищает, от чего не защищает и что построено на сегодня.</p>
+<h2>1. Проблема</h2>
+<p>Большинство запусков мем-коинов заканчивается одинаково. Ранние покупатели и создатель держат монеты, которые достались им почти даром, и продают их тем, кто пришёл позже. На классической кривой связывания денег в пуле хватает лишь на часть рыночной стоимости, поэтому, когда начинаются продажи, под ценой ничего нет. Обычные меры защиты (блокировки, поэтапная разблокировка, налоги на продажу) зависят от того, сдержит ли кто-то обещание, или от правила, которое можно изменить.</p>
+<p>Jisr убирает дешёвые ранние монеты и кладёт под каждую монету реальные деньги.</p>
+<h2>2. Как устроена монета</h2>
+<p>У каждой монеты, запущенной на Jisr, одинаковые условия. Создатель выбирает только название, тикер, изображение, описание и ссылки.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Условие</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Общее предложение</td>
+<td>1,000,000,000 монет, создаются один раз</td>
+</tr>
+<tr>
+<td>Продажа</td>
+<td>Первые 800,000,000 монет по одной фиксированной цене</td>
+</tr>
+<tr>
+<td>Цена продажи (резерв в долларах)</td>
+<td>$0.0001 за монету, капитализация $100,000</td>
+</tr>
+<tr>
+<td>Выше нижней границы</td>
+<td>Последние 200,000,000 монет, цена растёт по кривой</td>
+</tr>
+<tr>
+<td>Комиссия за сделку</td>
+<td>5% с каждой покупки и каждой продажи</td>
+</tr>
+<tr>
+<td>Лимит на кошелёк</td>
+<td>2.5% предложения (25,000,000 монет) на кошелёк</td>
+</tr>
+<tr>
+<td>Монеты, выданные создателю</td>
+<td>Нет</td>
+</tr>
+</tbody></table></div>
+<h3>2.1 Одна цена для всех</h3>
+<p>Первые 800 миллионов монет продаются по одной цене всем, включая создателя. Дешёвого раннего раунда нет, поэтому ни у кого нет монет, которые обошлись дешевле ваших.</p>
+<h3>2.2 Обеспеченная нижняя граница</h3>
+<p>Каждая монета, которая уходит с рынка, вносит одну нижнюю цену в <strong>резерв нижней границы</strong> этой монеты. Поэтому в резерве всегда достаточно средств, чтобы выкупить все монеты в обращении по нижней цене. Любой держатель может в любой момент продать монеты обратно рынку и получить нижнюю цену за вычетом комиссии 5%.</p>
+<p>Пример с резервом в долларах:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Шаг</th>
+<th>Сумма</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Вы платите</td>
+<td>$1,000.00</td>
+</tr>
+<tr>
+<td>Комиссия за покупку (5%)</td>
+<td>$50.00</td>
+</tr>
+<tr>
+<td>Вы получаете монет</td>
+<td>9,500,000</td>
+</tr>
+<tr>
+<td>Вы продаёте их все по нижней цене</td>
+<td>$950.00 до комиссии</td>
+</tr>
+<tr>
+<td>Комиссия за продажу (5%)</td>
+<td>$47.50</td>
+</tr>
+<tr>
+<td>Вы получаете</td>
+<td>$902.50</td>
+</tr>
+</tbody></table></div>
+<p>Покупка с последующей продажей по нижней цене стоит 9.75% комиссий. Это максимум, который покупатель по нижней цене может потерять из-за самого механизма. Риски из раздела 6 — отдельная тема.</p>
+<h3>2.3 Выпуск и растущая нижняя граница</h3>
+<p>Когда все 800 миллионов монет продажи проданы, монета считается <strong>выпущенной</strong> (graduated). С этого момента 2% с каждой сделки, которые остаются в резерве, делают его больше необходимого, и нижняя цена повышается соответственно:</p>
+<blockquote>
+<p>нижняя цена = резерв нижней границы ÷ большее из (монеты в обращении, 800,000,000)</p>
+</blockquote>
+<p>Нижняя цена никогда не снижается. В момент выпуска в резерве около $81,684 для монеты с капитализацией $100,000, поэтому нижняя граница начинается примерно на 2.1% выше цены продажи и растёт вместе с объёмом торгов.</p>
+<h3>2.4 Выше нижней границы</h3>
+<p>Последние 200 миллионов монет стоят нижнюю цену плюс премию, которая растёт по мере их распродажи. Премия хранится в отдельном <strong>резерве премий</strong> и возвращается, когда монеты продаются обратно по той же линии.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Продано монет с кривой</th>
+<th>Цена следующей монеты</th>
+<th>Рыночная стоимость по этой цене</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>$0.0001</td>
+<td>$100,000</td>
+</tr>
+<tr>
+<td>100,000,000</td>
+<td>около $0.0004</td>
+<td>около $400,000</td>
+</tr>
+<tr>
+<td>150,000,000</td>
+<td>около $0.0016</td>
+<td>около $1,600,000</td>
+</tr>
+<tr>
+<td>190,000,000 (конец кривой)</td>
+<td>около $0.04</td>
+<td>около $40,000,000</td>
+</tr>
+</tbody></table></div>
+<p>Нижняя граница покрывает только нижнюю цену. Покупатель, заплативший премию сверх неё, может потерять эту премию, если другие продадут раньше.</p>
+<h3>2.5 Куда идут 5%</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Доля</th>
+<th>Получатель</th>
+<th>Назначение</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1%</td>
+<td>Создатель монеты</td>
+<td>Выплачивается только когда монетой торгуют</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>Резерв нижней границы монеты</td>
+<td>Поднимает нижнюю границу для всех держателей после выпуска</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>Кошелёк площадки</td>
+<td>Обеспечивает работу площадки</td>
+</tr>
+</tbody></table></div>
+<h3>2.6 Лимит на кошелёк</h3>
+<p>Ни один кошелёк не может держать больше 2.5% предложения монеты. Это относится ко всем кошелькам, включая кошелёк создателя. Лимит ограничивает объём, который один адрес может продать за раз. Он не мешает одному человеку использовать несколько кошельков: блокчейн не знает, что два адреса принадлежат одному лицу.</p>
+<h2>3. Кто чем управляет</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Объект</th>
+<th>Кто может перемещать его средства или менять его</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Резервы монеты</td>
+<td>Никто. Деньги уходят только продавцу по формуле, создателю как комиссия 1% или на кошелёк площадки как комиссия 2%</td>
+</tr>
+<tr>
+<td>Монета</td>
+<td>Только её держатели. Нет новой эмиссии, нет паузы, нет чёрного списка, нет изменения комиссий</td>
+</tr>
+<tr>
+<td>Кошелёк площадки</td>
+<td>Команда площадки. Он получает комиссию 2%</td>
+</tr>
+<tr>
+<td>Владелец фабрики</td>
+<td>Может изменить адрес кошелька площадки. Больше ничего</td>
+</tr>
+</tbody></table></div>
+<p>У контрактов монеты и рынка нет владельца, нет обновления, нет паузы и нет функции вывода. После запуска у создателя нет особых прав. Тесты фиксируют полный список функций, которые могут менять состояние, поэтому добавление административной функции ломает сборку.</p>
+<p>Цена такого решения: если после запуска найдётся ошибка, никто не сможет приостановить или исправить работающий рынок.</p>
+<h2>4. Для создателей</h2>
+<ul>
+<li>Запуск стоит одну транзакцию в сети. Платы за листинг нет.</li>
+<li>Создатель не получает монет. Чтобы держать монету, он покупает её по цене продажи, как все, в пределах того же лимита 2.5%.</li>
+<li>Создатель получает 1% с каждой сделки по своей монете и может забрать эти средства в любой момент.</li>
+<li>Ничто из купленного создателем не блокируется и не разблокируется поэтапно, потому что он заплатил ту же цену, что и любой другой покупатель.</li>
+</ul>
+<h2>5. Сети и резервные валюты</h2>
+<ul>
+<li><strong>Сети.</strong> Контракты работают в любой сети EVM: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain и других. Монета существует в той сети, где её запустили.</li>
+<li><strong>Резервная валюта.</strong> Каждое развёртывание площадки оценивает и обеспечивает свои монеты одним токеном: долларовым стейблкоином (USDT или USDC) или другим стандартным токеном, например токенизированной акцией. С токенизированной акцией нижняя граница — это количество акций, поэтому её стоимость в долларах меняется вместе с акцией.</li>
+<li><strong>Оплата собственной валютой сети.</strong> Там, где подключён маршрутизатор обмена, покупатели могут платить и получать выплаты в ETH или BNB. Платёж конвертируется на входе и на выходе; в резерве хранится только резервный токен.</li>
+</ul>
+<h2>6. Риски</h2>
+<p>Прочитайте этот раздел, прежде чем использовать площадку с чем-либо ценным.</p>
+<ul>
+<li><strong>Нет аудита.</strong> Контракты прошли собственные тесты, включая случайную торговлю и моделирование атак. Независимый аудитор безопасности их не проверял. Ошибка может привести к потере средств.</li>
+<li><strong>Нет спасения.</strong> Никто не может приостановить или исправить работающий рынок. Это защищает резерв от людей и убирает страховку от ошибок.</li>
+<li><strong>Комиссии.</strong> Покупка и продажа по нижней цене стоят в сумме 9.75%.</li>
+<li><strong>Риск премии.</strong> Нижняя граница защищает нижнюю цену. Деньги, уплаченные сверх неё, не защищены.</li>
+<li><strong>Риск резервного токена.</strong> Стейблкоин может потерять привязку, а его эмитент может заморозить адрес. Токенизированная акция следует за своей акцией и может ограничивать круг держателей. Контракты не могут защитить ни от чего из этого.</li>
+<li><strong>Риск обмена.</strong> Оплата собственной валютой сети зависит от маршрутизатора и его ликвидности и может стоить дороже, чем оплата резервным токеном.</li>
+<li><strong>Связанные кошельки.</strong> Лимит 2.5% считается по адресу.</li>
+<li><strong>Монеты, отправленные на рынок обычным переводом</strong>, а не через продажу, для отправителя потеряны.</li>
+<li><strong>Нижняя граница — это механизм.</strong> Это сумма, которую контракт заплатит за монету в резервном токене. Это не обещание прибыли и не страховка.</li>
+</ul>
+<h2>7. Состояние</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Часть</th>
+<th>Состояние</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Контракты EVM</td>
+<td>Построены и протестированы (35 тестов контрактов)</td>
+</tr>
+<tr>
+<td>Веб-приложение и страница развёртывания</td>
+<td>Построены и протестированы (22 теста в браузере), работают</td>
+</tr>
+<tr>
+<td>Тестовое развёртывание</td>
+<td>Работает в тестовой сети Sepolia, с тестовыми деньгами без стоимости</td>
+</tr>
+<tr>
+<td>Независимый аудит безопасности</td>
+<td>Не проведён</td>
+</tr>
+<tr>
+<td>Развёртывание в реальных сетях</td>
+<td>Не выполнено. Оно идёт после аудита</td>
+</tr>
+<tr>
+<td>Solana</td>
+<td>Программа написана и протестирована локально. Не развёрнута, в веб-приложении её пока нет</td>
+</tr>
+<tr>
+<td>Продажа монеты в другой сети (мост)</td>
+<td>Запланировано. Не построено</td>
+</tr>
+</tbody></table></div>
+<p>Тестовое развёртывание в Sepolia:</p>
+<ul>
+<li>Фабрика площадки: <code>0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647</code></li>
+<li>Сайт: <a rel="noopener" href="https://w8nwzbf9h5-svg.github.io/jisr-launchpad/">https://w8nwzbf9h5-svg.github.io/jisr-launchpad/</a></li>
+<li>Код: <a rel="noopener" href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad">https://github.com/w8nwzbf9h5-svg/jisr-launchpad</a></li>
+</ul>
+<h2>8. Уведомление</h2>
+<p>Этот документ описывает программное обеспечение. Это не предложение какой-либо монеты и не финансовая рекомендация. Монеты, запущенные на Jisr, создают их создатели, а не площадка. Каждый, кто пользуется площадкой, сам отвечает за свои решения.</p>
+<p>Это перевод. Основной является английская версия; при расхождениях действует английский текст.</p>
+
+</article>
+<article id="paper-pt" lang="pt" hidden>
+<h1>Jisr Launchpad: White Paper</h1>
+<p>Versão 0.1 · 22 de novembro de 2026 · Fase de rede de testes</p>
+<p>Jisr (جسر, &quot;ponte&quot;) é uma plataforma de lançamento de meme coins em que cada moeda tem um preço mínimo coberto por dinheiro guardado num contrato do qual ninguém pode sacar. Este documento explica como funciona, do que protege, do que não protege e o que está construído hoje.</p>
+<h2>1. O problema</h2>
+<p>A maioria dos lançamentos de meme coins termina do mesmo jeito. Os primeiros compradores e o criador têm moedas que quase não lhes custaram nada e vendem para quem chega depois. Numa curva de vinculação clássica, o dinheiro do pool é só uma fração do valor de mercado, então o preço não tem nada por baixo quando as vendas começam. As defesas habituais (bloqueios, liberação gradual, taxas de venda) dependem de alguém cumprir uma promessa ou de uma regra que pode ser alterada.</p>
+<p>Jisr elimina as moedas baratas do início e coloca dinheiro real debaixo de cada moeda.</p>
+<h2>2. Como funciona uma moeda</h2>
+<p>Todas as moedas lançadas na Jisr têm as mesmas condições. O criador escolhe apenas o nome, o símbolo, a imagem, a descrição e os links.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Condição</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Oferta total</td>
+<td>1,000,000,000 moedas, criadas uma única vez</td>
+</tr>
+<tr>
+<td>Venda</td>
+<td>As primeiras 800,000,000 moedas a um único preço fixo</td>
+</tr>
+<tr>
+<td>Preço de venda (reserva em dólares)</td>
+<td>$0.0001 por moeda, uma capitalização de $100,000</td>
+</tr>
+<tr>
+<td>Acima do piso</td>
+<td>As últimas 200,000,000 moedas, com preço numa curva crescente</td>
+</tr>
+<tr>
+<td>Taxa de negociação</td>
+<td>5% de cada compra e de cada venda</td>
+</tr>
+<tr>
+<td>Limite por carteira</td>
+<td>2.5% da oferta (25,000,000 moedas) por carteira</td>
+</tr>
+<tr>
+<td>Moedas dadas ao criador</td>
+<td>Nenhuma</td>
+</tr>
+</tbody></table></div>
+<h3>2.1 Um preço para todos</h3>
+<p>As primeiras 800 milhões de moedas são vendidas pelo mesmo preço para todo mundo, inclusive o criador. Não há rodada inicial barata, então ninguém tem moedas que custaram menos do que as suas.</p>
+<h3>2.2 O piso coberto</h3>
+<p>Cada moeda que sai do mercado deposita um preço de piso na <strong>reserva do piso</strong> dessa moeda. Por isso a reserva sempre tem o suficiente para recomprar todas as moedas em circulação pelo preço de piso. Qualquer titular pode vender ao mercado a qualquer momento e receber o preço de piso, menos a taxa de 5%.</p>
+<p>Exemplo com reserva em dólares:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Etapa</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Você paga</td>
+<td>$1,000.00</td>
+</tr>
+<tr>
+<td>Taxa da compra (5%)</td>
+<td>$50.00</td>
+</tr>
+<tr>
+<td>Moedas que você recebe</td>
+<td>9,500,000</td>
+</tr>
+<tr>
+<td>Você vende todas pelo preço de piso</td>
+<td>$950.00 antes da taxa</td>
+</tr>
+<tr>
+<td>Taxa da venda (5%)</td>
+<td>$47.50</td>
+</tr>
+<tr>
+<td>Você recebe</td>
+<td>$902.50</td>
+</tr>
+</tbody></table></div>
+<p>Comprar e depois vender pelo preço de piso custa 9.75% em taxas. Isso é o máximo que um comprador ao preço de piso pode perder pelo mecanismo em si. Os riscos da seção 6 são à parte.</p>
+<h3>2.3 Graduação e piso crescente</h3>
+<p>Quando todas as 800 milhões de moedas da venda forem vendidas, a moeda está <strong>graduada</strong>. A partir daí, os 2% de cada negociação que ficam na reserva a tornam maior do que o necessário, e o preço de piso é elevado para acompanhar:</p>
+<blockquote>
+<p>preço de piso = reserva do piso ÷ o maior entre (moedas em circulação, 800,000,000)</p>
+</blockquote>
+<p>O preço de piso nunca é reduzido. Na graduação a reserva tem cerca de $81,684 para uma moeda de $100,000, então o piso começa cerca de 2.1% acima do preço de venda e sobe com o volume negociado.</p>
+<h3>2.4 Acima do piso</h3>
+<p>As últimas 200 milhões de moedas custam o preço de piso mais um prêmio que cresce à medida que se esgotam. O prêmio fica numa <strong>reserva de prêmios</strong> separada e é devolvido quando as moedas são vendidas ao longo da mesma linha.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Moedas da curva vendidas</th>
+<th>Preço da próxima moeda</th>
+<th>Valor de mercado a esse preço</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>$0.0001</td>
+<td>$100,000</td>
+</tr>
+<tr>
+<td>100,000,000</td>
+<td>cerca de $0.0004</td>
+<td>cerca de $400,000</td>
+</tr>
+<tr>
+<td>150,000,000</td>
+<td>cerca de $0.0016</td>
+<td>cerca de $1,600,000</td>
+</tr>
+<tr>
+<td>190,000,000 (fim da curva)</td>
+<td>cerca de $0.04</td>
+<td>cerca de $40,000,000</td>
+</tr>
+</tbody></table></div>
+<p>O piso cobre apenas o preço de piso. Quem paga um prêmio acima do piso pode perder esse prêmio se outros venderem antes.</p>
+<h3>2.5 Para onde vão os 5%</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Parte</th>
+<th>Vai para</th>
+<th>Finalidade</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1%</td>
+<td>O criador da moeda</td>
+<td>Pago apenas quando as pessoas negociam a moeda</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>A reserva do piso da moeda</td>
+<td>Eleva o piso para todos os titulares após a graduação</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>A carteira da plataforma</td>
+<td>Mantém a plataforma</td>
+</tr>
+</tbody></table></div>
+<h3>2.6 O limite por carteira</h3>
+<p>Nenhuma carteira pode ter mais de 2.5% da oferta de uma moeda. Isso vale para todas as carteiras, inclusive a do criador. O limite restringe quanto um endereço pode vender de uma vez. Não impede que uma pessoa use várias carteiras: uma blockchain não sabe que dois endereços pertencem à mesma pessoa.</p>
+<h2>3. Quem controla o quê</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Quem pode mover seus fundos ou alterá-lo</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>As reservas de uma moeda</td>
+<td>Ninguém. O dinheiro sai apenas para um vendedor conforme a fórmula, para o criador como taxa de 1% ou para a carteira da plataforma como taxa de 2%</td>
+</tr>
+<tr>
+<td>Uma moeda</td>
+<td>Apenas seus titulares. Sem novas emissões, sem pausa, sem lista negra, sem mudança de taxas</td>
+</tr>
+<tr>
+<td>A carteira da plataforma</td>
+<td>A equipe da plataforma. Recebe a taxa de 2%</td>
+</tr>
+<tr>
+<td>O dono da fábrica</td>
+<td>Pode mudar qual endereço é a carteira da plataforma. Nada mais</td>
+</tr>
+</tbody></table></div>
+<p>Os contratos da moeda e do mercado não têm dono, nem atualização, nem pausa, nem função de saque. O criador não tem direitos especiais depois do lançamento. Os testes fixam a lista completa das funções que podem alterar o estado, de modo que adicionar uma função administrativa faz a compilação falhar.</p>
+<p>O custo desse desenho: se um erro for encontrado depois do lançamento, ninguém pode pausar nem corrigir um mercado em funcionamento.</p>
+<h2>4. Para criadores</h2>
+<ul>
+<li>Lançar custa uma transação de rede. Não há taxa de listagem.</li>
+<li>O criador não recebe moedas. Para ter a moeda, ele compra pelo preço de venda como todo mundo, dentro do mesmo limite de 2.5%.</li>
+<li>O criador ganha 1% de cada negociação da sua moeda e pode sacar a qualquer momento.</li>
+<li>Nada do que o criador compra fica bloqueado ou é liberado em etapas, porque ele pagou o mesmo preço que qualquer outro comprador.</li>
+</ul>
+<h2>5. Redes e moedas de reserva</h2>
+<ul>
+<li><strong>Redes.</strong> Os contratos funcionam em qualquer rede EVM: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain e outras. Uma moeda vive na rede em que foi lançada.</li>
+<li><strong>Moeda de reserva.</strong> Cada implantação da plataforma precifica e cobre suas moedas em um único token: uma stablecoin em dólar (USDT ou USDC) ou outro token padrão, como uma ação tokenizada. Com uma ação tokenizada, o piso é um número de ações, então seu valor em dólares acompanha a ação.</li>
+<li><strong>Pagar com a moeda própria da rede.</strong> Onde houver um roteador de troca conectado, os compradores podem pagar e receber em ETH ou BNB. O pagamento é convertido na entrada e na saída; a reserva guarda apenas o token de reserva.</li>
+</ul>
+<h2>6. Riscos</h2>
+<p>Leia esta seção antes de usar a plataforma com qualquer coisa de valor.</p>
+<ul>
+<li><strong>Sem auditoria.</strong> Os contratos passaram nos próprios testes, incluindo negociação aleatória e simulações de ataque. Não foram revisados por um auditor de segurança independente. Um erro pode causar perda de fundos.</li>
+<li><strong>Sem resgate.</strong> Ninguém pode pausar ou consertar um mercado em funcionamento. Isso protege a reserva das pessoas e remove a rede de segurança contra erros.</li>
+<li><strong>Taxas.</strong> Comprar e vender pelo preço de piso custa 9.75% no total.</li>
+<li><strong>Risco do prêmio.</strong> O piso protege o preço de piso. O dinheiro pago acima do piso não está protegido.</li>
+<li><strong>Risco do token de reserva.</strong> Uma stablecoin pode perder a paridade e seu emissor pode congelar um endereço. Uma ação tokenizada acompanha sua ação e pode restringir quem pode tê-la. Os contratos não conseguem defender contra nada disso.</li>
+<li><strong>Risco de troca.</strong> Pagar com a moeda própria da rede depende do roteador e da sua liquidez, e pode custar mais do que pagar com o token de reserva.</li>
+<li><strong>Carteiras vinculadas.</strong> O limite de 2.5% é por endereço.</li>
+<li><strong>Moedas enviadas ao mercado por transferência simples</strong>, em vez de uma venda, são perdidas por quem enviou.</li>
+<li><strong>O piso é um mecanismo.</strong> É o valor que o contrato pagará, no token de reserva, por uma moeda. Não é promessa de lucro e não é seguro.</li>
+</ul>
+<h2>7. Situação</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Parte</th>
+<th>Situação</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Contratos EVM</td>
+<td>Construídos e testados (35 testes de contratos)</td>
+</tr>
+<tr>
+<td>Aplicação web e página de implantação</td>
+<td>Construídas e testadas (22 testes no navegador), no ar</td>
+</tr>
+<tr>
+<td>Implantação de teste</td>
+<td>No ar na rede de testes Sepolia, com dinheiro de teste sem valor</td>
+</tr>
+<tr>
+<td>Auditoria de segurança independente</td>
+<td>Não realizada</td>
+</tr>
+<tr>
+<td>Implantação em redes reais</td>
+<td>Não realizada. Vem depois da auditoria</td>
+</tr>
+<tr>
+<td>Solana</td>
+<td>Programa escrito e testado localmente. Não implantado, ainda não está na aplicação web</td>
+</tr>
+<tr>
+<td>Vender uma moeda em outra rede (ponte)</td>
+<td>Planejado. Não construído</td>
+</tr>
+</tbody></table></div>
+<p>Implantação de teste na Sepolia:</p>
+<ul>
+<li>Fábrica da plataforma: <code>0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647</code></li>
+<li>Site: <a rel="noopener" href="https://w8nwzbf9h5-svg.github.io/jisr-launchpad/">https://w8nwzbf9h5-svg.github.io/jisr-launchpad/</a></li>
+<li>Código: <a rel="noopener" href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad">https://github.com/w8nwzbf9h5-svg/jisr-launchpad</a></li>
+</ul>
+<h2>8. Aviso</h2>
+<p>Este documento descreve um software. Não é uma oferta de nenhuma moeda nem aconselhamento financeiro. As moedas lançadas na Jisr são criadas por seus criadores, não pela plataforma. Quem usa a plataforma é responsável pelas próprias decisões.</p>
+<p>Esta é uma tradução. A versão em inglês é a referência; se houver diferença, vale o texto em inglês.</p>
+
+</article>
+<article id="paper-tr" lang="tr" hidden>
+<h1>Jisr Launchpad: Teknik Doküman (White Paper)</h1>
+<p>Sürüm 0.1 · 22 Kasım 2026 · Test ağı aşaması</p>
+<p>Jisr (جسر, &quot;köprü&quot;), her coinin bir taban fiyatına sahip olduğu bir meme coin çıkarma platformudur. Bu taban fiyat, kimsenin para çekemediği bir sözleşmede tutulan parayla karşılanır. Bu doküman platformun nasıl çalıştığını, neye karşı koruduğunu, neye karşı korumadığını ve bugün neyin hazır olduğunu anlatır.</p>
+<h2>1. Sorun</h2>
+<p>Meme coin çıkışlarının çoğu aynı şekilde biter. İlk alıcılar ve coini oluşturan kişi, neredeyse bedavaya gelmiş coinleri tutar ve bunları sonradan gelenlere satar. Klasik bir bağlanma eğrisinde havuzdaki para piyasa değerinin yalnızca küçük bir kısmıdır; bu yüzden satış başladığında fiyatın altında hiçbir şey yoktur. Alışılmış önlemler (kilitler, kademeli serbest bırakma, satış vergileri) ya birinin sözünü tutmasına ya da değiştirilebilen bir kurala dayanır.</p>
+<p>Jisr, erken dönemin ucuz coinlerini kaldırır ve her coinin altına gerçek para koyar.</p>
+<h2>2. Bir coin nasıl çalışır</h2>
+<p>Jisr&#39;de çıkarılan her coinin koşulları aynıdır. Oluşturan kişi yalnızca adı, sembolü, görseli, açıklamayı ve bağlantıları seçer.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Koşul</th>
+<th>Değer</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Toplam arz</td>
+<td>1,000,000,000 coin, bir kez oluşturulur</td>
+</tr>
+<tr>
+<td>Satış</td>
+<td>İlk 800,000,000 coin tek bir sabit fiyattan</td>
+</tr>
+<tr>
+<td>Satış fiyatı (dolar rezervi)</td>
+<td>Coin başına $0.0001, yani $100,000 piyasa değeri</td>
+</tr>
+<tr>
+<td>Tabanın üstü</td>
+<td>Son 200,000,000 coin, yükselen bir eğriyle fiyatlanır</td>
+</tr>
+<tr>
+<td>İşlem ücreti</td>
+<td>Her alımdan ve her satımdan %5</td>
+</tr>
+<tr>
+<td>Cüzdan sınırı</td>
+<td>Cüzdan başına arzın %2.5&#39;i (25,000,000 coin)</td>
+</tr>
+<tr>
+<td>Oluşturana verilen coin</td>
+<td>Yok</td>
+</tr>
+</tbody></table></div>
+<h3>2.1 Herkese tek fiyat</h3>
+<p>İlk 800 milyon coin, oluşturan dahil herkese aynı fiyattan satılır. Ucuz bir erken tur yoktur; bu yüzden kimse sizinkinden daha ucuza gelmiş coin tutmaz.</p>
+<h3>2.2 Karşılığı olan taban</h3>
+<p>Piyasadan çıkan her coin, o coinin <strong>taban rezervine</strong> bir taban fiyatı yatırır. Bu yüzden rezervde, dolaşımdaki bütün coinleri taban fiyattan geri almaya yetecek para her zaman bulunur. Her sahip, coinlerini istediği zaman piyasaya geri satabilir ve %5 ücret düşüldükten sonra taban fiyatı alır.</p>
+<p>Dolar rezerviyle örnek:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Adım</th>
+<th>Tutar</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ödediğiniz</td>
+<td>$1,000.00</td>
+</tr>
+<tr>
+<td>Alım ücreti (%5)</td>
+<td>$50.00</td>
+</tr>
+<tr>
+<td>Aldığınız coin</td>
+<td>9,500,000</td>
+</tr>
+<tr>
+<td>Hepsini taban fiyattan geri satarsınız</td>
+<td>Ücretten önce $950.00</td>
+</tr>
+<tr>
+<td>Satım ücreti (%5)</td>
+<td>$47.50</td>
+</tr>
+<tr>
+<td>Elinize geçen</td>
+<td>$902.50</td>
+</tr>
+</tbody></table></div>
+<p>Taban fiyattan alıp sonra satmak toplam %9.75 ücrete mal olur. Taban fiyattan alan birinin mekanizmanın kendisi yüzünden kaybedebileceği en fazla tutar budur. 6. bölümdeki riskler ayrıdır.</p>
+<h3>2.3 Mezuniyet ve yükselen taban</h3>
+<p>Satıştaki 800 milyon coinin tamamı satıldığında coin <strong>mezun</strong> olmuş sayılır. Bundan sonra her işlemden rezervde kalan %2, rezervi gerekenden büyük hale getirir ve taban fiyat buna göre yükseltilir:</p>
+<blockquote>
+<p>taban fiyat = taban rezervi ÷ (dolaşımdaki coin sayısı ile 800,000,000&#39;dan büyük olanı)</p>
+</blockquote>
+<p>Taban fiyat hiçbir zaman düşürülmez. Mezuniyet anında $100,000 değerindeki bir coin için rezervde yaklaşık $81,684 bulunur; yani taban, satış fiyatının yaklaşık %2.1 üstünde başlar ve işlem hacmiyle birlikte yükselir.</p>
+<h3>2.4 Tabanın üstü</h3>
+<p>Son 200 milyon coin, taban fiyata ek olarak, bu coinler satıldıkça büyüyen bir prim karşılığında satılır. Prim ayrı bir <strong>prim rezervinde</strong> tutulur ve coinler aynı çizgi boyunca geri satıldığında iade edilir.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Eğriden satılan coin</th>
+<th>Sıradaki coinin fiyatı</th>
+<th>Bu fiyattaki piyasa değeri</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>$0.0001</td>
+<td>$100,000</td>
+</tr>
+<tr>
+<td>100,000,000</td>
+<td>yaklaşık $0.0004</td>
+<td>yaklaşık $400,000</td>
+</tr>
+<tr>
+<td>150,000,000</td>
+<td>yaklaşık $0.0016</td>
+<td>yaklaşık $1,600,000</td>
+</tr>
+<tr>
+<td>190,000,000 (eğrinin sonu)</td>
+<td>yaklaşık $0.04</td>
+<td>yaklaşık $40,000,000</td>
+</tr>
+</tbody></table></div>
+<p>Taban yalnızca taban fiyatı karşılar. Tabanın üstünde prim ödeyen bir alıcı, başkaları ondan önce satarsa bu primi kaybedebilir.</p>
+<h3>2.5 %5 nereye gider</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Pay</th>
+<th>Gittiği yer</th>
+<th>Amaç</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>%1</td>
+<td>Coini oluşturan kişi</td>
+<td>Yalnızca coin işlem gördüğünde ödenir</td>
+</tr>
+<tr>
+<td>%2</td>
+<td>Coinin taban rezervi</td>
+<td>Mezuniyetten sonra tabanı bütün sahipler için yükseltir</td>
+</tr>
+<tr>
+<td>%2</td>
+<td>Platform cüzdanı</td>
+<td>Platformun işletilmesi</td>
+</tr>
+</tbody></table></div>
+<h3>2.6 Cüzdan sınırı</h3>
+<p>Hiçbir cüzdan bir coinin arzının %2.5&#39;inden fazlasını tutamaz. Bu, oluşturanın cüzdanı dahil bütün cüzdanlar için geçerlidir. Sınır, tek bir adresin bir seferde satabileceği miktarı kısıtlar. Bir kişinin birden çok cüzdan kullanmasını engelleyemez: bir blokzincir iki adresin aynı kişiye ait olduğunu bilemez.</p>
+<h2>3. Kim neyi kontrol eder</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Unsur</th>
+<th>Parasını kim hareket ettirebilir veya onu kim değiştirebilir</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Bir coinin rezervleri</td>
+<td>Hiç kimse. Para yalnızca formüle göre satıcıya, %1 ücret olarak oluşturana veya %2 ücret olarak platform cüzdanına çıkar</td>
+</tr>
+<tr>
+<td>Bir coin</td>
+<td>Yalnızca sahipleri. Yeni basım yok, durdurma yok, kara liste yok, ücret değişikliği yok</td>
+</tr>
+<tr>
+<td>Platform cüzdanı</td>
+<td>Platform ekibi. %2 ücreti alır</td>
+</tr>
+<tr>
+<td>Fabrika sahibi</td>
+<td>Platform cüzdanının hangi adres olduğunu değiştirebilir. Başka hiçbir şey yapamaz</td>
+</tr>
+</tbody></table></div>
+<p>Coin ve piyasa sözleşmelerinin sahibi yoktur; yükseltme, durdurma ve para çekme işlevleri de yoktur. Oluşturanın çıkıştan sonra hiçbir özel yetkisi kalmaz. Testler, durumu değiştirebilen işlevlerin tam listesini sabitler; bu yüzden bir yönetici işlevi eklemek derlemeyi başarısız kılar.</p>
+<p>Bu tasarımın bedeli: çıkıştan sonra bir hata bulunursa, kimse çalışan bir piyasayı durduramaz veya düzeltemez.</p>
+<h2>4. Oluşturanlar için</h2>
+<ul>
+<li>Coin çıkarmak bir ağ işlemine mal olur. Listeleme ücreti yoktur.</li>
+<li>Oluşturan kişi coin almaz. Coini tutmak isterse herkes gibi satış fiyatından, aynı %2.5 sınırı içinde satın alır.</li>
+<li>Oluşturan kişi coinindeki her işlemin %1&#39;ini kazanır ve bunu istediği zaman tahsil edebilir.</li>
+<li>Oluşturanın satın aldığı hiçbir şey kilitlenmez veya kademeli serbest bırakılmaz, çünkü diğer bütün alıcılarla aynı fiyatı ödemiştir.</li>
+</ul>
+<h2>5. Ağlar ve rezerv para birimleri</h2>
+<ul>
+<li><strong>Ağlar.</strong> Sözleşmeler herhangi bir EVM ağında çalışır: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain ve diğerleri. Bir coin, çıkarıldığı ağda yaşar.</li>
+<li><strong>Rezerv para birimi.</strong> Platformun her kurulumu, coinlerini tek bir token ile fiyatlar ve karşılar: dolar bazlı bir stablecoin (USDT veya USDC) ya da tokenleştirilmiş hisse gibi başka bir standart token. Tokenleştirilmiş hissede taban bir hisse adedidir; bu yüzden dolar değeri hisseyle birlikte hareket eder.</li>
+<li><strong>Ağın kendi para birimiyle ödeme.</strong> Bir takas yönlendiricisinin bağlı olduğu yerlerde alıcılar ETH veya BNB ile ödeyebilir ve ödeme alabilir. Ödeme girişte ve çıkışta dönüştürülür; rezervde yalnızca rezerv tokeni tutulur.</li>
+</ul>
+<h2>6. Riskler</h2>
+<p>Platformu değeri olan herhangi bir şeyle kullanmadan önce bu bölümü okuyun.</p>
+<ul>
+<li><strong>Denetlenmedi.</strong> Sözleşmeler, rastgele işlem ve saldırı simülasyonları dahil kendi testlerinden geçti. Bağımsız bir güvenlik denetçisi tarafından incelenmedi. Bir hata para kaybına yol açabilir.</li>
+<li><strong>Kurtarma yok.</strong> Kimse çalışan bir piyasayı durduramaz veya onaramaz. Bu, rezervi insanlardan korur ve hatalara karşı güvenlik ağını ortadan kaldırır.</li>
+<li><strong>Ücretler.</strong> Taban fiyattan alıp satmak toplamda %9.75&#39;e mal olur.</li>
+<li><strong>Prim riski.</strong> Taban, taban fiyatı korur. Tabanın üstünde ödenen para korunmaz.</li>
+<li><strong>Rezerv tokeni riski.</strong> Bir stablecoin sabitini kaybedebilir ve onu çıkaran kurum bir adresi dondurabilir. Tokenleştirilmiş bir hisse kendi hissesini izler ve kimin tutabileceğini kısıtlayabilir. Sözleşmeler bunların hiçbirine karşı savunma yapamaz.</li>
+<li><strong>Takas riski.</strong> Ağın kendi para birimiyle ödeme, yönlendiriciye ve onun likiditesine bağlıdır ve rezerv tokeniyle ödemekten pahalı olabilir.</li>
+<li><strong>Bağlantılı cüzdanlar.</strong> %2.5 sınırı adres başınadır.</li>
+<li><strong>Satış yerine düz transferle piyasaya gönderilen coinler</strong> gönderen için kaybolur.</li>
+<li><strong>Taban bir mekanizmadır.</strong> Sözleşmenin bir coin için rezerv tokeniyle ödeyeceği tutardır. Kâr vaadi değildir ve sigorta değildir.</li>
+</ul>
+<h2>7. Durum</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Bölüm</th>
+<th>Durum</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EVM sözleşmeleri</td>
+<td>Yazıldı ve test edildi (35 sözleşme testi)</td>
+</tr>
+<tr>
+<td>Web uygulaması ve kurulum sayfası</td>
+<td>Yazıldı ve test edildi (22 tarayıcı testi), yayında</td>
+</tr>
+<tr>
+<td>Test kurulumu</td>
+<td>Sepolia test ağında yayında, değeri olmayan test parasıyla</td>
+</tr>
+<tr>
+<td>Bağımsız güvenlik denetimi</td>
+<td>Yapılmadı</td>
+</tr>
+<tr>
+<td>Gerçek ağlarda kurulum</td>
+<td>Yapılmadı. Denetimden sonra gelir</td>
+</tr>
+<tr>
+<td>Solana</td>
+<td>Program yazıldı ve yerelde test edildi. Kurulmadı, henüz web uygulamasında yok</td>
+</tr>
+<tr>
+<td>Bir coini başka bir ağda satmak (köprü)</td>
+<td>Planlandı. Yazılmadı</td>
+</tr>
+</tbody></table></div>
+<p>Sepolia&#39;daki test kurulumu:</p>
+<ul>
+<li>Platform fabrikası: <code>0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647</code></li>
+<li>Site: <a rel="noopener" href="https://w8nwzbf9h5-svg.github.io/jisr-launchpad/">https://w8nwzbf9h5-svg.github.io/jisr-launchpad/</a></li>
+<li>Kod: <a rel="noopener" href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad">https://github.com/w8nwzbf9h5-svg/jisr-launchpad</a></li>
+</ul>
+<h2>8. Bildirim</h2>
+<p>Bu doküman bir yazılımı anlatır. Herhangi bir coinin teklifi değildir ve finansal tavsiye değildir. Jisr&#39;de çıkarılan coinleri platform değil, onları oluşturanlar yaratır. Platformu kullanan herkes kendi kararlarından sorumludur.</p>
+<p>Bu bir çeviridir. Esas alınan sürüm İngilizce olandır; bir fark varsa İngilizce metin geçerlidir.</p>
+
+</article>
+<article id="paper-id" lang="id" hidden>
+<h1>Jisr Launchpad: Buku Putih</h1>
+<p>Versi 0.1 · 22 November 2026 · Tahap jaringan uji</p>
+<p>Jisr (جسر, &quot;jembatan&quot;) adalah platform peluncuran meme coin. Setiap koin di sini memiliki harga dasar yang dijamin oleh dana dalam kontrak yang tidak bisa ditarik oleh siapa pun. Dokumen ini menjelaskan cara kerjanya, apa yang dilindunginya, apa yang tidak dilindunginya, dan apa yang sudah dibangun saat ini.</p>
+<h2>1. Masalahnya</h2>
+<p>Sebagian besar peluncuran meme coin berakhir dengan cara yang sama. Pembeli awal dan pembuat koin memegang koin yang hampir tidak ada biayanya, lalu menjualnya kepada pembeli yang datang belakangan. Pada kurva bonding klasik, dana di pool hanya sebagian kecil dari nilai pasar, sehingga tidak ada yang menopang harga ketika penjualan dimulai. Perlindungan yang lazim (penguncian, pelepasan bertahap, pajak jual) bergantung pada janji seseorang atau pada aturan yang bisa diubah.</p>
+<p>Jisr menghapus koin murah di awal dan menaruh dana nyata di bawah setiap koin.</p>
+<h2>2. Cara kerja sebuah koin</h2>
+<p>Semua koin yang diluncurkan di Jisr memiliki ketentuan yang sama. Pembuat hanya memilih nama, simbol, gambar, deskripsi, dan tautan.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Ketentuan</th>
+<th>Nilai</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Total pasokan</td>
+<td>1,000,000,000 koin, dibuat satu kali</td>
+</tr>
+<tr>
+<td>Penjualan</td>
+<td>800,000,000 koin pertama dengan satu harga tetap</td>
+</tr>
+<tr>
+<td>Harga jual (cadangan dolar)</td>
+<td>$0.0001 per koin, kapitalisasi pasar $100,000</td>
+</tr>
+<tr>
+<td>Di atas harga dasar</td>
+<td>200,000,000 koin terakhir, dengan harga pada kurva yang naik</td>
+</tr>
+<tr>
+<td>Biaya transaksi</td>
+<td>5% dari setiap pembelian dan setiap penjualan</td>
+</tr>
+<tr>
+<td>Batas dompet</td>
+<td>2.5% dari pasokan (25,000,000 koin) per dompet</td>
+</tr>
+<tr>
+<td>Koin yang diberikan kepada pembuat</td>
+<td>Tidak ada</td>
+</tr>
+</tbody></table></div>
+<h3>2.1 Satu harga untuk semua</h3>
+<p>800 juta koin pertama dijual dengan harga yang sama kepada semua orang, termasuk pembuatnya. Tidak ada putaran awal yang murah, jadi tidak ada orang yang memegang koin dengan biaya lebih rendah daripada milik Anda.</p>
+<h3>2.2 Harga dasar yang dijamin</h3>
+<p>Setiap koin yang keluar dari pasar menyetor satu harga dasar ke <strong>cadangan harga dasar</strong> koin tersebut. Karena itu cadangan selalu cukup untuk membeli kembali semua koin yang beredar pada harga dasar. Setiap pemegang dapat menjual kembali ke pasar kapan saja dan menerima harga dasar dikurangi biaya 5%.</p>
+<p>Contoh dengan cadangan dolar:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Langkah</th>
+<th>Jumlah</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Anda membayar</td>
+<td>$1,000.00</td>
+</tr>
+<tr>
+<td>Biaya pembelian (5%)</td>
+<td>$50.00</td>
+</tr>
+<tr>
+<td>Koin yang Anda terima</td>
+<td>9,500,000</td>
+</tr>
+<tr>
+<td>Anda menjual semuanya pada harga dasar</td>
+<td>$950.00 sebelum biaya</td>
+</tr>
+<tr>
+<td>Biaya penjualan (5%)</td>
+<td>$47.50</td>
+</tr>
+<tr>
+<td>Anda menerima</td>
+<td>$902.50</td>
+</tr>
+</tbody></table></div>
+<p>Membeli lalu menjual pada harga dasar memakan biaya 9.75%. Itulah kerugian terbesar yang bisa dialami pembeli pada harga dasar akibat mekanisme itu sendiri. Risiko pada bagian 6 adalah hal terpisah.</p>
+<h3>2.3 Kelulusan dan harga dasar yang naik</h3>
+<p>Ketika 800 juta koin penjualan sudah terjual semua, koin tersebut telah <strong>lulus</strong>. Sejak saat itu, 2% dari setiap transaksi yang tetap berada di cadangan membuat cadangan lebih besar daripada yang dibutuhkan, dan harga dasar dinaikkan agar sesuai:</p>
+<blockquote>
+<p>harga dasar = cadangan harga dasar ÷ yang lebih besar antara (koin beredar, 800,000,000)</p>
+</blockquote>
+<p>Harga dasar tidak pernah diturunkan. Saat kelulusan, cadangan berisi sekitar $81,684 untuk koin senilai $100,000, sehingga harga dasar dimulai sekitar 2.1% di atas harga jual dan naik seiring volume transaksi.</p>
+<h3>2.4 Di atas harga dasar</h3>
+<p>200 juta koin terakhir berharga sebesar harga dasar ditambah premi yang membesar seiring koin-koin itu terjual. Premi disimpan di <strong>cadangan premi</strong> yang terpisah dan dikembalikan ketika koin dijual kembali di sepanjang garis yang sama.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Koin kurva yang terjual</th>
+<th>Harga koin berikutnya</th>
+<th>Nilai pasar pada harga itu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>$0.0001</td>
+<td>$100,000</td>
+</tr>
+<tr>
+<td>100,000,000</td>
+<td>sekitar $0.0004</td>
+<td>sekitar $400,000</td>
+</tr>
+<tr>
+<td>150,000,000</td>
+<td>sekitar $0.0016</td>
+<td>sekitar $1,600,000</td>
+</tr>
+<tr>
+<td>190,000,000 (akhir kurva)</td>
+<td>sekitar $0.04</td>
+<td>sekitar $40,000,000</td>
+</tr>
+</tbody></table></div>
+<p>Harga dasar hanya menjamin harga dasar. Pembeli yang membayar premi di atas harga dasar bisa kehilangan premi itu jika orang lain menjual lebih dulu.</p>
+<h3>2.5 Ke mana 5% itu pergi</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Bagian</th>
+<th>Tujuan</th>
+<th>Kegunaan</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1%</td>
+<td>Pembuat koin</td>
+<td>Dibayarkan hanya ketika koin diperdagangkan</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>Cadangan harga dasar koin</td>
+<td>Menaikkan harga dasar bagi semua pemegang setelah kelulusan</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>Dompet platform</td>
+<td>Menjalankan platform</td>
+</tr>
+</tbody></table></div>
+<h3>2.6 Batas dompet</h3>
+<p>Tidak ada dompet yang boleh memegang lebih dari 2.5% pasokan sebuah koin. Ini berlaku untuk semua dompet, termasuk dompet pembuat. Batas ini membatasi jumlah yang bisa dijual satu alamat sekaligus. Batas ini tidak bisa mencegah satu orang memakai beberapa dompet: blockchain tidak tahu bahwa dua alamat dimiliki orang yang sama.</p>
+<h2>3. Siapa mengendalikan apa</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Hal</th>
+<th>Siapa yang bisa memindahkan dananya atau mengubahnya</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Cadangan sebuah koin</td>
+<td>Tidak ada. Dana hanya keluar kepada penjual sesuai rumus, kepada pembuat sebagai biaya 1%, atau ke dompet platform sebagai biaya 2%</td>
+</tr>
+<tr>
+<td>Sebuah koin</td>
+<td>Hanya para pemegangnya. Tidak ada pencetakan baru, tidak ada jeda, tidak ada daftar hitam, tidak ada perubahan biaya</td>
+</tr>
+<tr>
+<td>Dompet platform</td>
+<td>Tim platform. Dompet ini menerima biaya 2%</td>
+</tr>
+<tr>
+<td>Pemilik pabrik (factory)</td>
+<td>Dapat mengganti alamat dompet platform. Tidak ada yang lain</td>
+</tr>
+</tbody></table></div>
+<p>Kontrak koin dan kontrak pasar tidak memiliki pemilik, tidak bisa ditingkatkan, tidak bisa dijeda, dan tidak punya fungsi penarikan. Pembuat tidak memiliki hak khusus setelah peluncuran. Rangkaian pengujian mengunci daftar lengkap fungsi yang bisa mengubah keadaan, sehingga menambahkan fungsi admin akan menggagalkan proses build.</p>
+<p>Harga dari rancangan ini: jika ditemukan bug setelah peluncuran, tidak ada yang bisa menjeda atau memperbaiki pasar yang sedang berjalan.</p>
+<h2>4. Untuk pembuat koin</h2>
+<ul>
+<li>Peluncuran memerlukan satu transaksi jaringan. Tidak ada biaya listing.</li>
+<li>Pembuat tidak menerima koin. Untuk memegang koin, pembuat membeli pada harga jual seperti orang lain, dalam batas 2.5% yang sama.</li>
+<li>Pembuat memperoleh 1% dari setiap transaksi koinnya dan dapat mengklaimnya kapan saja.</li>
+<li>Tidak ada pembelian pembuat yang dikunci atau dilepas bertahap, karena pembuat membayar harga yang sama dengan pembeli lain.</li>
+</ul>
+<h2>5. Jaringan dan mata uang cadangan</h2>
+<ul>
+<li><strong>Jaringan.</strong> Kontrak berjalan di jaringan EVM mana pun: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain, dan lainnya. Sebuah koin berada di jaringan tempat koin itu diluncurkan.</li>
+<li><strong>Mata uang cadangan.</strong> Setiap pemasangan platform menghargai dan menjamin koin-koinnya dengan satu token: stablecoin dolar (USDT atau USDC), atau token standar lain seperti saham yang ditokenisasi. Dengan saham yang ditokenisasi, harga dasar berupa sejumlah saham, sehingga nilai dolarnya bergerak mengikuti saham itu.</li>
+<li><strong>Membayar dengan mata uang asli jaringan.</strong> Jika router pertukaran terhubung, pembeli dapat membayar dan dibayar dalam ETH atau BNB. Pembayaran dikonversi saat masuk dan keluar; cadangan hanya memegang token cadangan.</li>
+</ul>
+<h2>6. Risiko</h2>
+<p>Baca bagian ini sebelum menggunakan platform dengan apa pun yang bernilai.</p>
+<ul>
+<li><strong>Belum diaudit.</strong> Kontrak telah lulus pengujiannya sendiri, termasuk perdagangan acak dan simulasi serangan. Kontrak belum ditinjau oleh auditor keamanan independen. Bug bisa menyebabkan hilangnya dana.</li>
+<li><strong>Tidak ada penyelamatan.</strong> Tidak ada yang bisa menjeda atau memperbaiki pasar yang sedang berjalan. Ini melindungi cadangan dari campur tangan manusia dan menghilangkan jaring pengaman terhadap bug.</li>
+<li><strong>Biaya.</strong> Membeli dan menjual pada harga dasar memakan biaya total 9.75%.</li>
+<li><strong>Risiko premi.</strong> Harga dasar melindungi harga dasar. Uang yang dibayarkan di atas harga dasar tidak dilindungi.</li>
+<li><strong>Risiko token cadangan.</strong> Stablecoin bisa kehilangan patokannya, dan penerbitnya bisa membekukan alamat. Saham yang ditokenisasi mengikuti sahamnya dan bisa membatasi siapa yang boleh memegangnya. Kontrak tidak bisa melindungi dari hal-hal ini.</li>
+<li><strong>Risiko pertukaran.</strong> Membayar dengan mata uang asli jaringan bergantung pada router dan likuiditasnya, dan bisa lebih mahal daripada membayar dengan token cadangan.</li>
+<li><strong>Dompet yang saling terkait.</strong> Batas 2.5% berlaku per alamat.</li>
+<li><strong>Koin yang dikirim ke pasar dengan transfer biasa</strong>, bukan melalui penjualan, hilang bagi pengirimnya.</li>
+<li><strong>Harga dasar adalah sebuah mekanisme.</strong> Itu adalah jumlah yang akan dibayar kontrak, dalam token cadangan, untuk satu koin. Itu bukan janji keuntungan dan bukan asuransi.</li>
+</ul>
+<h2>7. Status</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Bagian</th>
+<th>Keadaan</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Kontrak EVM</td>
+<td>Sudah dibangun dan diuji (35 pengujian kontrak)</td>
+</tr>
+<tr>
+<td>Aplikasi web dan halaman pemasangan</td>
+<td>Sudah dibangun dan diuji (22 pengujian di peramban), sudah daring</td>
+</tr>
+<tr>
+<td>Pemasangan uji</td>
+<td>Daring di jaringan uji Sepolia, dengan uang uji yang tidak bernilai</td>
+</tr>
+<tr>
+<td>Audit keamanan independen</td>
+<td>Belum dilakukan</td>
+</tr>
+<tr>
+<td>Pemasangan di jaringan sungguhan</td>
+<td>Belum dilakukan. Menyusul setelah audit</td>
+</tr>
+<tr>
+<td>Solana</td>
+<td>Program sudah ditulis dan diuji secara lokal. Belum dipasang, belum ada di aplikasi web</td>
+</tr>
+<tr>
+<td>Menjual koin di jaringan lain (jembatan)</td>
+<td>Direncanakan. Belum dibangun</td>
+</tr>
+</tbody></table></div>
+<p>Pemasangan uji di Sepolia:</p>
+<ul>
+<li>Pabrik platform: <code>0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647</code></li>
+<li>Situs: <a rel="noopener" href="https://w8nwzbf9h5-svg.github.io/jisr-launchpad/">https://w8nwzbf9h5-svg.github.io/jisr-launchpad/</a></li>
+<li>Kode: <a rel="noopener" href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad">https://github.com/w8nwzbf9h5-svg/jisr-launchpad</a></li>
+</ul>
+<h2>8. Pemberitahuan</h2>
+<p>Dokumen ini menjelaskan sebuah perangkat lunak. Ini bukan penawaran koin apa pun dan bukan nasihat keuangan. Koin yang diluncurkan di Jisr dibuat oleh pembuatnya, bukan oleh platform. Siapa pun yang menggunakan platform bertanggung jawab atas keputusannya sendiri.</p>
+<p>Ini adalah terjemahan. Versi bahasa Inggris adalah acuan; jika ada perbedaan, teks bahasa Inggris yang berlaku.</p>
 
 </article>
 </main>
 <script>
 (function () {
-  var en = document.getElementById("paper-en"), ar = document.getElementById("paper-ar"), btn = document.getElementById("langBtn"), back = document.getElementById("backLink");
+  var META = {"en":{"title":"Jisr Launchpad: White Paper","back":"Open the launchpad"},"ar":{"title":"منصة جسر: الورقة البيضاء","back":"افتح المنصة"},"zh":{"title":"Jisr Launchpad：白皮书","back":"打开平台"},"es":{"title":"Jisr Launchpad: Libro blanco","back":"Abrir la plataforma"},"hi":{"title":"Jisr Launchpad: श्वेत पत्र","back":"प्लेटफ़ॉर्म खोलें"},"fr":{"title":"Jisr Launchpad : livre blanc","back":"Ouvrir la plateforme"},"ru":{"title":"Jisr Launchpad: Белая книга","back":"Открыть площадку"},"pt":{"title":"Jisr Launchpad: White Paper","back":"Abrir a plataforma"},"tr":{"title":"Jisr Launchpad: Teknik Doküman","back":"Platformu aç"},"id":{"title":"Jisr Launchpad: Buku Putih","back":"Buka platform"}}, sel = document.getElementById("langSel"), back = document.getElementById("backLink");
   function show(lang) {
-    var isAr = lang === "ar";
-    en.hidden = isAr; ar.hidden = !isAr;
-    btn.textContent = isAr ? "English" : "العربية";
-    back.textContent = isAr ? "افتح المنصة" : "Open the launchpad";
-    document.documentElement.lang = isAr ? "ar" : "en";
-    document.title = isAr ? "منصة جسر: الورقة البيضاء" : "Jisr Launchpad: White Paper";
+    if (!META[lang]) lang = "en";
+    for (var code in META) document.getElementById("paper-" + code).hidden = code !== lang;
+    sel.value = lang;
+    back.textContent = META[lang].back;
+    document.documentElement.lang = lang;
+    document.title = META[lang].title;
     try { localStorage.setItem("jisr.paperLang", lang); } catch (_) {}
   }
-  var q = /[?&]lang=(ar|en)/.exec(location.search), saved = null;
+  var q = /[?&]lang=([a-z]{2})/.exec(location.search), saved = null;
   try { saved = localStorage.getItem("jisr.paperLang"); } catch (_) {}
-  show(q ? q[1] : saved === "ar" || saved === "en" ? saved : /^ar/i.test(navigator.language || "") ? "ar" : "en");
-  btn.addEventListener("click", function () { show(ar.hidden ? "ar" : "en"); });
+  var nav = String(navigator.language || "").slice(0, 2).toLowerCase();
+  show(q && META[q[1]] ? q[1] : META[saved] ? saved : META[nav] ? nav : "en");
+  sel.addEventListener("change", function () { show(sel.value); window.scrollTo(0, 0); });
 })();
 </script>
 </body>
