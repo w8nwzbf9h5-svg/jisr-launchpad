@@ -21,16 +21,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  publish:
+  # Two jobs, as GitHub recommends: the site files are uploaded first, and published only once
+  # the upload is complete. Doing both in one job sometimes fails to find the upload.
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
           path: web
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - id: deployment
         uses: actions/deploy-pages@v4
