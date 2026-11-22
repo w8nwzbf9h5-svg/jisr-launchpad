@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=647b0e3b">
+<link rel="stylesheet" href="styles.css?v=d1b564d8">
 </head>
 <body>
 
@@ -62,7 +62,7 @@
       <form class="form card" id="launchForm" novalidate>
         <div class="field"><label for="lName">Coin name</label><input type="text" id="lName" maxlength="32" placeholder="Desert Rocket" autocomplete="off"></div>
         <div class="field"><label for="lTicker">Ticker</label><input type="text" id="lTicker" maxlength="10" placeholder="DRKT" autocomplete="off" style="text-transform:uppercase;font-family:var(--mono)"></div>
-        <div class="field"><label for="lNet">Network and currency</label><select id="lNet" class="netsel" style="max-width:none;border-radius:8px;padding:10px 12px"></select><div class="hint" id="lNetHint"></div></div>
+        <div class="field"><label for="lNet">Network and currency</label><select id="lNet" class="netsel" style="max-width:100%;border-radius:8px;padding:10px 12px"></select><div class="hint" id="lNetHint"></div></div>
         <div class="field"><label for="lImgFile">Picture, optional</label>
           <input type="file" id="lImgFile" accept="image/png,image/jpeg,image/webp">
           <div id="lImgPrev" class="imgprev"></div>
@@ -125,7 +125,7 @@
 <script>
 /* Load the scripts in order. deployments.js is always fetched fresh, so a newly linked contract shows at once. */
 (function () {
-  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=6feae430", "wallet.js?v=52c21746", "app.js?v=7cc3b055"];
+  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=6feae430", "wallet.js?v=52c21746", "app.js?v=d0878c80"];
   (function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");

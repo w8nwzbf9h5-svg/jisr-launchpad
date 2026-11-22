@@ -11,6 +11,11 @@
   --r:14px;
 }
 *{box-sizing:border-box}
+html{overflow-x:hidden}
+/* One-column layouts never grow wider than the screen. Phone browsers size a menu, a file picker or a
+   text box by its content, and without this one wide control stretches the whole column off the page. */
+.hero,.about,.cgrid,.col,.trades,.field,.stack,.page,.form,.lgrid,.how{grid-template-columns:minmax(0,1fr)}
+.form>*,.field>*{min-width:0;max-width:100%}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 button,input,textarea,select{font:inherit;color:inherit}
@@ -167,7 +172,7 @@ nav button[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accen
 .form input[type=text],.form textarea,.form select{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--raise);padding:11px 12px}
 .form input[type=text]:focus,.form textarea:focus,.form select:focus{border-color:var(--accent);outline:none}
 .form textarea{min-height:84px;resize:vertical}
-.form input[type=file]{font-size:13.5px;color:var(--muted)}
+.form input[type=file]{font-size:13.5px;color:var(--muted);width:100%}
 .form input[type=file]::file-selector-button{font:inherit;font-weight:700;color:var(--ink);background:var(--raise);border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin-right:10px;cursor:pointer}
 .imgprev{display:flex;gap:12px;align-items:center}
 .imgprev:empty{display:none}
