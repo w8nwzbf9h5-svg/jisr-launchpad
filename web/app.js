@@ -234,6 +234,7 @@
   function explain(e) {
     if (!e) return "Something went wrong.";
     if (window.JISR_WALLET.rejected(e)) return "You cancelled the request in your wallet.";
+    if (window.JISR_WALLET.notPermitted(e)) return "Your wallet has not allowed this site to use your account on " + (S.cfg ? S.cfg.name : "this network") + ". Open this site's permissions in your wallet and allow the account on that network, or disconnect and connect again.";
     const name = (e.revert && e.revert.name) || findErrorName(e);
     if (name && ERRORS[name]) return ERRORS[name];
     const txt = window.JISR_WALLET.detail(e) || String(e);

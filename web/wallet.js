@@ -27,6 +27,15 @@ window.JISR_WALLET = (function () {
     return code === 4001 || code === "ACTION_REJECTED" || c2 === 4001 || c3 === 4001 || /user (rejected|denied|cancell?ed)|rejected by (the )?user/i.test(detail(e));
   }
 
+  /* MetaMask mobile answers this when the site is connected but the account is not allowed for this
+     site on the current network. Only the wallet's own permission screen, or a fresh connection, fixes it. */
+  const notPermitted = (e) => /must provide an Ethereum address/i.test(detail(e)) || (e && (e.code === 4100 || (e.error && e.error.code === 4100)));
+  /* Drop the site's connection and ask for a new one, so the wallet shows its permission screen again. */
+  async function reconnect() {
+    try { await window.ethereum.request({ method: "wallet_revokePermissions", params: [{ eth_accounts: {} }] }); } catch (_) {}
+    return await window.ethereum.request({ method: "eth_requestAccounts", params: [] });
+  }
+
   const readers = {};
   /* A public read-only endpoint for the network, used when the wallet's own endpoint cannot answer. */
   function reader(chainId) {
@@ -84,5 +93,5 @@ window.JISR_WALLET = (function () {
   }
   const signer = (provider, account) => new Signer(provider, account);
 
-  return { PROXY, detail, rejected, reader, read, rawSend, waitReceipt, hasCode, signer };
+  return { PROXY, detail, rejected, notPermitted, reconnect, reader, read, rawSend, waitReceipt, hasCode, signer };
 })();

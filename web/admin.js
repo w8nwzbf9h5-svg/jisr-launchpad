@@ -13,6 +13,7 @@
   function status(msg, kind) { const el = $("aStatus"); el.textContent = msg; el.className = "status" + (kind ? " " + kind : ""); }
   function explain(e) {
     if (W.rejected(e)) return "ألغيت الطلب من المحفظة.";
+    if (W.notPermitted(e)) { $("aReconnect").hidden = false; return "المحفظة لم تسمح لهذا الموقع باستخدام حسابك على هذه الشبكة. افتح صلاحيات الموقع داخل المحفظة وفعّل حسابك على هذه الشبكة، أو اضغط «أعد ربط المحفظة» هنا ووافق من جديد مع اختيار هذه الشبكة ضمن الصلاحيات."; }
     const t = W.detail(e) || String(e);
     if (/insufficient funds/i.test(t)) return "رصيد المحفظة لا يكفي لرسوم الشبكة.";
     if (/OwnableUnauthorizedAccount/.test(t)) return "هذه المحفظة ليست مالك المصنع.";
@@ -71,6 +72,10 @@
       const restored = restoreResult();
       status(restored ? "المحفظة مرتبطة. آخر نشر من هذا الجهاز محفوظ: النص جاهز للنسخ في الخطوة 4." : k ? "المحفظة مرتبطة على " + k.name + "." : "المحفظة مرتبطة. هذه شبكة جديدة على الموقع: اكتب اسمها ورمز عملتها في الخطوة 1.", "good");
     });
+  }
+
+  async function reconnect() {
+    await guarded("إعادة ربط المحفظة…", async () => { await W.reconnect(); location.reload(); });
   }
 
   /* Gas to offer when neither the wallet nor the public endpoint can estimate it (measured use plus a margin). */
@@ -229,6 +234,7 @@
   }
 
   $("aConnect").addEventListener("click", connect);
+  $("aReconnect").addEventListener("click", reconnect);
   $("aTestKit").addEventListener("click", () => testKit("usd"));
   $("aTestKitStock").addEventListener("click", () => testKit("stock"));
   $("aCheck").addEventListener("click", check);

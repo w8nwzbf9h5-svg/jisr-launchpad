@@ -41,7 +41,7 @@ body{font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahom
     <div class="kv"><span>العنوان</span><b class="ltr" id="aAccount">غير مرتبطة</b></div>
     <div class="kv"><span>الشبكة</span><b id="aNet">—</b></div>
     <div class="kv"><span>الرصيد</span><b class="ltr" id="aBal">—</b></div>
-    <div class="row2"><button class="btn primary" id="aConnect">اربط المحفظة</button></div>
+    <div class="row2"><button class="btn primary" id="aConnect">اربط المحفظة</button><button class="btn" id="aReconnect" hidden>أعد ربط المحفظة</button></div>
     <p class="muted" style="margin-top:8px">تعمل الصفحة على أي شبكة متوافقة مع إيثيريوم (EVM): إيثيريوم، BNB، Base، Arbitrum، Optimism، Polygon، Avalanche، Robinhood Chain وغيرها. لتغيير الشبكة، غيّرها من داخل المحفظة ثم أعد فتح الصفحة.</p>
     <div id="aNewNet" hidden>
       <div class="flag" style="margin-top:8px">هذه الشبكة غير مسمّاة مسبقاً في الموقع. عرّفها هنا لتظهر باسمها للزوار.</div>
@@ -115,7 +115,7 @@ body{font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahom
 <script>
 /* Load the scripts in order. deployments.js is always fetched fresh, so a newly linked contract shows at once. */
 (function () {
-  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=6feae430", "wallet.js?v=b90efa14", "contracts.js?v=608eda7b", "admin.js?v=0d73f9a4"];
+  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=6feae430", "wallet.js?v=28e405ad", "contracts.js?v=608eda7b", "admin.js?v=cadaa2f3"];
   (function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");

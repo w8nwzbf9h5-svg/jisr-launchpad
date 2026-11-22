@@ -73,6 +73,7 @@ function waitFor(child, text, ms) {
           // A stand-in for a limited mobile wallet: it cannot estimate gas, and it refuses a transaction with no recipient.
           if (localStorage.getItem("e2e.limitedWallet")) {
             if (method === "eth_estimateGas") { const e = new Error("Internal JSON-RPC error."); e.code = -32603; throw e; }
+            if (method === "eth_sendTransaction" && localStorage.getItem("e2e.limitedWallet") === "noperm") { const e = new Error("Invalid parameters: must provide an Ethereum address."); e.code = -32602; throw e; }
             if (method === "eth_sendTransaction" && !(params[0] && params[0].to)) { const e = new Error("Unsupported transaction type"); e.code = -32000; throw e; }
           }
           const r = await fetch(rpc, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: id++, method, params: params || [] }) });
@@ -353,6 +354,11 @@ function waitFor(child, text, ms) {
     await page.goto(WEB + "/admin.html", { waitUntil: "networkidle0" });
     await click("#aConnect"); await aStatus("آخر نشر من هذا الجهاز محفوظ");
     assert.equal(await text("#aFactoryOut"), limFactory);
+    // a wallet that has not allowed the account on this network: the page says what to do and offers a fresh connection
+    await page.evaluate(() => localStorage.setItem("e2e.limitedWallet", "noperm"));
+    assert.equal(await page.$eval("#aReconnect", (el) => el.hidden), true);
+    await click("#aTestKit"); await aStatus("لم تسمح لهذا الموقع");
+    assert.equal(await page.$eval("#aReconnect", (el) => el.hidden), false, "the reconnect button appears");
     await page.evaluate(() => { localStorage.removeItem("e2e.limitedWallet"); localStorage.removeItem("jisr.lastDeploy"); });
     step("deploy page: a limited mobile wallet still deploys, and a reload keeps the result");
 
