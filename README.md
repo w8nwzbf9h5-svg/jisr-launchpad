@@ -1,18 +1,23 @@
-# Jisr Launchpad (Ethereum and BNB Chain)
+# Jisr Launchpad
 
-The launchpad for the two EVM chains: the smart contracts and the web app that talks to them. The same code deploys on Ethereum and on BNB Chain.
+A launchpad for meme coins where every coin is sold at one fixed price and has a floor covered 100% by a reserve nobody can withdraw. This repository holds the smart contracts and the web app that talks to them. The same contracts deploy on any EVM network.
 
-Status: written and tested locally, end to end. **Not audited and not deployed.** Do not put real money in before an independent security audit.
+- **White paper:** [English](WHITEPAPER.md) · [العربية](WHITEPAPER-AR.md) · [on the site](https://w8nwzbf9h5-svg.github.io/jisr-launchpad/whitepaper.html)
+- **Site:** https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
+- **Test deployment:** Sepolia test network, factory `0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647`. Test money only, no value.
+
+Status: tested locally end to end and deployed on a test network. **Not audited and not deployed on any real network.** Do not put real money in before an independent security audit.
 
 | Folder | What it is |
 |---|---|
 | `contracts/` | The three contracts, plus test-only mocks |
-| `test/` | 23 contract tests |
+| `test/` | 35 contract tests |
 | `web/` | The web app. Static files, no build step, no server |
-| `e2e/` | A browser test that drives the web app against a local chain |
+| `e2e/` | A browser test (22 steps) that drives the web app against a local chain |
 | `scripts/` | Deploy, local demo, local web server |
 | `solana/` | The Solana program and its pricing library, with tests. Not yet built to on-chain bytecode, and not yet in the web app. See `solana/README.md` |
 | `DEPLOY-AR.md` | Arabic guide: deploy from a wallet and link the site |
+| `WHITEPAPER.md`, `WHITEPAPER-AR.md` | The white paper. `npm run whitepaper` rebuilds `web/whitepaper.html` from them |
 
 ## What is here
 

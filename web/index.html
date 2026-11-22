@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=d1b564d8">
+<link rel="stylesheet" href="styles.css?v=54fee9d5">
 </head>
 <body>
 
@@ -18,6 +18,7 @@
       <button data-act="nav" data-v="board" id="nav-board">Board</button>
       <button data-act="nav" data-v="launch" id="nav-launch">Launch a coin</button>
       <button data-act="nav" data-v="how" id="nav-how">How it works</button>
+      <a href="whitepaper.html" id="nav-paper">White paper</a>
     </nav>
     <div class="right">
       <label class="sr" for="netSel" hidden>Network</label>
@@ -125,7 +126,7 @@
 <script>
 /* Load the scripts in order. deployments.js is always fetched fresh, so a newly linked contract shows at once. */
 (function () {
-  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=6feae430", "wallet.js?v=52c21746", "app.js?v=d0878c80"];
+  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=6feae430", "wallet.js?v=52c21746", "app.js?v=5a3fb56d"];
   (function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");

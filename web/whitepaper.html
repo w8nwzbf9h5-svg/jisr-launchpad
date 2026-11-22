@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jisr Launchpad: White Paper</title>
+<meta name="description" content="How Jisr Launchpad works: a fixed sale price, a floor covered 100% by a reserve nobody can withdraw, and the risks.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=54fee9d5">
+<style>
+.paper{max-width:780px;margin:0 auto;padding:26px 16px 64px}
+.paper article{overflow-wrap:anywhere}
+.paper h1{font-weight:800;font-size:clamp(28px,7vw,42px);line-height:1.12;letter-spacing:-.02em;margin:8px 0 10px}
+.paper h1+p{color:var(--muted);font-size:14px;font-weight:600;margin:0 0 18px}
+.paper h2{font-weight:800;font-size:22px;line-height:1.25;margin:38px 0 10px;padding-top:18px;border-top:1px solid var(--line)}
+.paper h3{font-weight:700;font-size:17px;margin:24px 0 8px}
+.paper p,.paper li{font-size:16px;line-height:1.7}
+.paper p{margin:0 0 12px}
+.paper ul{margin:0 0 12px;padding-inline-start:22px}
+.paper li{margin-bottom:6px}
+.paper a{color:var(--accent)}
+.paper code{font-family:var(--mono);font-size:13px;background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:2px 6px;direction:ltr;unicode-bidi:embed}
+.paper blockquote{margin:14px 0;padding:12px 16px;border-inline-start:4px solid var(--floor);background:var(--surface);border-radius:8px}
+.paper blockquote p{margin:0;font-weight:600}
+.paper .tw{overflow-x:auto;margin:12px 0 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.paper table{width:100%;border-collapse:collapse;font-size:14.5px}
+.paper th,.paper td{padding:10px 12px;text-align:start;vertical-align:top;border-bottom:1px solid var(--line)}
+.paper th{color:var(--muted);font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:var(--raise)}
+.paper tr:last-child td{border-bottom:0}
+.paper article[lang=ar]{font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
+.paper article[lang=ar] th{letter-spacing:0;text-transform:none;font-size:13.5px}
+.ptop{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;padding-bottom:12px}
+.ptop a.brand{text-decoration:none}
+.ptop .acts{display:flex;gap:8px;align-items:center}
+.ptop .acts a,.ptop .acts button{border:1px solid var(--line);background:var(--raise);color:var(--ink);border-radius:10px;padding:8px 12px;font-size:13.5px;font-weight:600;text-decoration:none;cursor:pointer}
+@media print{body{background:#fff;color:#000}.top{display:none}.paper .tw,.paper blockquote,.paper code,.paper th{background:#fff;border-color:#999}.paper a{color:#000}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap ptop">
+    <a class="brand" href="./" aria-label="Jisr Launchpad, back to the launchpad"><b>JISR</b><i></i><span>launchpad</span></a>
+    <div class="acts">
+      <a href="./" id="backLink">Open the launchpad</a>
+      <button type="button" id="langBtn" aria-label="Switch language">العربية</button>
+    </div>
+  </div>
+</header>
+<main class="paper">
+<article id="paper-en" lang="en">
+<h1>Jisr Launchpad: White Paper</h1>
+<p>Version 0.1 · 22 November 2026 · Test network stage</p>
+<p>Jisr (جسر, &quot;bridge&quot;) is a launchpad for meme coins in which every coin has a price floor backed by money held in a contract that nobody can withdraw from. This paper describes how it works, what it protects against, what it does not, and what is built today.</p>
+<h2>1. The problem</h2>
+<p>Most meme coin launches end the same way. Early buyers and the creator hold coins that cost them almost nothing, and they sell into later buyers. On a classic bonding curve the money in the pool is only a fraction of the market value, so the price has nothing under it when selling starts. The usual defences (locks, vesting, sell taxes) depend on someone keeping a promise or on a rule that can be changed.</p>
+<p>Jisr removes the cheap early coins and puts real money under every coin.</p>
+<h2>2. How a coin works</h2>
+<p>Every coin launched on Jisr has the same terms. The creator chooses only the name, the ticker, the picture, the description and the links.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Total supply</td>
+<td>1,000,000,000 coins, created once</td>
+</tr>
+<tr>
+<td>Sale</td>
+<td>The first 800,000,000 coins at one fixed price</td>
+</tr>
+<tr>
+<td>Sale price (dollar reserve)</td>
+<td>$0.0001 per coin, a $100,000 market cap</td>
+</tr>
+<tr>
+<td>Above the floor</td>
+<td>The last 200,000,000 coins, priced on a rising curve</td>
+</tr>
+<tr>
+<td>Trading fee</td>
+<td>5% of every buy and every sell</td>
+</tr>
+<tr>
+<td>Wallet limit</td>
+<td>2.5% of supply (25,000,000 coins) per wallet</td>
+</tr>
+<tr>
+<td>Coins given to the creator</td>
+<td>None</td>
+</tr>
+</tbody></table></div>
+<h3>2.1 One price for everyone</h3>
+<p>The first 800 million coins are sold at the same price to everybody, the creator included. There is no cheap early round, so nobody holds coins that cost less than yours.</p>
+<h3>2.2 The covered floor</h3>
+<p>Each coin that leaves the market puts one floor price into the coin&#39;s <strong>floor reserve</strong>. The reserve therefore always holds enough to buy back every coin in circulation at the floor price. Any holder can sell back to the market at any time and receive the floor price, less the 5% fee.</p>
+<p>Worked example with a dollar reserve:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Amount</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>You pay</td>
+<td>$1,000.00</td>
+</tr>
+<tr>
+<td>Fee on the buy (5%)</td>
+<td>$50.00</td>
+</tr>
+<tr>
+<td>Coins you receive</td>
+<td>9,500,000</td>
+</tr>
+<tr>
+<td>You sell all of them back at the floor</td>
+<td>$950.00 before the fee</td>
+</tr>
+<tr>
+<td>Fee on the sale (5%)</td>
+<td>$47.50</td>
+</tr>
+<tr>
+<td>You receive</td>
+<td>$902.50</td>
+</tr>
+</tbody></table></div>
+<p>A buy followed by a sale at the floor costs 9.75% in fees. That is the most a floor-price buyer can lose to the mechanism itself. The risks in section 6 are separate.</p>
+<h3>2.3 Graduation and the rising floor</h3>
+<p>When all 800 million sale coins have been sold, the coin has <strong>graduated</strong>. From then on, the 2% of every trade that stays in the reserve makes the reserve larger than it needs to be, and the floor price is raised to match:</p>
+<blockquote>
+<p>floor price = floor reserve ÷ the larger of (coins in circulation, 800,000,000)</p>
+</blockquote>
+<p>The floor price is never lowered. At graduation the reserve holds about $81,684 for a $100,000 coin, so the floor starts about 2.1% above the sale price and climbs with trading volume.</p>
+<h3>2.4 Above the floor</h3>
+<p>The last 200 million coins cost the floor price plus a premium that grows as they sell out. The premium is held in a separate <strong>premium reserve</strong> and is paid back when coins are sold along the same line.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Curve coins sold</th>
+<th>Price of the next coin</th>
+<th>Market value at that price</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>$0.0001</td>
+<td>$100,000</td>
+</tr>
+<tr>
+<td>100,000,000</td>
+<td>about $0.0004</td>
+<td>about $400,000</td>
+</tr>
+<tr>
+<td>150,000,000</td>
+<td>about $0.0016</td>
+<td>about $1,600,000</td>
+</tr>
+<tr>
+<td>190,000,000 (the curve ends)</td>
+<td>about $0.04</td>
+<td>about $40,000,000</td>
+</tr>
+</tbody></table></div>
+<p>The floor covers the floor price only. A buyer who pays a premium above the floor can lose that premium if others sell first.</p>
+<h3>2.5 Where the 5% goes</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Share</th>
+<th>Goes to</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1%</td>
+<td>The coin&#39;s creator</td>
+<td>Paid only when people trade the coin</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>The coin&#39;s floor reserve</td>
+<td>Raises the floor for every holder after graduation</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>The launchpad&#39;s platform wallet</td>
+<td>Runs the launchpad</td>
+</tr>
+</tbody></table></div>
+<h3>2.6 The wallet limit</h3>
+<p>No wallet can hold more than 2.5% of a coin&#39;s supply. This applies to every wallet, the creator&#39;s included. It limits how much one address can sell at once. It cannot stop one person from using several wallets: a blockchain cannot tell that two addresses belong to the same person.</p>
+<h2>3. Who controls what</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Thing</th>
+<th>Who can move its funds or change it</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A coin&#39;s reserves</td>
+<td>Nobody. Money leaves only to a seller by the formula, to the creator as the 1% fee, or to the platform wallet as the 2% fee</td>
+</tr>
+<tr>
+<td>A coin</td>
+<td>Its holders only. No new coins, no pause, no blacklist, no fee switch</td>
+</tr>
+<tr>
+<td>The platform wallet</td>
+<td>The launchpad team. It receives the 2% fee</td>
+</tr>
+<tr>
+<td>The factory owner</td>
+<td>Can change which address is the platform wallet. Nothing else</td>
+</tr>
+</tbody></table></div>
+<p>The coin and market contracts have no owner, no upgrade path, no pause and no withdrawal function. The creator has no special rights after launch. The test suite pins the full list of functions that can change state, so adding an admin function fails the build.</p>
+<p>The cost of this design: if a bug is found after launch, nobody can pause or patch a live market.</p>
+<h2>4. For creators</h2>
+<ul>
+<li>Launching costs one network transaction. There is no listing fee.</li>
+<li>The creator receives no coins. To hold the coin, the creator buys at the sale price like everyone else, within the same 2.5% limit.</li>
+<li>The creator earns 1% of every trade in the coin, claimable at any time.</li>
+<li>Nothing the creator buys is locked or vested, because the creator paid the same price as every other buyer.</li>
+</ul>
+<h2>5. Networks and currencies</h2>
+<ul>
+<li><strong>Networks.</strong> The contracts work on any EVM network: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain and others. A coin lives on the network it was launched on.</li>
+<li><strong>Reserve currency.</strong> Each launchpad deployment prices and backs its coins in one token: a dollar stablecoin (USDT or USDC), or another standard token such as a tokenized stock. With a stock token the floor is a number of shares, so its dollar value moves with the stock.</li>
+<li><strong>Paying with the network&#39;s own currency.</strong> Where a swap router is connected, buyers can pay and be paid in ETH or BNB. The payment is converted on the way in and out; the reserve holds only the reserve token.</li>
+</ul>
+<h2>6. Risks</h2>
+<p>Read this section before using the launchpad with anything of value.</p>
+<ul>
+<li><strong>Not audited.</strong> The contracts have passed their own tests, including randomised trading and attack simulations. They have not been reviewed by an independent security auditor. A bug could lose funds.</li>
+<li><strong>No rescue.</strong> Nobody can pause or fix a live market. This protects the reserve from people and removes the safety net against bugs.</li>
+<li><strong>Fees.</strong> Buying and selling at the floor costs 9.75% in total.</li>
+<li><strong>Premium risk.</strong> The floor protects the floor price. Money paid above the floor is not protected.</li>
+<li><strong>Reserve token risk.</strong> A stablecoin can lose its peg, and its issuer can freeze an address. A stock token follows its stock and may restrict who can hold it. The contracts cannot defend against any of these.</li>
+<li><strong>Swap risk.</strong> Paying in the network&#39;s own currency depends on the router and its liquidity, and can cost more than paying in the reserve token.</li>
+<li><strong>Linked wallets.</strong> The 2.5% limit is per address.</li>
+<li><strong>Coins sent to the market by plain transfer</strong> instead of through a sale are lost to the sender.</li>
+<li><strong>The floor is a mechanism.</strong> It is the amount the contract will pay, in the reserve token, for a coin. It is not a promise of profit and it is not insurance.</li>
+</ul>
+<h2>7. Status</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Part</th>
+<th>State</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EVM contracts</td>
+<td>Built and tested (35 contract tests)</td>
+</tr>
+<tr>
+<td>Web app and deploy page</td>
+<td>Built and tested (22 browser tests), live</td>
+</tr>
+<tr>
+<td>Test deployment</td>
+<td>Live on the Sepolia test network, with test money that has no value</td>
+</tr>
+<tr>
+<td>Independent security audit</td>
+<td>Not done</td>
+</tr>
+<tr>
+<td>Deployment on real networks</td>
+<td>Not done. It follows the audit</td>
+</tr>
+<tr>
+<td>Solana</td>
+<td>Program written and tested locally. Not deployed, not yet in the web app</td>
+</tr>
+<tr>
+<td>Selling a coin on a different network (bridge)</td>
+<td>Planned. Not built</td>
+</tr>
+</tbody></table></div>
+<p>Test deployment on Sepolia:</p>
+<ul>
+<li>Launchpad factory: <code>0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647</code></li>
+<li>Site: <a rel="noopener" href="https://w8nwzbf9h5-svg.github.io/jisr-launchpad/">https://w8nwzbf9h5-svg.github.io/jisr-launchpad/</a></li>
+<li>Code: <a rel="noopener" href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad">https://github.com/w8nwzbf9h5-svg/jisr-launchpad</a></li>
+</ul>
+<h2>8. Notice</h2>
+<p>This paper describes software. It is not an offer of any coin, and it is not financial advice. Coins launched on Jisr are created by their creators, not by the launchpad. Anyone using the launchpad is responsible for their own decisions.</p>
+
+</article>
+<article id="paper-ar" lang="ar" dir="rtl" hidden>
+<h1>منصة جسر: الورقة البيضاء</h1>
+<p>الإصدار 0.1 · 22 نوفمبر 2026 · مرحلة الشبكة التجريبية</p>
+<p>جسر (Jisr) منصة لإطلاق عملات الميم، لكل عملة فيها أرضية سعرية مغطاة بأموال محفوظة في عقد لا يستطيع أحد السحب منه. تشرح هذه الورقة كيف تعمل المنصة، وممَّ تحمي، وما الذي لا تحمي منه، وما المبني منها اليوم.</p>
+<h2>1. المشكلة</h2>
+<p>أغلب إطلاقات عملات الميم تنتهي بالطريقة نفسها. المشترون الأوائل والمطوّر يحملون عملات كلّفتهم شيئاً لا يُذكر، ويبيعونها على من جاء بعدهم. وفي منحنى التسعير التقليدي تكون الأموال في المجمع جزءاً صغيراً من القيمة السوقية، فلا يوجد ما يسند السعر عند بدء البيع. أما وسائل الحماية المعتادة (القفل، الصرف على مراحل، ضرائب البيع) فتعتمد على وعد من شخص أو على قاعدة يمكن تغييرها.</p>
+<p>جسر تلغي العملات الرخيصة المبكرة، وتضع مالاً حقيقياً تحت كل عملة.</p>
+<h2>2. كيف تعمل العملة</h2>
+<p>كل عملة تُطلق على جسر لها الشروط نفسها. المطوّر يختار فقط الاسم والرمز والصورة والوصف والروابط.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>البند</th>
+<th>القيمة</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>إجمالي المعروض</td>
+<td>1,000,000,000 عملة، تُنشأ مرة واحدة</td>
+</tr>
+<tr>
+<td>البيع</td>
+<td>أول 800,000,000 عملة بسعر ثابت واحد</td>
+</tr>
+<tr>
+<td>سعر البيع (احتياطي بالدولار)</td>
+<td>0.0001 دولار للعملة، أي قيمة سوقية 100,000 دولار</td>
+</tr>
+<tr>
+<td>فوق الأرضية</td>
+<td>آخر 200,000,000 عملة، بسعر يرتفع على منحنى</td>
+</tr>
+<tr>
+<td>رسوم التداول</td>
+<td>5% على كل شراء وكل بيع</td>
+</tr>
+<tr>
+<td>حد المحفظة</td>
+<td>2.5% من المعروض (25,000,000 عملة) لكل محفظة</td>
+</tr>
+<tr>
+<td>عملات مجانية للمطوّر</td>
+<td>لا شيء</td>
+</tr>
+</tbody></table></div>
+<h3>2.1 سعر واحد للجميع</h3>
+<p>أول 800 مليون عملة تُباع بالسعر نفسه لكل الناس، والمطوّر منهم. لا توجد جولة مبكرة رخيصة، فلا أحد يحمل عملات كلّفته أقل مما كلّفتك.</p>
+<h3>2.2 الأرضية المغطاة</h3>
+<p>كل عملة تخرج من السوق تضع سعر أرضية واحداً في <strong>احتياطي الأرضية</strong> الخاص بالعملة. لذلك يحمل الاحتياطي دائماً ما يكفي لإعادة شراء كل العملات المتداولة بسعر الأرضية. أي حامل يستطيع البيع للسوق في أي وقت ويستلم سعر الأرضية ناقصاً رسوم 5%.</p>
+<p>مثال باحتياطي بالدولار:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>الخطوة</th>
+<th>المبلغ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>تدفع</td>
+<td>1,000.00 دولار</td>
+</tr>
+<tr>
+<td>رسوم الشراء (5%)</td>
+<td>50.00 دولار</td>
+</tr>
+<tr>
+<td>العملات التي تستلمها</td>
+<td>9,500,000</td>
+</tr>
+<tr>
+<td>تبيعها كلها بسعر الأرضية</td>
+<td>950.00 دولار قبل الرسوم</td>
+</tr>
+<tr>
+<td>رسوم البيع (5%)</td>
+<td>47.50 دولار</td>
+</tr>
+<tr>
+<td>تستلم</td>
+<td>902.50 دولار</td>
+</tr>
+</tbody></table></div>
+<p>الشراء ثم البيع بسعر الأرضية يكلّف 9.75% رسوماً. هذا أقصى ما يخسره مشتري سعر الأرضية بسبب الآلية نفسها. المخاطر في القسم 6 أمر آخر.</p>
+<h3>2.3 التخرّج والأرضية الصاعدة</h3>
+<p>عند بيع كل عملات البيع الـ800 مليون تكون العملة قد <strong>تخرّجت</strong>. بعدها، نسبة 2% التي تبقى في الاحتياطي من كل صفقة تجعله أكبر من حاجته، فيُرفع سعر الأرضية ليطابقه:</p>
+<blockquote>
+<p>سعر الأرضية = احتياطي الأرضية ÷ الأكبر من (العملات المتداولة، 800,000,000)</p>
+</blockquote>
+<p>سعر الأرضية لا ينخفض أبداً. عند التخرّج يحمل الاحتياطي نحو 81,684 دولاراً لعملة قيمتها 100,000 دولار، فتبدأ الأرضية أعلى من سعر البيع بنحو 2.1% وتصعد مع حجم التداول.</p>
+<h3>2.4 فوق الأرضية</h3>
+<p>آخر 200 مليون عملة تكلّف سعر الأرضية مضافاً إليه علاوة تكبر كلما بيع منها أكثر. العلاوة تُحفظ في <strong>احتياطي علاوة</strong> منفصل، وتُردّ عند بيع العملات على الخط نفسه.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>عملات المنحنى المباعة</th>
+<th>سعر العملة التالية</th>
+<th>القيمة السوقية عند هذا السعر</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0.0001 دولار</td>
+<td>100,000 دولار</td>
+</tr>
+<tr>
+<td>100,000,000</td>
+<td>نحو 0.0004 دولار</td>
+<td>نحو 400,000 دولار</td>
+</tr>
+<tr>
+<td>150,000,000</td>
+<td>نحو 0.0016 دولار</td>
+<td>نحو 1,600,000 دولار</td>
+</tr>
+<tr>
+<td>190,000,000 (نهاية المنحنى)</td>
+<td>نحو 0.04 دولار</td>
+<td>نحو 40,000,000 دولار</td>
+</tr>
+</tbody></table></div>
+<p>الأرضية تغطي سعر الأرضية فقط. من يدفع علاوة فوق الأرضية قد يخسر تلك العلاوة إذا باع غيره قبله.</p>
+<h3>2.5 أين تذهب الـ5%</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>النسبة</th>
+<th>تذهب إلى</th>
+<th>الغرض</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1%</td>
+<td>مطوّر العملة</td>
+<td>تُدفع فقط عندما يتداول الناس العملة</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>احتياطي أرضية العملة</td>
+<td>ترفع الأرضية لكل الحاملين بعد التخرّج</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>محفظة المنصة</td>
+<td>تشغيل المنصة</td>
+</tr>
+</tbody></table></div>
+<h3>2.6 حد المحفظة</h3>
+<p>لا تستطيع أي محفظة حمل أكثر من 2.5% من معروض العملة. يسري ذلك على كل المحافظ، ومحفظة المطوّر منها. الحد يقيّد ما يستطيع عنوان واحد بيعه دفعة واحدة. لكنه لا يمنع شخصاً من استخدام عدة محافظ: البلوكشين لا يعرف أن عنوانين يعودان لشخص واحد.</p>
+<h2>3. من يتحكم بماذا</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>الشيء</th>
+<th>من يستطيع تحريك أمواله أو تغييره</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>احتياطيات العملة</td>
+<td>لا أحد. المال يخرج فقط للبائع حسب المعادلة، أو للمطوّر كرسوم 1%، أو لمحفظة المنصة كرسوم 2%</td>
+</tr>
+<tr>
+<td>العملة</td>
+<td>حاملوها فقط. لا إصدار جديد، لا إيقاف، لا قائمة سوداء، لا تغيير للرسوم</td>
+</tr>
+<tr>
+<td>محفظة المنصة</td>
+<td>إدارة المنصة. تستلم رسوم 2%</td>
+</tr>
+<tr>
+<td>مالك المصنع</td>
+<td>يستطيع تغيير عنوان محفظة المنصة. لا شيء غير ذلك</td>
+</tr>
+</tbody></table></div>
+<p>عقدا العملة والسوق بلا مالك، وبلا ترقية، وبلا إيقاف، وبلا دالة سحب. والمطوّر ليس له أي صلاحية خاصة بعد الإطلاق. الاختبارات تثبّت القائمة الكاملة للدوال التي تغيّر الحالة، فإضافة أي دالة إدارية تُفشل البناء.</p>
+<p>ثمن هذا التصميم: إذا اكتُشف خلل بعد الإطلاق، لا يستطيع أحد إيقاف سوق قائم أو إصلاحه.</p>
+<h2>4. للمطوّرين</h2>
+<ul>
+<li>الإطلاق يكلّف عملية واحدة على الشبكة. لا توجد رسوم إدراج.</li>
+<li>المطوّر لا يستلم أي عملات. إذا أراد حمل العملة يشتريها بسعر البيع مثل الجميع، وضمن حد 2.5% نفسه.</li>
+<li>المطوّر يكسب 1% من كل صفقة على عملته، ويستطيع تحصيلها في أي وقت.</li>
+<li>ما يشتريه المطوّر لا يُقفل ولا يُصرف على مراحل، لأنه دفع السعر نفسه الذي دفعه كل مشترٍ.</li>
+</ul>
+<h2>5. الشبكات والعملات</h2>
+<ul>
+<li><strong>الشبكات.</strong> العقود تعمل على أي شبكة EVM: إيثيريوم، BNB Chain، Base، Arbitrum، Optimism، Polygon، Avalanche، Robinhood Chain وغيرها. العملة تعيش على الشبكة التي أُطلقت عليها.</li>
+<li><strong>عملة الاحتياط.</strong> كل نشر للمنصة يسعّر عملاته ويغطيها بعملة واحدة: عملة مستقرة بالدولار (USDT أو USDC)، أو عملة قياسية أخرى مثل سهم مرمَّز. مع السهم المرمَّز تكون الأرضية عدداً من الأسهم، فقيمتها بالدولار تتحرك مع السهم.</li>
+<li><strong>الدفع بعملة الشبكة.</strong> حيث يوجد محوّل عملات موصول، يستطيع المشتري الدفع والاستلام بـ ETH أو BNB. المبلغ يُحوَّل عند الدخول والخروج، والاحتياطي يحمل عملة الاحتياط فقط.</li>
+</ul>
+<h2>6. المخاطر</h2>
+<p>اقرأ هذا القسم قبل استخدام المنصة بأي شيء له قيمة.</p>
+<ul>
+<li><strong>غير مدققة.</strong> العقود اجتازت اختباراتها، ومنها تداول عشوائي ومحاكاة هجمات. لكنها لم تُراجَع من مدقق أمني مستقل. أي خلل قد يسبب خسارة أموال.</li>
+<li><strong>لا إنقاذ.</strong> لا يستطيع أحد إيقاف سوق قائم أو إصلاحه. هذا يحمي الاحتياطي من البشر، ويزيل شبكة الأمان ضد الأخطاء البرمجية.</li>
+<li><strong>الرسوم.</strong> الشراء ثم البيع بسعر الأرضية يكلّف 9.75% إجمالاً.</li>
+<li><strong>مخاطرة العلاوة.</strong> الأرضية تحمي سعر الأرضية. المال المدفوع فوق الأرضية غير محمي.</li>
+<li><strong>مخاطرة عملة الاحتياط.</strong> العملة المستقرة قد تفقد ارتباطها بالدولار، ومُصدرها يستطيع تجميد عنوان. والسهم المرمَّز يتبع سهمه وقد يقيّد من يحق له حمله. العقود لا تستطيع الحماية من أي من ذلك.</li>
+<li><strong>مخاطرة التحويل.</strong> الدفع بعملة الشبكة يعتمد على المحوّل وسيولته، وقد يكلّف أكثر من الدفع بعملة الاحتياط.</li>
+<li><strong>المحافظ المترابطة.</strong> حد 2.5% يُحسب لكل عنوان.</li>
+<li><strong>العملات المرسلة للسوق بتحويل عادي</strong> بدل البيع تضيع على مرسلها.</li>
+<li><strong>الأرضية آلية.</strong> هي المبلغ الذي يدفعه العقد، بعملة الاحتياط، مقابل العملة. ليست وعداً بربح وليست تأميناً.</li>
+</ul>
+<h2>7. الحالة</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>الجزء</th>
+<th>الحالة</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>عقود EVM</td>
+<td>مبنية ومختبرة (35 اختباراً للعقود)</td>
+</tr>
+<tr>
+<td>الموقع وصفحة النشر</td>
+<td>مبنيان ومختبران (22 اختباراً في المتصفح)، ويعملان</td>
+</tr>
+<tr>
+<td>النشر التجريبي</td>
+<td>يعمل على شبكة Sepolia التجريبية، بأموال تجريبية بلا قيمة</td>
+</tr>
+<tr>
+<td>تدقيق أمني مستقل</td>
+<td>لم يتم</td>
+</tr>
+<tr>
+<td>النشر على الشبكات الحقيقية</td>
+<td>لم يتم. يأتي بعد التدقيق</td>
+</tr>
+<tr>
+<td>Solana</td>
+<td>البرنامج مكتوب ومختبر محلياً. غير منشور، وغير موصول بالموقع بعد</td>
+</tr>
+<tr>
+<td>بيع العملة على شبكة أخرى (الجسر)</td>
+<td>مخطط له. غير مبني</td>
+</tr>
+</tbody></table></div>
+<p>النشر التجريبي على Sepolia:</p>
+<ul>
+<li>مصنع المنصة: <code>0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647</code></li>
+<li>الموقع: <a rel="noopener" href="https://w8nwzbf9h5-svg.github.io/jisr-launchpad/">https://w8nwzbf9h5-svg.github.io/jisr-launchpad/</a></li>
+<li>الكود: <a rel="noopener" href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad">https://github.com/w8nwzbf9h5-svg/jisr-launchpad</a></li>
+</ul>
+<h2>8. تنبيه</h2>
+<p>هذه الورقة تصف برنامجاً. ليست عرضاً لأي عملة وليست نصيحة مالية. العملات التي تُطلق على جسر ينشئها مطوّروها وليست المنصة. كل من يستخدم المنصة مسؤول عن قراراته.</p>
+
+</article>
+</main>
+<script>
+(function () {
+  var en = document.getElementById("paper-en"), ar = document.getElementById("paper-ar"), btn = document.getElementById("langBtn"), back = document.getElementById("backLink");
+  function show(lang) {
+    var isAr = lang === "ar";
+    en.hidden = isAr; ar.hidden = !isAr;
+    btn.textContent = isAr ? "English" : "العربية";
+    back.textContent = isAr ? "افتح المنصة" : "Open the launchpad";
+    document.documentElement.lang = isAr ? "ar" : "en";
+    document.title = isAr ? "منصة جسر: الورقة البيضاء" : "Jisr Launchpad: White Paper";
+    try { localStorage.setItem("jisr.paperLang", lang); } catch (_) {}
+  }
+  var q = /[?&]lang=(ar|en)/.exec(location.search), saved = null;
+  try { saved = localStorage.getItem("jisr.paperLang"); } catch (_) {}
+  show(q ? q[1] : saved === "ar" || saved === "en" ? saved : /^ar/i.test(navigator.language || "") ? "ar" : "en");
+  btn.addEventListener("click", function () { show(ar.hidden ? "ar" : "en"); });
+})();
+</script>
+</body>
+</html>

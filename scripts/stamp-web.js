@@ -9,7 +9,7 @@ const web = path.join(__dirname, "..", "web");
 const assets = ["styles.css", "app.js", "admin.js", "wallet.js", "config.js", "contracts.js", "vendor/ethers.umd.min.js"];
 const hash = (f) => crypto.createHash("sha256").update(fs.readFileSync(path.join(web, f))).digest("hex").slice(0, 8);
 
-for (const page of ["index.html", "admin.html"]) {
+for (const page of ["index.html", "admin.html", "whitepaper.html"]) {
   let html = fs.readFileSync(path.join(web, page), "utf8");
   for (const a of assets) {
     const re = new RegExp('"' + a.replace(/[.\/]/g, "\\$&") + '(\\?v=[0-9a-f]*)?"', "g");

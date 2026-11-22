@@ -104,6 +104,19 @@ function waitFor(child, text, ms) {
     assert.equal(await text("#specPrice"), "Fixed, $100.0K market cap");
     step("board lists coins read from the chain");
 
+    // 1b. The white paper is linked from the site and reads in English and Arabic.
+    assert.equal(await page.$eval("#nav-paper", (el) => el.getAttribute("href")), "whitepaper.html");
+    await page.goto(WEB + "/whitepaper.html?lang=en", { waitUntil: "networkidle0" });
+    assert((await text("#paper-en h1")).includes("White Paper"));
+    assert.equal(await page.$eval("#paper-ar", (el) => el.hidden), true);
+    await click("#langBtn");
+    assert.equal(await page.$eval("#paper-en", (el) => el.hidden), true);
+    assert((await text("#paper-ar h1")).includes("الورقة البيضاء"));
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true, "the paper fits a phone screen");
+    await page.goto(WEB, { waitUntil: "networkidle0" });
+    await page.waitForSelector("#rows .row");
+    step("white paper: linked from the site, English and Arabic, fits a phone");
+
     // 2. Connect the wallet and take test money.
     await click("#walletBtn");
     await page.waitForFunction(() => document.querySelector("#walletTxt").textContent.includes("0x"));
