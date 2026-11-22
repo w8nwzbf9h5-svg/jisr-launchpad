@@ -54,7 +54,10 @@
   }
 
   async function connect() {
-    if (!window.ethereum) { status("لا توجد محفظة. افتح هذه الصفحة من متصفح المحفظة، أو ثبّت إضافة محفظة.", "bad"); return; }
+    if (!window.ethereum) {
+      if (W.onPhone()) { status("جاري فتح الصفحة داخل تطبيق MetaMask…"); location.href = W.openInWalletUrl(); return; }
+      status("لا توجد محفظة. افتح هذه الصفحة من متصفح المحفظة، أو ثبّت إضافة محفظة.", "bad"); return;
+    }
     await guarded("جاري ربط المحفظة…", async () => {
       S.provider = new ethers.BrowserProvider(window.ethereum);
       const accounts = await S.provider.send("eth_requestAccounts", []);

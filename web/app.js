@@ -325,7 +325,10 @@
     S.signer = window.JISR_WALLET.signer(S.wallet, S.account);
   }
   async function connect() {
-    if (!window.ethereum) { toast("No wallet found. Open this page in a wallet's browser, or install a wallet extension."); return; }
+    if (!window.ethereum) {
+      if (window.JISR_WALLET.onPhone()) { toast("Opening this page in the MetaMask app…"); location.href = window.JISR_WALLET.openInWalletUrl(); return; }
+      toast("No wallet found. Open this page in a wallet's browser, or install a wallet extension."); return;
+    }
     try {
       S.wallet = new ethers.BrowserProvider(window.ethereum);
       const accounts = await S.wallet.send("eth_requestAccounts", []);

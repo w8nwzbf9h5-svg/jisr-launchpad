@@ -36,6 +36,11 @@ window.JISR_WALLET = (function () {
     return await window.ethereum.request({ method: "eth_requestAccounts", params: [] });
   }
 
+  /* On a phone, an ordinary browser has no wallet. This address opens the same page inside the
+     MetaMask app's own browser (or the app's download page if it is not installed). */
+  const onPhone = () => /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+  const openInWalletUrl = () => "https://link.metamask.io/dapp/" + location.host + location.pathname + location.search + location.hash;
+
   const readers = {};
   /* A public read-only endpoint for the network, used when the wallet's own endpoint cannot answer. */
   function reader(chainId) {
@@ -95,5 +100,5 @@ window.JISR_WALLET = (function () {
   }
   const signer = (provider, account) => new Signer(provider, account);
 
-  return { PROXY, detail, rejected, notPermitted, reconnect, reader, read, rawSend, waitReceipt, hasCode, signer };
+  return { PROXY, detail, rejected, notPermitted, reconnect, onPhone, openInWalletUrl, reader, read, rawSend, waitReceipt, hasCode, signer };
 })();
