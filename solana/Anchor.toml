@@ -1,0 +1,16 @@
+[toolchain]
+anchor_version = "0.31.1"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+jisr = "Fhv1WWx9hLDjViokFuLiypJfzSk6VHgJvi3J5xgMRh3W"
+
+[programs.devnet]
+jisr = "Fhv1WWx9hLDjViokFuLiypJfzSk6VHgJvi3J5xgMRh3W"
+
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/id.json"

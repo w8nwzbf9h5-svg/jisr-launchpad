@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Jisr · صفحة النشر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+body{font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;line-height:1.7}
+.adm{max-width:720px;margin:0 auto;padding:18px 16px 60px;display:grid;gap:14px}
+.adm h1{font-size:26px;font-weight:700;margin:6px 0 0}
+.adm h2{font-size:18px;font-weight:700;margin:0 0 6px}
+.adm p{margin:0 0 8px}
+.adm .muted{color:var(--muted);font-size:14px}
+.adm input[type=text]{width:100%;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:10px 12px;font-family:var(--mono);font-size:13.5px;direction:ltr;text-align:left}
+.adm textarea{width:100%;min-height:150px;border:1px solid var(--line);border-radius:8px;background:var(--raise);padding:10px 12px;font-family:var(--mono);font-size:12.5px;direction:ltr;text-align:left}
+.adm label{font-size:14px;font-weight:600;display:block;margin:8px 0 4px}
+.adm .ltr{direction:ltr;unicode-bidi:embed;font-family:var(--mono);font-size:13px;overflow-wrap:anywhere}
+.adm .row2{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.adm .kv{align-items:baseline}
+.adm .status{border-right:4px solid var(--accent);background:var(--raise);padding:10px 12px;border-radius:6px;font-size:14.5px}
+.adm .status.bad{border-right-color:var(--bad)}
+.adm .status.good{border-right-color:var(--good)}
+.adm .check{display:flex;gap:8px;align-items:flex-start;font-size:14px;margin-top:10px}
+.adm .flag{border-left:0;border-right:4px solid var(--floor)}
+</style>
+</head>
+<body>
+<main class="adm">
+  <h1>صفحة النشر والإدارة</h1>
+  <p class="muted">هذه الصفحة لصاحب المنصة فقط. كل عملية هنا تُرسَل من محفظتك وتوقّعها أنت. مفتاحك لا يغادر المحفظة.</p>
+
+  <div class="status" id="aStatus" role="status" aria-live="polite">اربط محفظتك للبدء.</div>
+
+  <section class="card">
+    <h2>1. المحفظة والشبكة</h2>
+    <div class="kv"><span>العنوان</span><b class="ltr" id="aAccount">غير مرتبطة</b></div>
+    <div class="kv"><span>الشبكة</span><b id="aNet">—</b></div>
+    <div class="kv"><span>الرصيد</span><b class="ltr" id="aBal">—</b></div>
+    <div class="row2"><button class="btn primary" id="aConnect">اربط المحفظة</button></div>
+    <p class="muted" style="margin-top:8px">لتغيير الشبكة، غيّرها من داخل المحفظة ثم أعد فتح الصفحة.</p>
+  </section>
+
+  <section class="card">
+    <h2>2. تجربة على شبكة تجريبية</h2>
+    <p>ينشر عملة مستقرة تجريبية، ومحوّل عملات تجريبي، والمصنع. كل شيء بلا قيمة مالية ومخصص للتجربة فقط. يحتاج 3 توقيعات.</p>
+    <div class="row2"><button class="btn primary" id="aTestKit" disabled>انشر العدّة التجريبية</button></div>
+    <p class="muted" style="margin-top:8px">هذا الزر لا يعمل على إيثيريوم أو BNB الحقيقيتين.</p>
+  </section>
+
+  <section class="card">
+    <h2>3. نشر المصنع بعناوين حقيقية</h2>
+    <p class="muted">هذه العناوين نهائية ولا يمكن تغييرها بعد النشر، ما عدا محفظة المنصة.</p>
+    <label for="aStable">عنوان العملة المستقرة (USDC أو USDT)</label>
+    <input type="text" id="aStable" placeholder="0x…" autocomplete="off">
+    <label for="aRouter">عنوان محوّل العملات (Uniswap V2 أو PancakeSwap V2)</label>
+    <input type="text" id="aRouter" placeholder="0x…" autocomplete="off">
+    <label for="aPlatform">محفظة المنصة، تستلم 2%</label>
+    <input type="text" id="aPlatform" placeholder="0x…" autocomplete="off">
+    <label for="aOwner">المالك، يستطيع تغيير محفظة المنصة فقط</label>
+    <input type="text" id="aOwner" placeholder="0x…" autocomplete="off">
+    <div class="row2"><button class="btn" id="aCheck" disabled>افحص العناوين</button></div>
+    <div id="aCheckOut" style="margin-top:10px"></div>
+    <label class="check" id="aAckWrap" hidden><input type="checkbox" id="aAck"><span>أفهم أن هذه شبكة حقيقية بأموال حقيقية، وأن العقود لم تُدقَّق أمنياً من جهة مستقلة، وأن لا أحد يستطيع إيقافها أو إصلاحها بعد النشر.</span></label>
+    <div class="row2"><button class="btn primary" id="aDeploy" disabled>انشر المصنع</button></div>
+  </section>
+
+  <section class="card" id="aResult" hidden>
+    <h2>4. اربط الموقع بالعقد</h2>
+    <div class="kv"><span>عنوان المصنع</span><b class="ltr" id="aFactoryOut"></b></div>
+    <label for="aRpc">رابط قراءة للشبكة (RPC)، اختياري لكنه مهم</label>
+    <input type="text" id="aRpc" placeholder="https://…" autocomplete="off">
+    <p class="muted">بدونه لا تظهر العملات للزائر إلا بعد ربط محفظته. خذه من مزوّد RPC باسم حسابك.</p>
+    <label for="aOut">انسخ هذا النص كاملاً وضعه مكان محتوى الملف deployments.js</label>
+    <textarea id="aOut" readonly></textarea>
+    <div class="row2"><button class="btn primary" id="aCopy">انسخ النص</button></div>
+    <div class="flag" style="margin-top:10px">بعد استبدال الملف ورفعه، افتح الصفحة الرئيسية للموقع. ستظهر الشبكة في القائمة أعلى الصفحة.</div>
+  </section>
+
+  <section class="card">
+    <h2>5. إدارة مصنع منشور</h2>
+    <label for="aFactory">عنوان المصنع</label>
+    <input type="text" id="aFactory" placeholder="0x…" autocomplete="off">
+    <div class="row2"><button class="btn" id="aLoad" disabled>اعرض بياناته</button></div>
+    <div id="aInfo" style="margin-top:10px"></div>
+    <label for="aNewWallet">محفظة منصة جديدة</label>
+    <input type="text" id="aNewWallet" placeholder="0x…" autocomplete="off">
+    <div class="row2"><button class="btn" id="aSetWallet" disabled>غيّر محفظة المنصة</button></div>
+    <p class="muted" style="margin-top:8px">هذه هي الصلاحية الوحيدة للمالك. لا يستطيع المالك لمس أي عملة أو أي احتياطي.</p>
+  </section>
+
+  <p class="muted"><a href="index.html">الرجوع إلى الموقع</a></p>
+</main>
+
+<script src="vendor/ethers.umd.min.js"></script>
+<script src="deployments.js"></script>
+<script src="config.js"></script>
+<script src="contracts.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

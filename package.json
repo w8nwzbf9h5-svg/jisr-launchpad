@@ -1,0 +1,25 @@
+{
+  "name": "jisr-launchpad",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "e2e": "hardhat compile && node scripts/export-web.js && node e2e/run.js",
+    "chain": "hardhat node",
+    "demo:deploy": "hardhat run scripts/local-demo.js --network localhost",
+    "web": "node scripts/serve.js",
+    "web:artifacts": "hardhat compile && node scripts/export-web.js"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@openzeppelin/contracts": "5.1.0",
+    "@openzeppelin/contracts-upgradeable": "5.1.0",
+    "chai": "^4.5.0",
+    "ethers": "^6.13.4",
+    "hardhat": "^2.22.17",
+    "puppeteer-core": "^23.11.1",
+    "solc": "0.8.26"
+  }
+}
