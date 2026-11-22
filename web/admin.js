@@ -66,7 +66,8 @@
       const c = CFG.chains[S.chainId];
       if (c && ethers.isAddress(c.factory || "") && !val("aFactory")) $("aFactory").value = c.factory;
       if (window.ethereum.on) { window.ethereum.on("chainChanged", () => location.reload()); window.ethereum.on("accountsChanged", () => location.reload()); }
-      status(k ? "المحفظة مرتبطة على " + k.name + "." : "المحفظة مرتبطة. هذه شبكة جديدة على الموقع: اكتب اسمها ورمز عملتها في الخطوة 1.", "good");
+      const restored = restoreResult();
+      status(restored ? "المحفظة مرتبطة. آخر نشر من هذا الجهاز محفوظ: النص جاهز للنسخ في الخطوة 4." : k ? "المحفظة مرتبطة على " + k.name + "." : "المحفظة مرتبطة. هذه شبكة جديدة على الموقع: اكتب اسمها ورمز عملتها في الخطوة 1.", "good");
     });
   }
 
@@ -83,7 +84,16 @@
     $("aFactoryOut").textContent = factory;
     $("aFactory").value = factory;
     $("aResult").hidden = false;
+    // remember the result on this device, so a page reload does not lose the address
+    try { localStorage.setItem("jisr.lastDeploy", JSON.stringify({ chainId: S.chainId, factory, testKit: !!testKit })); } catch (_) {}
     writeSnippet();
+  }
+  function restoreResult() {
+    try {
+      const d = JSON.parse(localStorage.getItem("jisr.lastDeploy") || "null");
+      if (d && d.chainId === S.chainId && ethers.isAddress(d.factory || "")) { showResult(d.factory, !!d.testKit); return true; }
+    } catch (_) {}
+    return false;
   }
   function writeSnippet() {
     if (!S.factoryOut) return;

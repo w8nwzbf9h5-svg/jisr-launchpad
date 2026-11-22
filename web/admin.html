@@ -22,7 +22,7 @@ body{font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahom
 .adm .ltr{direction:ltr;unicode-bidi:embed;font-family:var(--mono);font-size:13px;overflow-wrap:anywhere}
 .adm .row2{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .adm .kv{align-items:baseline}
-.adm .status{border-right:4px solid var(--accent);background:var(--raise);padding:10px 12px;border-radius:6px;font-size:14.5px}
+.adm .status{border-right:4px solid var(--accent);background:var(--raise);padding:10px 12px;border-radius:6px;font-size:14.5px;position:sticky;top:8px;z-index:20;box-shadow:0 6px 18px rgba(0,0,0,.45)}
 .adm .status.bad{border-right-color:var(--bad)}
 .adm .status.good{border-right-color:var(--good)}
 .adm .check{display:flex;gap:8px;align-items:flex-start;font-size:14px;margin-top:10px}
@@ -115,7 +115,7 @@ body{font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahom
 <script>
 /* Load the scripts in order. deployments.js is always fetched fresh, so a newly linked contract shows at once. */
 (function () {
-  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=478cb376", "contracts.js?v=608eda7b", "admin.js?v=bb53b788"];
+  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=478cb376", "contracts.js?v=608eda7b", "admin.js?v=0a5166a3"];
   (function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");
