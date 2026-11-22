@@ -70,6 +70,11 @@ function waitFor(child, text, ms) {
         request: async ({ method, params }) => {
           if (method === "eth_requestAccounts" || method === "eth_accounts") return [acct];
           if (method === "wallet_switchEthereumChain") return null;
+          // A stand-in for a limited mobile wallet: it cannot estimate gas, and it refuses a transaction with no recipient.
+          if (localStorage.getItem("e2e.limitedWallet")) {
+            if (method === "eth_estimateGas") { const e = new Error("Internal JSON-RPC error."); e.code = -32603; throw e; }
+            if (method === "eth_sendTransaction" && !(params[0] && params[0].to)) { const e = new Error("Unsupported transaction type"); e.code = -32000; throw e; }
+          }
           const r = await fetch(rpc, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: id++, method, params: params || [] }) });
           const j = await r.json();
           if (j.error) { const e = new Error(j.error.message); e.code = j.error.code; e.data = j.error.data; throw e; }
@@ -331,6 +336,25 @@ function waitFor(child, text, ms) {
     await page.waitForFunction(() => document.querySelector("#rows").textContent.includes("No coins yet"));
     assert((await text("#foot")).includes(realFactory));
     step("two currencies on one network: each factory is offered separately with its own coins");
+
+    // 15b. A limited mobile wallet: no gas estimates, and no transactions without a recipient.
+    // The deploy page goes through the standard CREATE2 deployer and the public endpoint, and still finishes.
+    await provider.send("hardhat_setCode", ["0x4e59b44847b379578588920cA78FbF26c0B4956C", "0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe03601600081602082378035828234f58015156039578182fd5b8082525050506014600cf3"]);
+    await page.goto(WEB + "/admin.html", { waitUntil: "networkidle0" });
+    await page.evaluate(() => localStorage.setItem("e2e.limitedWallet", "1"));
+    await click("#aConnect"); await aStatus("المحفظة مرتبطة");
+    await click("#aTestKitStock"); await aStatus("تم نشر العدّة التجريبية");
+    const limFactory = await text("#aFactoryOut");
+    const lim = new ethers.Contract(limFactory, facAbi, provider);
+    assert.equal(await lim.owner(), account, "deployed through the CREATE2 deployer, the owner is still the wallet");
+    assert.equal(await lim.saleMarketCap(), 400n * 10n ** 18n);
+    assert.notEqual(await lim.router(), ethers.ZeroAddress);
+    // a reload keeps the result, so the address is not lost
+    await page.goto(WEB + "/admin.html", { waitUntil: "networkidle0" });
+    await click("#aConnect"); await aStatus("آخر نشر من هذا الجهاز محفوظ");
+    assert.equal(await text("#aFactoryOut"), limFactory);
+    await page.evaluate(() => { localStorage.removeItem("e2e.limitedWallet"); localStorage.removeItem("jisr.lastDeploy"); });
+    step("deploy page: a limited mobile wallet still deploys, and a reload keeps the result");
 
     // 16b. A factory priced in a stock token, with no swap router: deploy it, link it, launch and buy with it.
     await page.goto(WEB + "/admin.html", { waitUntil: "networkidle0" });

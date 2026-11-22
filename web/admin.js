@@ -2,7 +2,7 @@
 (function () {
   "use strict";
   const { ethers } = window;
-  const CFG = window.JISR_CONFIG, ART = window.JISR_ARTIFACTS;
+  const CFG = window.JISR_CONFIG, ART = window.JISR_ARTIFACTS, W = window.JISR_WALLET;
   const ERC20 = ["function symbol() view returns (string)", "function decimals() view returns (uint8)"];
   const ROUTER = ["function WETH() view returns (address)", "function getAmountsOut(uint256 amountIn, address[] path) view returns (uint256[])"];
   const $ = (id) => document.getElementById(id);
@@ -12,12 +12,14 @@
 
   function status(msg, kind) { const el = $("aStatus"); el.textContent = msg; el.className = "status" + (kind ? " " + kind : ""); }
   function explain(e) {
-    if (e && (e.code === "ACTION_REJECTED" || e.code === 4001 || (e.info && e.info.error && e.info.error.code === 4001))) return "ألغيت الطلب من المحفظة.";
-    const t = String((e && (e.shortMessage || e.reason || e.message)) || e);
+    if (W.rejected(e)) return "ألغيت الطلب من المحفظة.";
+    const t = W.detail(e) || String(e);
     if (/insufficient funds/i.test(t)) return "رصيد المحفظة لا يكفي لرسوم الشبكة.";
     if (/OwnableUnauthorizedAccount/.test(t)) return "هذه المحفظة ليست مالك المصنع.";
     if (/BadMarketCap/.test(t)) return "القيمة السوقية المدخلة خارج الحدود المسموحة.";
-    return t.length > 200 ? t.slice(0, 200) + "…" : t;
+    if (/did not answer in time/i.test(t)) return "المحفظة لم تردّ. افتح تطبيق المحفظة وتأكد أنها تعمل، ثم أعد المحاولة.";
+    if (/did not return a transaction id/i.test(t)) return "المحفظة لم تُرجع رقم العملية. تحقق من سجل المحفظة قبل إعادة المحاولة.";
+    return "ردّ المحفظة: " + (t.length > 260 ? t.slice(0, 260) + "…" : t);
   }
   const isAddr = (v) => ethers.isAddress((v || "").trim());
   const val = (id) => $(id).value.trim();
@@ -56,7 +58,7 @@
       S.provider = new ethers.BrowserProvider(window.ethereum);
       const accounts = await S.provider.send("eth_requestAccounts", []);
       S.account = ethers.getAddress(accounts[0]);
-      S.signer = await S.provider.getSigner(S.account);
+      S.signer = W.signer(S.provider, S.account);
       S.chainId = String((await S.provider.getNetwork()).chainId);
       $("aAccount").textContent = S.account;
       const k = known();
@@ -71,13 +73,27 @@
     });
   }
 
+  /* Gas to offer when neither the wallet nor the public endpoint can estimate it (measured use plus a margin). */
+  const GAS = { MockStable: 800000n, MockRouter: 1200000n, LaunchpadFactory: 4800000n };
   async function deployContract(name, args, label) {
+    const data = (await new ethers.ContractFactory(ART[name].abi, ART[name].bytecode).getDeployTransaction(...args)).data;
+    let addr = null, hash;
     status(label + ": وقّع من المحفظة…");
-    const f = new ethers.ContractFactory(ART[name].abi, ART[name].bytecode, S.signer);
-    const c = await f.deploy(...args);
+    if (await W.hasCode(S.chainId, W.PROXY)) {
+      // Through the standard CREATE2 deployer: an ordinary transaction with a recipient, which every wallet accepts.
+      const salt = ethers.hexlify(ethers.randomBytes(32));
+      addr = ethers.getCreate2Address(W.PROXY, salt, ethers.keccak256(data));
+      hash = await W.rawSend(S.chainId, S.account, { to: W.PROXY, data: ethers.concat([salt, data]) }, GAS[name] + 150000n);
+    } else {
+      hash = await W.rawSend(S.chainId, S.account, { data }, GAS[name]);
+    }
     status(label + ": بانتظار الشبكة…");
-    await c.waitForDeployment();
-    return c;
+    const rc = await W.waitReceipt(S.chainId, hash);
+    if (!rc) throw new Error(label + ": لم تؤكد الشبكة العملية خلال 10 دقائق. تحقق من سجل المحفظة ثم أعد المحاولة.");
+    if (Number(rc.status) !== 1) throw new Error(label + ": رفضت الشبكة العملية.");
+    if (!addr) addr = rc.contractAddress;
+    if (!addr || !(await W.hasCode(S.chainId, addr))) throw new Error(label + ": لم يظهر العقد على الشبكة.");
+    return { target: ethers.getAddress(addr) };
   }
   function showResult(factory, testKit) {
     S.testKit = testKit; S.factoryOut = factory;
@@ -122,10 +138,21 @@
       if (!net().test) throw new Error("العدّة التجريبية لا تُنشر على شبكة حقيقية.");
       const stock = kind === "stock";
       const dec = stock ? 18 : 6, cap = (stock ? 400n : 100000n) * 10n ** BigInt(dec), unit = cap / 100000n;
-      const token = await deployContract("MockStable", stock ? ["Mock Tesla Stock", "mTSLA", dec] : ["Mock USD", "mUSD", dec], "1 من 3: عملة الاحتياط التجريبية");
+      // Steps already done are remembered on this device, so a retry after a failure does not pay for them again.
+      const key = "jisr.kit:" + S.chainId + ":" + S.account + ":" + kind;
+      let done = {};
+      try { done = JSON.parse(localStorage.getItem(key) || "{}") || {}; } catch (_) {}
+      const keep = () => { try { localStorage.setItem(key, JSON.stringify(done)); } catch (_) {} };
+      const have = async (a) => ethers.isAddress(a || "") && (await W.hasCode(S.chainId, a));
+      if (!(await have(done.token))) {
+        done = { token: (await deployContract("MockStable", stock ? ["Mock Tesla Stock", "mTSLA", dec] : ["Mock USD", "mUSD", dec], "1 من 3: عملة الاحتياط التجريبية")).target }; keep();
+      }
       const perNative = (net().native === "BNB" ? 650n : 3200n) * unit;
-      const router = await deployContract("MockRouter", [ethers.Wallet.createRandom().address, token.target, perNative], "2 من 3: محوّل العملات التجريبي");
-      const factory = await deployContract("LaunchpadFactory", [token.target, router.target, S.account, S.account, cap], "3 من 3: المصنع");
+      if (!(await have(done.router))) {
+        done.router = (await deployContract("MockRouter", [ethers.Wallet.createRandom().address, done.token, perNative], "2 من 3: محوّل العملات التجريبي")).target; keep();
+      }
+      const factory = await deployContract("LaunchpadFactory", [done.token, done.router, S.account, S.account, cap], "3 من 3: المصنع");
+      try { localStorage.removeItem(key); } catch (_) {}
       showResult(factory.target, true);
       status("تم نشر العدّة التجريبية. انسخ النص من الخطوة 4 إلى الملف deployments.js.", "good");
     });

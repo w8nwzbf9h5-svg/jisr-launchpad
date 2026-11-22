@@ -233,10 +233,10 @@
   function toast(msg, ms) { const el = $("#toast"); el.textContent = msg; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms || 5000); }
   function explain(e) {
     if (!e) return "Something went wrong.";
-    if (e.code === "ACTION_REJECTED" || e.code === 4001 || (e.info && e.info.error && e.info.error.code === 4001)) return "You cancelled the request in your wallet.";
+    if (window.JISR_WALLET.rejected(e)) return "You cancelled the request in your wallet.";
     const name = (e.revert && e.revert.name) || findErrorName(e);
     if (name && ERRORS[name]) return ERRORS[name];
-    const txt = String(e.shortMessage || e.reason || e.message || e);
+    const txt = window.JISR_WALLET.detail(e) || String(e);
     if (/insufficient funds/i.test(txt)) return "Your wallet does not have enough " + (S.cfg ? S.cfg.native : "funds") + " for this and the network fee.";
     if (/EXCESSIVE_INPUT_AMOUNT|INSUFFICIENT_OUTPUT_AMOUNT/.test(txt)) return ERRORS.Slippage;
     if (/exceeds balance|ERC20InsufficientBalance/.test(txt)) return "Your wallet does not hold enough for this trade.";
@@ -307,11 +307,21 @@
   async function bindSigner() {
     const net = await S.wallet.getNetwork();
     if (String(net.chainId) !== S.chainId) {
-      try { await S.wallet.send("wallet_switchEthereumChain", [{ chainId: "0x" + Number(S.chainId).toString(16) }]); }
-      catch (e) { S.signer = null; toast("Switch your wallet to " + S.cfg.name + " to trade here."); return; }
+      const hex = "0x" + Number(S.chainId).toString(16);
+      try { await S.wallet.send("wallet_switchEthereumChain", [{ chainId: hex }]); }
+      catch (e) {
+        // The wallet may not know this network yet: offer to add it, which also switches to it.
+        let added = false;
+        if (S.cfg.rpcUrl && !window.JISR_WALLET.rejected(e)) {
+          const add = { chainId: hex, chainName: S.cfg.name, nativeCurrency: { name: S.cfg.native, symbol: S.cfg.native, decimals: 18 }, rpcUrls: [S.cfg.rpcUrl] };
+          if (S.cfg.explorer) add.blockExplorerUrls = [S.cfg.explorer];
+          try { await S.wallet.send("wallet_addEthereumChain", [add]); added = true; } catch (_) {}
+        }
+        if (!added) { S.signer = null; toast("Switch your wallet to " + S.cfg.name + " to trade here."); return; }
+      }
       S.wallet = new ethers.BrowserProvider(window.ethereum);
     }
-    S.signer = await S.wallet.getSigner(S.account);
+    S.signer = window.JISR_WALLET.signer(S.wallet, S.account);
   }
   async function connect() {
     if (!window.ethereum) { toast("No wallet found. Open this page in a wallet's browser, or install a wallet extension."); return; }

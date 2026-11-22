@@ -6,7 +6,7 @@ const path = require("path");
 const crypto = require("crypto");
 
 const web = path.join(__dirname, "..", "web");
-const assets = ["styles.css", "app.js", "admin.js", "config.js", "contracts.js", "vendor/ethers.umd.min.js"];
+const assets = ["styles.css", "app.js", "admin.js", "wallet.js", "config.js", "contracts.js", "vendor/ethers.umd.min.js"];
 const hash = (f) => crypto.createHash("sha256").update(fs.readFileSync(path.join(web, f))).digest("hex").slice(0, 8);
 
 for (const page of ["index.html", "admin.html"]) {
