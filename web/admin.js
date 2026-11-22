@@ -88,9 +88,9 @@
       // Through the standard CREATE2 deployer: an ordinary transaction with a recipient, which every wallet accepts.
       const salt = ethers.hexlify(ethers.randomBytes(32));
       addr = ethers.getCreate2Address(W.PROXY, salt, ethers.keccak256(data));
-      hash = await W.rawSend(S.chainId, S.account, { to: W.PROXY, data: ethers.concat([salt, data]) }, GAS[name] + 150000n);
+      hash = await W.rawSend(S.chainId, S.account, { to: W.PROXY, data: ethers.concat([salt, data]) }, GAS[name] + 150000n, 3);
     } else {
-      hash = await W.rawSend(S.chainId, S.account, { data }, GAS[name]);
+      hash = await W.rawSend(S.chainId, S.account, { data }, GAS[name], 3);
     }
     status(label + ": بانتظار الشبكة…");
     const rc = await W.waitReceipt(S.chainId, hash);

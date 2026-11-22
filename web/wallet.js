@@ -53,10 +53,12 @@ window.JISR_WALLET = (function () {
   }
 
   /* Ask the wallet to sign and send one transaction. Returns the transaction hash. */
-  async function rawSend(chainId, from, tx, gasFallback) {
+  /* marginPct is the headroom added to the gas estimate. A deployment always uses the same gas, so it
+     needs very little; wallets require the balance to cover the whole limit, so a large margin can block a tight balance. */
+  async function rawSend(chainId, from, tx, gasFallback, marginPct) {
     const req = Object.assign({ from }, tx);
     let gas = null;
-    try { gas = BigInt(await read(chainId, "eth_estimateGas", [req])) * 12n / 10n; } catch (_) { gas = gasFallback || null; }
+    try { gas = BigInt(await read(chainId, "eth_estimateGas", [req])) * BigInt(100 + (marginPct == null ? 20 : marginPct)) / 100n; } catch (_) { gas = gasFallback || null; }
     if (gas) req.gas = ethers.toQuantity(gas);
     return await ask("eth_sendTransaction", [req]);
   }
