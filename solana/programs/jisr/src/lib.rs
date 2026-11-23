@@ -75,7 +75,7 @@ pub mod jisr {
     /// The creator receives no coins. The whole supply is minted to the market's vault and the
     /// mint authority is removed before this instruction ends.
     pub fn create_coin(ctx: Context<CreateCoin>, name: String, symbol: String, uri: String) -> Result<()> {
-        require!((2..=32).contains(&name.len()) && (2..=10).contains(&symbol.len()) && uri.len() <= 200, JisrError::BadName);
+        require!((2..=32).contains(&name.len()) && (2..=10).contains(&symbol.len()) && uri.len() <= 400, JisrError::BadName);
 
         let coin_mint = ctx.accounts.coin_mint.key();
         let index = ctx.accounts.config.coin_count;
@@ -292,7 +292,7 @@ pub struct Market {
     pub name: String,
     #[max_len(10)]
     pub symbol: String,
-    #[max_len(200)]
+    #[max_len(400)]
     pub uri: String,
 }
 

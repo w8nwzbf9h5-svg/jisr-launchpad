@@ -5,7 +5,7 @@ name: Solana program
 on:
   push:
     branches: [main]
-    paths: ["solana/**", ".github/workflows/solana.yml"]
+    paths: ["solana/**", "web/solana/**", ".github/workflows/solana.yml"]
   workflow_dispatch:
 
 permissions:
@@ -43,6 +43,16 @@ jobs:
       - name: Program tests
         working-directory: solana
         run: cargo test -p jisr --release
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Client test against a local Solana node
+        run: |
+          # the same client file the web page uses, driving the program just built
+          PROGRAM_ID=$(grep -oP 'declare_id!\("\K[^"]+' solana/programs/jisr/src/lib.rs)
+          solana-test-validator --reset --quiet --ledger /tmp/jisr-ledger --bpf-program "$PROGRAM_ID" solana/target/deploy/jisr.so > /tmp/validator.log 2>&1 &
+          npm install --no-save --no-package-lock --no-audit --no-fund @solana/web3.js@1
+          PROGRAM_ID="$PROGRAM_ID" node solana/client-test/run.js || { echo "--- node log ---"; tail -40 /tmp/validator.log; exit 1; }
       - uses: actions/upload-artifact@v4
         with:
           name: jisr-solana-program
