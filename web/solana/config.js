@@ -4,5 +4,5 @@ window.JISR_SOLANA = {
   rpcUrl: "https://api.devnet.solana.com",
   explorer: "https://explorer.solana.com",
   clusterParam: "?cluster=devnet",
-  programId: ""
+  programId: "7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU"
 };

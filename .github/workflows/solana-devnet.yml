@@ -79,7 +79,8 @@ jobs:
         working-directory: solana
         run: |
           solana program deploy target/deploy/jisr.so --program-id target/deploy/jisr-keypair.json -k /tmp/deployer.json -u devnet --final --max-sign-attempts 60
-          solana program show "$PROGRAM_ID" -u devnet
+          # (showing the program needs a key file to be named too, even though it signs nothing)
+          solana program show "$PROGRAM_ID" -u devnet -k /tmp/deployer.json || true
       - name: Report
         if: success()
         run: |
