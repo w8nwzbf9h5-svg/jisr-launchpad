@@ -151,7 +151,8 @@
     else if (S.view === "coin") renderCoin();
     else renderLaunch();
     $("#foot").innerHTML = "Network: " + esc(C.name) + ". Program " + (S.programId ? '<span class="num">' + esc(S.programId.toBase58()) + "</span>" : "not deployed") +
-      '. Not audited. Use at your own risk. <a class="linkbtn" href="whitepaper.html">White paper</a>';
+      '. Not audited. Use at your own risk. <a class="linkbtn" href="whitepaper.html">White paper</a>' +
+      (C.other ? ' · <a class="linkbtn" href="solana.html?net=' + esc(C.other.key) + '">Switch to ' + esc(C.other.name) + "</a>" : "");
   }
   /* The setup card replaces every view until the program is deployed and initialized. */
   const shown = () => (!S.programId || !S.loaded || S.loadError || !S.cfg ? "setup" : S.view);

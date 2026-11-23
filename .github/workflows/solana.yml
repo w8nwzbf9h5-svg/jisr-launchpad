@@ -5,7 +5,7 @@ name: Solana program
 on:
   push:
     branches: [main]
-    paths: ["solana/**", "web/solana/**", ".github/workflows/solana.yml"]
+    paths: ["solana/**", "web/solana/**", "scripts/solana-deploy.sh", "scripts/solana-start.js", ".github/workflows/solana.yml"]
   workflow_dispatch:
 
 permissions:
@@ -67,3 +67,17 @@ jobs:
             solana/target/deploy/jisr.so
             solana/target/idl/jisr.json
           if-no-files-found: error
+      - name: Rehearse the real-network deployment against a local node
+        run: |
+          # The same script the real deployment uses: deploy, start, hand the admin role on, make final.
+          # It needs the program built for an address whose key we hold, so build once more for a new one.
+          cd solana
+          solana-keygen new --no-bip39-passphrase --silent --force -o target/deploy/jisr-keypair.json
+          anchor keys sync
+          anchor build
+          cd ..
+          pkill -f solana-test-validator || true
+          sleep 3
+          solana-test-validator --reset --quiet --ledger /tmp/jisr-ledger > /tmp/validator.log 2>&1 &
+          PROGRAM_KEY="$PWD/solana/target/deploy/jisr-keypair.json" PROGRAM_SO="$PWD/solana/target/deploy/jisr.so" node solana/client-test/rehearsal.js || { echo "--- node log ---"; tail -40 /tmp/validator.log; exit 1; }
+          rm -f solana/target/deploy/jisr-keypair.json
