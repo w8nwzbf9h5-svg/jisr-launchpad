@@ -1,0 +1,50 @@
+# Builds the Solana program for deployment and runs its tests.
+# The built program (jisr.so) and its interface file (jisr.json) are attached to the run as "jisr-solana-program".
+name: Solana program
+
+on:
+  push:
+    branches: [main]
+    paths: ["solana/**", ".github/workflows/solana.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            solana/target
+          key: solana-${{ runner.os }}-${{ hashFiles('solana/Cargo.lock') }}
+      - name: Install the Solana tools
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Anchor
+        run: npm install -g @coral-xyz/anchor-cli@0.31.1
+      - name: Versions
+        run: solana --version && anchor --version && cargo --version
+      - name: Build the program
+        working-directory: solana
+        run: anchor build
+      - name: Program tests
+        working-directory: solana
+        run: cargo test -p jisr --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jisr-solana-program
+          path: |
+            solana/target/deploy/jisr.so
+            solana/target/idl/jisr.json
+          if-no-files-found: error
