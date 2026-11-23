@@ -2,3 +2,4 @@ Changing this file starts a deployment of the Solana program to devnet (test net
 See .github/workflows/solana-devnet.yml. Each deployment gets a new address.
 
 deployment 1: 2026-11-23
+deployment 2: 2026-11-23, deployer funded by hand
