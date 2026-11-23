@@ -174,6 +174,13 @@
   function setPlatformWalletIx(programId, admin, newWallet) {
     return ix(programId, "set_platform_wallet", [meta(admin, false, true), meta(configAddress(programId), true)], [newWallet.toBytes()]);
   }
+  /* Handing the admin role on takes two steps: the admin names the next one, and that wallet accepts. */
+  function proposeAdminIx(programId, admin, newAdmin) {
+    return ix(programId, "propose_admin", [meta(admin, false, true), meta(configAddress(programId), true)], [newAdmin.toBytes()]);
+  }
+  function acceptAdminIx(programId, newAdmin) {
+    return ix(programId, "accept_admin", [meta(newAdmin, false, true), meta(configAddress(programId), true)]);
+  }
   /* Launch coin number `index` (the config's current coin count). Returns the instructions and the new addresses. */
   function createCoinIxs(programId, creator, stableMint, index, name, symbol, uri) {
     const coinMint = coinMintAddress(programId, index), market = marketAddress(programId, coinMint);
@@ -277,7 +284,7 @@
     quoteBuy, quoteSell, coinsForBudget, currentPrice, marketCap, outstanding,
     configAddress, coinMintAddress, marketAddress, ata,
     decodeConfig, decodeMarket, decodeMint, tokenAmount, getConfig, getMarkets, getMarket, getBalances,
-    ensureAtaIx, initializeIx, setPlatformWalletIx, createCoinIxs, buyIxs, sellIxs, claimCreatorFeesIxs, sweepPlatformFeesIxs, reinforceIx,
+    ensureAtaIx, initializeIx, setPlatformWalletIx, proposeAdminIx, acceptAdminIx, createCoinIxs, buyIxs, sellIxs, claimCreatorFeesIxs, sweepPlatformFeesIxs, reinforceIx,
     TEST_DOLLAR, createTestDollarIxs, testDollarFaucetIxs, packMeta, unpackMeta, byteLength
   };
 });

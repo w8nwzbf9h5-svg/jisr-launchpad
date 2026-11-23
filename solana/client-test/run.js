@@ -127,7 +127,19 @@ function raise(n) {
   await send([J.setPlatformWalletIx(programId, admin.publicKey, bob.publicKey)], admin);
   assert.equal((await J.getConfig(conn, programId)).platformWallet.toBase58(), bob.publicKey.toBase58());
   await send([J.setPlatformWalletIx(programId, admin.publicKey, platform.publicKey)], admin);
-  step("fees: paid to the creator and the platform wallet only; the admin alone changes the platform wallet");
+  // handing the admin role on: the admin names the next one, and only that wallet can accept
+  await fails(send([J.proposeAdminIx(programId, alice.publicKey, alice.publicKey)], alice), "a stranger naming the next admin");
+  await send([J.proposeAdminIx(programId, admin.publicKey, bob.publicKey)], admin);
+  cfg = await J.getConfig(conn, programId);
+  assert.deepEqual([cfg.admin.toBase58(), cfg.pendingAdmin.toBase58()], [admin.publicKey.toBase58(), bob.publicKey.toBase58()], "naming the next admin changes nothing until they accept");
+  await fails(send([J.acceptAdminIx(programId, alice.publicKey)], alice), "a wallet that was not named accepting the admin role");
+  await send([J.acceptAdminIx(programId, bob.publicKey)], bob);
+  cfg = await J.getConfig(conn, programId);
+  assert.deepEqual([cfg.admin.toBase58(), cfg.pendingAdmin.toBase58()], [bob.publicKey.toBase58(), web3.PublicKey.default.toBase58()]);
+  await fails(send([J.setPlatformWalletIx(programId, admin.publicKey, admin.publicKey)], admin), "the old admin changing the platform wallet");
+  await send([J.proposeAdminIx(programId, bob.publicKey, admin.publicKey)], bob);
+  await send([J.acceptAdminIx(programId, admin.publicKey)], admin);
+  step("fees: paid to the creator and the platform wallet only; the admin alone changes the platform wallet and hands the role on in two steps");
 
   // 5. the 2.5% wallet limit
   await dollars(alice, 10000n * U);
@@ -187,11 +199,16 @@ function raise(n) {
   // 7. a second coin: listing order and independent markets
   cfg = await J.getConfig(conn, programId);
   const second = J.createCoinIxs(programId, alice.publicKey, stableMint, cfg.coinCount, "Second Coin", "TWO", "");
+  // a stranger creates the new market's stablecoin account first and puts $3 in it; the launch must still work
+  await send(J.testDollarFaucetIxs(bob.publicKey, second.market, 3n * U), bob, [J.TEST_DOLLAR.faucetKey()]);
   await send(second.ixs, alice);
+  assert.equal(J.tokenAmount(await conn.getAccountInfo(J.ata(second.market, stableMint))), 3n * U);
+  await send([J.reinforceIx(programId, stableMint, second.coinMint)], bob);
+  assert.equal((await market(second.coinMint)).floorReserve, 3n * U, "money sent to a market outside a trade can only become floor reserve");
   const list = await J.getMarkets(conn, programId, 2n, 10);
   assert.deepEqual(list.map((x) => x.symbol), ["TWO", "HUMP"], "newest first");
-  assert.deepEqual(state(list[0]).slice(0, 6), ["0", "0", "0", "0", "0", "0"]);
-  step("listing: a second coin appears first and starts empty");
+  assert.deepEqual(state(list[0]).slice(0, 6), ["0", "0", "3000000", "0", "0", "0"]);
+  step("listing: a second coin appears first; an account made for it in advance cannot block its launch");
 
   console.log("\n  " + steps + " client steps passed against the program " + programId.toBase58());
 })().catch((e) => { console.error(e); process.exit(1); });

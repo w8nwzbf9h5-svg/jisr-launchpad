@@ -360,3 +360,59 @@ async fn graduation_rising_floor_and_everyone_exits() {
     assert_eq!(m.math().outstanding(), 0);
     assert_eq!(env.tokens(coin.coin_vault).await, TOTAL_SUPPLY);
 }
+
+/// Anyone can create a token account for any owner. A stranger who creates the next market's stablecoin
+/// account before the coin is launched must not be able to block the launch.
+#[tokio::test]
+async fn a_vault_made_in_advance_cannot_block_a_launch() {
+    let mut env = Env::new().await;
+    let admin = env.user(0).await;
+    let platform = env.user(0).await;
+    let creator = env.user(0).await;
+    let stranger = env.user(100).await;
+    env.initialize(&admin, platform.pubkey()).await;
+
+    // the stranger creates the vault of coin number 0 before that coin exists, and puts $5 in it
+    let mint = Pubkey::find_program_address(&[jisr::COIN_SEED, &0u64.to_le_bytes()], &jisr::ID).0;
+    let market = Pubkey::find_program_address(&[jisr::MARKET_SEED, mint.as_ref()], &jisr::ID).0;
+    let vault = get_associated_token_address(&market, &env.stable_mint);
+    let stranger_stable = get_associated_token_address(&stranger.pubkey(), &env.stable_mint);
+    let ixs = vec![
+        spl_associated_token_account::instruction::create_associated_token_account(&stranger.pubkey(), &market, &env.stable_mint, &spl_token::id()),
+        spl_token::instruction::transfer(&spl_token::id(), &stranger_stable, &vault, &stranger.pubkey(), &[], 5 * USD).unwrap(),
+    ];
+    env.send(ixs, &[&stranger]).await.unwrap();
+    assert_eq!(env.tokens(vault).await, 5 * USD);
+
+    // the launch still works, and the account is the market's and nobody else's
+    let coin = env.create_coin(&creator, "Camel Cash", "HUMP").await.unwrap();
+    assert_eq!(coin.stable_vault, vault);
+    let acc = env.banks.get_account(vault).await.unwrap().unwrap();
+    let state = spl_token::state::Account::unpack(&acc.data).unwrap();
+    assert_eq!(state.owner, coin.market, "the vault belongs to the market PDA");
+    assert!(state.delegate.is_none() && state.close_authority.is_none(), "nobody else has any right over the vault");
+    let m = env.check(&coin).await;
+    assert_eq!(m.floor_reserve, 0, "money that was there before the launch is not counted until reinforce");
+
+    // the $5 can only become floor reserve
+    let ix = Instruction {
+        program_id: jisr::ID,
+        accounts: jisr::accounts::Reinforce { config: env.config, market: coin.market, stable_vault: coin.stable_vault }.to_account_metas(None),
+        data: jisr::instruction::Reinforce {}.data(),
+    };
+    env.send(vec![ix], &[]).await.unwrap();
+    let m = env.check(&coin).await;
+    assert_eq!(m.floor_reserve, 5 * USD);
+
+    // and the coin trades as usual: $1,000 buys 9.5M coins and they sell back for $902.50
+    let alice = env.user(10_000).await;
+    env.buy(&coin, &alice, 9_500_000 * COIN, 1000 * USD).await.unwrap();
+    env.sell(&coin, &alice, 9_500_000 * COIN).await.unwrap();
+    assert_eq!(env.stable_of(&alice.pubkey()).await, 9_000 * USD + 902_500_000);
+    let m = env.check(&coin).await;
+    assert_eq!(m.floor_reserve, 5 * USD + 39 * USD, "the gift plus the 2% of both trades");
+
+    // the next coin, with no account made in advance, launches too
+    let next = env.create_coin(&creator, "Second Coin", "TWO").await.unwrap();
+    assert_ne!(next.stable_vault, vault);
+}

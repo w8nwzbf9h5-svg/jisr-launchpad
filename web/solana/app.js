@@ -7,6 +7,9 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const short = (k) => { const s = String(k); return s.slice(0, 4) + "…" + s.slice(-4); };
   const SLIP_BPS = 100n; // 1%
+  /* On a test network the page offers test dollars, free SOL for fees and the one-time setup. On the real
+     network (test: false in config.js) none of that exists: the reserve currency is real and setup is done at deployment. */
+  const TEST = C.test !== false, CUR = TEST ? "test $" : C.stableName || "USDC";
 
   const S = {
     conn: null, programId: null, cfg: null, dec: 6, stableReady: false,
@@ -56,7 +59,7 @@
     const custom = /"Custom":\s*(\d+)/.exec(t) || /custom program error: 0x([0-9a-f]+)/i.exec(t);
     if (custom) { const code = /0x/i.test(custom[0]) ? parseInt(custom[1], 16) : Number(custom[1]); if (PROGRAM_ERRORS[code]) return PROGRAM_ERRORS[code]; if (code === 1) return "Not enough balance for this trade."; }
     if (/may not be used to pay transaction fees|InvalidAccountForFee|no record of a prior credit|insufficient lamports|insufficient funds for (fee|rent)|InsufficientFundsForFee|AccountNotFound/i.test(t))
-      return "Your wallet has no SOL on " + C.name + " to pay the network fee." + (helperKey() ? " Press “Get SOL for fees” in the bar at the top, then try again." : " Get some from faucet.solana.com, then try again.");
+      return "Your wallet has no SOL on " + C.name + " to pay the network fee." + (!TEST ? " Add a little SOL to it, then try again." : helperKey() ? " Press “Get SOL for fees” in the bar at the top, then try again." : " Get some from faucet.solana.com, then try again.");
     if (/blockhash not found|block height exceeded|expired/i.test(t)) return "The request took too long and expired. Try again.";
     if (/failed to fetch|networkerror|429|too many requests/i.test(t)) return "The Solana network did not answer. Try again in a moment.";
     return t.length > 180 ? t.slice(0, 180) + "…" : t || "Something went wrong.";
@@ -135,11 +138,12 @@
     const w = $("#walletBtn");
     w.classList.toggle("on", !!S.wallet);
     $("#walletTxt").textContent = S.wallet ? short(S.wallet.toBase58()) + (S.cfg ? " · " + fUsd(S.stable) : "") : "Connect Phantom";
-    const faucet = S.cfg && S.isTestDollar ? ' <button class="linkbtn" data-act="faucet">Get 10,000 test dollars</button>' : "";
-    $("#stripTxt").innerHTML = "<b>" + esc(C.name) + ".</b> Test network. Coins and money here have no value." + faucet +
-      (S.wallet && S.sol < LOW_SOL ? " Your wallet has almost no SOL for network fees: " + (helperKey()
+    const faucet = TEST && S.cfg && S.isTestDollar ? ' <button class="linkbtn" data-act="faucet">Get 10,000 test dollars</button>' : "";
+    $("#stripTxt").innerHTML = "<b>" + esc(C.name) + ".</b> " + (TEST ? "Test network. Coins and money here have no value." : "Trades here use real " + esc(CUR) + ".") + faucet +
+      (S.wallet && S.sol < LOW_SOL ? " Your wallet has almost no SOL for network fees" + (!TEST ? "." : ": ") + (!TEST ? "" : helperKey()
         ? '<button class="linkbtn" data-act="solFaucet">Get SOL for fees</button>.'
         : '<a class="linkbtn" href="https://faucet.solana.com" target="_blank" rel="noopener">get devnet SOL</a>.') : "");
+    $("#specPay").textContent = TEST ? "Test dollars" : CUR;
     for (const v of ["board", "coin", "launch", "setup"]) $("#v-" + v).hidden = v !== shown();
     document.querySelectorAll("nav [data-act=nav]").forEach((b) => b.setAttribute("aria-current", b.dataset.v === S.view ? "page" : "false"));
     if (shown() === "setup") renderSetup();
@@ -156,6 +160,7 @@
     if (!S.programId) { el.innerHTML = '<div class="card"><h2>Solana is not live yet</h2><p class="note">The Jisr program has not been deployed to ' + esc(C.name) + ". The Ethereum-family networks are on the <a href=\"./\">main page</a>.</p></div>"; return; }
     if (!S.loaded) { el.innerHTML = '<div class="empty">Reading the program on ' + esc(C.name) + "…</div>"; return; }
     if (S.loadError) { el.innerHTML = '<div class="card"><h2>Could not read the network</h2><p class="note">' + esc(S.loadError) + '</p><button class="btn" data-act="refresh">Try again</button></div>'; return; }
+    if (!TEST) { el.innerHTML = '<div class="card"><h2>Not started yet</h2><p class="note">The program is deployed on ' + esc(C.name) + " but the launchpad has not been started. That step is part of the deployment and is not done from this page.</p></div>"; return; }
     el.innerHTML = '<div class="card"><h2>One-time setup</h2>' +
       '<p class="note">The program is deployed but not started. Starting it records the reserve currency and makes the wallet that sends this the admin and the platform wallet. The admin can change the platform wallet and nothing else.</p>' +
       '<div class="kv"><span>1. The test dollar</span><b>' + (S.stableReady ? "Ready" : '<button class="btn" data-act="mkStable">Create it</button>') + "</b></div>" +
@@ -164,6 +169,7 @@
   }
   function renderBoard() {
     $("#specNet").textContent = "On " + C.name;
+    renderAdmin();
     const el = $("#rows");
     if (!S.markets.length) { el.innerHTML = '<div class="empty">No coins yet on ' + esc(C.name) + '. <button class="linkbtn" data-act="nav" data-v="launch">Launch the first one.</button></div>'; return; }
     el.innerHTML = S.markets.map((m) =>
@@ -172,6 +178,24 @@
       '<span class="mc">' + fUsd(mcap(m)) + "<small>MARKET CAP</small></span>" +
       '<span class="prog"><span class="runway' + (m.graduated ? " done" : "") + '" role="img" aria-label="' + Math.floor(soldPct(m)) + ' percent of the sale sold"><i style="width:' + soldPct(m) + '%"></i></span></span>' +
       '<span class="st">' + pills(m) + "</span></button>").join("");
+  }
+  /* Shown only to the admin wallet and to a wallet named as the next admin. The admin can change the wallet
+     that receives the launchpad's 2% fee and hand the admin role on. The program gives the admin no other power. */
+  function renderAdmin() {
+    const el = $("#adminBox"), c = S.cfg, w = S.wallet;
+    const isAdmin = w && c && c.admin.equals(w), isNext = w && c && c.pendingAdmin.equals(w);
+    if (!isAdmin && !isNext) { el.innerHTML = ""; return; }
+    const waiting = !c.pendingAdmin.equals(web3.PublicKey.default);
+    el.innerHTML = '<div class="card"><span class="label">Launchpad admin</span>' +
+      (isNext ? '<p class="note">This wallet has been named the next admin of the launchpad. Accepting takes the role over from <span class="num">' + short(c.admin.toBase58()) + '</span>.</p><button class="btn primary" data-act="admAccept">Accept the admin role</button>' : "") +
+      (isAdmin ? '<p class="note">Your wallet is the admin. The admin can change the wallet that receives the launchpad&#39;s 2% fee and hand the admin role on. It cannot touch any coin or any reserve.</p>' +
+        '<div class="kv"><span>Platform wallet now</span><b class="num">' + short(c.platformWallet.toBase58()) + "</b></div>" +
+        '<div class="field"><label for="admWallet">New platform wallet</label><input type="text" id="admWallet" autocomplete="off" placeholder="Solana wallet address"></div>' +
+        '<button class="btn" data-act="admWallet">Change the platform wallet</button>' +
+        '<div class="field"><label for="admNext">Hand the admin role to</label><input type="text" id="admNext" autocomplete="off" placeholder="Solana wallet address"></div>' +
+        '<button class="btn" data-act="admNext">Name the next admin</button>' +
+        '<p class="hint">' + (waiting ? 'Waiting for <span class="num">' + short(c.pendingAdmin.toBase58()) + "</span> to accept. Until then you stay the admin." : "The wallet you name becomes the admin only after it accepts here. Until then you stay the admin.") + "</p>" : "") +
+      '<div class="err" id="admErr" role="alert" hidden></div></div>';
   }
   function renderCoin() {
     const m = S.m, el = $("#v-coin");
@@ -209,7 +233,7 @@
     el.innerHTML =
       '<div class="tabs" role="tablist"><button role="tab" data-act="tab" data-v="buy" aria-selected="' + buy + '">Buy</button><button role="tab" data-act="tab" data-v="sell" aria-selected="' + !buy + '">Sell</button></div>' +
       (buy
-        ? '<div class="field"><label for="buyAmt">You pay</label><div class="amt-in"><input id="buyAmt" inputmode="decimal" autocomplete="off" placeholder="0" value="' + esc(S.buyAmt) + '"><span>test $</span></div><div class="hint">Your balance: ' + fUsd(S.stable) + "</div></div>"
+        ? '<div class="field"><label for="buyAmt">You pay</label><div class="amt-in"><input id="buyAmt" inputmode="decimal" autocomplete="off" placeholder="0" value="' + esc(S.buyAmt) + '"><span>' + esc(CUR) + "</span></div>" + '<div class="hint">Your balance: ' + fUsd(S.stable) + "</div></div>"
         : '<div class="field"><label for="sellAmt">You sell</label><div class="amt-in"><input id="sellAmt" inputmode="decimal" autocomplete="off" placeholder="0" value="' + esc(S.sellAmt) + '"><span>$' + esc(m.symbol) + '</span></div><div class="hint">You hold ' + fTok(S.held) + ' <button class="linkbtn" data-act="sellMax">Sell all</button></div></div>') +
       '<div id="quote" class="quote"></div><button class="btn ' + (buy ? "primary" : "sell") + ' wide" id="goBtn" data-act="' + (buy ? "buy" : "sell") + '">' + (buy ? "Buy" : "Sell") + " $" + esc(m.symbol) + "</button>";
     renderQuote();
@@ -230,7 +254,7 @@
           '<div class="kv"><span>Fee (5%)</span><b>' + fUsd(q.fee) + "</b></div>" +
           '<div class="kv big"><span>You pay</span><b>' + fUsd(q.total) + "</b></div>" +
           (capped ? '<div class="sub">Limited to the 2.5% a wallet may hold.</div>' : "") +
-          (S.wallet && q.total > S.stable ? '<div class="warn">You have ' + fUsd(S.stable) + ". Get test dollars from the bar at the top.</div>" : "") };
+          (S.wallet && q.total > S.stable ? '<div class="warn">You have ' + fUsd(S.stable) + (TEST ? ". Get test dollars from the bar at the top." : " in " + esc(CUR) + ".") + "</div>" : "") };
       }
       const coins = parseAmount(S.sellAmt, J.COIN_DECIMALS);
       if (!coins) return { html: "" };
@@ -302,12 +326,40 @@
     toast(creator ? "The creator was paid." : "The launchpad was paid.");
   });
 
+  /* Admin actions. An address is checked before the wallet is asked to sign. */
+  function addressFrom(id) {
+    const v = ($(id) || {}).value || "", err = $("#admErr");
+    let key = null;
+    try { key = new web3.PublicKey(v.trim()); } catch (_) { key = null; }
+    const bad = !key ? "That is not a Solana address." : !web3.PublicKey.isOnCurve(key.toBytes()) ? "That address is not a wallet. Use a wallet address, not a token account or a program." : "";
+    if (err) { err.textContent = bad; err.hidden = !bad; }
+    return bad ? null : key;
+  }
+  function doAdmWallet() {
+    const key = addressFrom("#admWallet"); if (!key) return;
+    run("Confirm in your wallet to change the platform wallet…", async () => {
+      await send([J.setPlatformWalletIx(S.programId, S.wallet, key)]);
+      toast("The platform wallet is now " + short(key.toBase58()) + ".");
+    });
+  }
+  function doAdmNext() {
+    const key = addressFrom("#admNext"); if (!key) return;
+    run("Confirm in your wallet to name the next admin…", async () => {
+      await send([J.proposeAdminIx(S.programId, S.wallet, key)]);
+      toast(short(key.toBase58()) + " can now accept the admin role.");
+    });
+  }
+  const doAdmAccept = () => run("Confirm in your wallet to accept the admin role…", async () => {
+    await send([J.acceptAdminIx(S.programId, S.wallet)]);
+    toast("Your wallet is now the admin.");
+  });
+
   /* A little SOL for network fees, from what is left at the public devnet deployer address. The transfer is
      signed and paid by that public key, so a wallet with nothing at all can receive it. Test networks only. */
   const LOW_SOL = 10000000n, HELP_LAMPORTS = 200000000; // below 0.01 SOL is "almost none"; the gift is 0.2 SOL
   function helperKey() {
     const h = C.feeHelperSeed;
-    if (!/^[0-9a-f]{64}$/.test(h || "")) return null;
+    if (!TEST || !/^[0-9a-f]{64}$/.test(h || "")) return null;
     try { return web3.Keypair.fromSeed(Uint8Array.from(h.match(/../g).map((b) => parseInt(b, 16)))); } catch (_) { return null; }
   }
   async function doSolFaucet() {
@@ -363,6 +415,9 @@
     else if (a === "init") doInit();
     else if (a === "payCreator") doPay(true);
     else if (a === "payPlatform") doPay(false);
+    else if (a === "admWallet") doAdmWallet();
+    else if (a === "admNext") doAdmNext();
+    else if (a === "admAccept") doAdmAccept();
   });
   document.addEventListener("input", (ev) => {
     if (ev.target.id === "buyAmt") { S.buyAmt = ev.target.value; renderQuote(); }

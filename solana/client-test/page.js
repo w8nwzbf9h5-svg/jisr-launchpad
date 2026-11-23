@@ -24,9 +24,25 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
   // the visitor's wallet starts with nothing; only the public fee-helper address has SOL, as on devnet after a deployment
   const helperSeed = "064291e20f163c014a27b8e346d730d9d73d4d8c55365839b7b563c6f602c19f";
   const helper = web3.Keypair.fromSeed(Uint8Array.from(helperSeed.match(/../g).map((b) => parseInt(b, 16))));
-  const sig = await conn.requestAirdrop(helper.publicKey, 3 * web3.LAMPORTS_PER_SOL);
-  const bh = await conn.getLatestBlockhash();
-  await conn.confirmTransaction({ signature: sig, blockhash: bh.blockhash, lastValidBlockHeight: bh.lastValidBlockHeight }, "confirmed");
+  const fund = async (key, sol) => {
+    const sig = await conn.requestAirdrop(key, sol * web3.LAMPORTS_PER_SOL);
+    const bh = await conn.getLatestBlockhash();
+    await conn.confirmTransaction({ signature: sig, blockhash: bh.blockhash, lastValidBlockHeight: bh.lastValidBlockHeight }, "confirmed");
+  };
+  await fund(helper.publicKey, 3);
+  // a node that has only just started can answer oddly; wait until it has finalized a block before the page uses it
+  for (let i = 0; i < 90 && (await conn.getSlot("finalized")) < 1; i++) await new Promise((r) => setTimeout(r, 1000));
+  // sign and send from this script, for the steps a second wallet has to take
+  const sendAs = async (kp, ixs) => {
+    const tx = new web3.Transaction().add(...ixs);
+    tx.feePayer = kp.publicKey;
+    const bh = await conn.getLatestBlockhash();
+    tx.recentBlockhash = bh.blockhash;
+    tx.sign(kp);
+    const sig = await conn.sendRawTransaction(tx.serialize());
+    const res = await conn.confirmTransaction({ signature: sig, blockhash: bh.blockhash, lastValidBlockHeight: bh.lastValidBlockHeight }, "confirmed");
+    if (res.value.err) throw new Error("transaction failed: " + JSON.stringify(res.value.err));
+  };
 
   const server = http.createServer((req, res) => {
     let f = path.join(WEB, decodeURIComponent(req.url.split("?")[0]));
@@ -40,10 +56,11 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
     page.on("pageerror", (e) => errors.push(String(e)));
     await page.setViewport({ width: 393, height: 852, isMobile: true });
     // the page's settings, pointed at the local node
+    const settings = { name: "Local Solana node", rpcUrl: RPC, explorer: "https://explorer.solana.com", clusterParam: "?cluster=custom", programId: programId.toBase58(), feeHelperSeed: helperSeed };
     await page.setRequestInterception(true);
     page.on("request", (req) => {
       if (new URL(req.url()).pathname.endsWith("/solana/config.js")) {
-        return req.respond({ status: 200, contentType: "application/javascript", body: "window.JISR_SOLANA = " + JSON.stringify({ name: "Local Solana node", rpcUrl: RPC, explorer: "https://explorer.solana.com", clusterParam: "?cluster=custom", programId: programId.toBase58(), feeHelperSeed: helperSeed }) + ";" });
+        return req.respond({ status: 200, contentType: "application/javascript", body: "window.JISR_SOLANA = " + JSON.stringify(settings) + ";" });
       }
       req.continue();
     });
@@ -56,8 +73,8 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
 
     const text = (sel) => page.$eval(sel, (el) => el.textContent);
     const click = (sel) => page.$eval(sel, (el) => el.click());
-    const has = async (sel, t) => {
-      try { await page.waitForFunction((s, x) => { const el = document.querySelector(s); return el && !el.hidden && el.textContent.includes(x); }, { timeout: 60000 }, sel, t); }
+    const has = async (sel, t, ms) => {
+      try { await page.waitForFunction((s, x) => { const el = document.querySelector(s); return el && !el.hidden && el.textContent.includes(x); }, { timeout: ms || 60000 }, sel, t); }
       catch (e) {
         const seen = await page.evaluate((s) => { const el = document.querySelector(s), to = document.querySelector("#toast"); return { there: el ? el.textContent.slice(0, 300) : null, toast: to ? (to.hidden ? "(hidden) " : "") + to.textContent : null }; }, sel);
         throw new Error('waited for "' + t + '" in ' + sel + " but saw: " + JSON.stringify(seen) + " page errors: " + errors.join(" | "));
@@ -65,6 +82,15 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
     };
     const toast = (t) => has("#toast", t);
     const idle = () => page.waitForFunction(() => !document.body.classList.contains("busy"), { timeout: 60000 });
+    // The first request a page sends to a fresh node has failed once in CI for a reason the log did not show.
+    // Press again, at most twice, and print what the page said, so a real fault still fails and is visible.
+    const pressUntil = async (sel, t) => {
+      for (let i = 0; ; i++) {
+        await click(sel);
+        try { await has("#toast", t, 25000); return; }
+        catch (e) { if (i >= 2) throw e; console.log("  again: " + e.message); await idle(); }
+      }
+    };
     const fill = async (sel, v) => { await page.focus(sel); await page.$eval(sel, (el) => { el.value = ""; }); await page.type(sel, v); };
 
     // 1. one-time setup from the page
@@ -74,7 +100,7 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
     await has("#walletTxt", "…");
     // with no SOL the wallet cannot pay a fee: the page says so plainly and offers a little SOL
     assert.equal(await conn.getBalance(wallet.publicKey), 0);
-    await click("[data-act=mkStable]"); await toast("Your wallet has no SOL"); await idle();
+    await pressUntil("[data-act=mkStable]", "Your wallet has no SOL"); await idle();
     await has("#stripTxt", "Get SOL for fees");
     await click("[data-act=solFaucet]"); await toast("0.2 SOL added to your wallet"); await idle();
     assert.equal(await conn.getBalance(wallet.publicKey), 200000000);
@@ -84,6 +110,7 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
     await has("#v-setup", "Ready");
     await click("[data-act=init]"); await toast("The launchpad is started"); await idle();
     await has("#rows", "No coins yet");
+    await has("#adminBox", "Your wallet is the admin");
     const cfg = await J.getConfig(conn, programId);
     assert.deepEqual([cfg.admin.toBase58(), cfg.platformWallet.toBase58(), cfg.stableMint.toBase58()], [wallet.publicKey.toBase58(), wallet.publicKey.toBase58(), J.TEST_DOLLAR.mintKey().publicKey.toBase58()]);
     step("setup from the page: an empty wallet gets fee money, the test dollar is created, the launchpad starts with that wallet as admin");
@@ -145,6 +172,46 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true, "the page fits a phone screen");
     assert.deepEqual(errors, [], "the page threw errors: " + errors.join(" | "));
     step("limit shown before buying; the board lists the coin; no page errors on a phone-sized screen");
+
+    // 8. the admin card: a wrong address is refused before the wallet is asked; the role moves only when the named wallet accepts
+    const other = web3.Keypair.generate();
+    await fund(other.publicKey, 1);
+    await fill("#admNext", "not an address"); await click("[data-act=admNext]");
+    await has("#admErr", "not a Solana address");
+    await fill("#admNext", J.ata(wallet.publicKey, cfg.stableMint).toBase58()); await click("[data-act=admNext]");
+    await has("#admErr", "not a wallet");
+    await fill("#admNext", other.publicKey.toBase58()); await click("[data-act=admNext]"); await toast("can now accept the admin role"); await idle();
+    await has("#adminBox", "Waiting for");
+    let c2 = await J.getConfig(conn, programId);
+    assert.deepEqual([c2.admin.toBase58(), c2.pendingAdmin.toBase58()], [wallet.publicKey.toBase58(), other.publicKey.toBase58()], "naming the next admin does not move the role");
+    await sendAs(other, [J.acceptAdminIx(programId, other.publicKey)]);
+    await click("[data-act=refresh]");
+    await page.waitForFunction(() => document.querySelector("#adminBox").textContent === "", { timeout: 60000 });
+    await sendAs(other, [J.proposeAdminIx(programId, other.publicKey, wallet.publicKey)]);
+    await click("[data-act=refresh]");
+    await has("#adminBox", "named the next admin");
+    await click("[data-act=admAccept]"); await toast("Your wallet is now the admin"); await idle();
+    await has("#adminBox", "Your wallet is the admin");
+    await fill("#admWallet", other.publicKey.toBase58()); await click("[data-act=admWallet]"); await toast("The platform wallet is now"); await idle();
+    c2 = await J.getConfig(conn, programId);
+    assert.deepEqual([c2.admin.toBase58(), c2.pendingAdmin.toBase58(), c2.platformWallet.toBase58()], [wallet.publicKey.toBase58(), web3.PublicKey.default.toBase58(), other.publicKey.toBase58()]);
+    assert.deepEqual(errors, [], "the page threw errors: " + errors.join(" | "));
+    step("admin card: bad addresses refused, the role moves only when the named wallet accepts, the platform wallet changes");
+
+    // 9. the same page set for the real network: no test money, no free SOL, no setup buttons
+    Object.assign(settings, { name: "Solana", test: false });
+    await page.goto("about:blank");
+    await page.goto("http://localhost:4196/solana.html", { waitUntil: "networkidle2" });
+    await has("#stripTxt", "Trades here use real USDC");
+    await has("#rows", "Camel Cash");
+    assert.equal(await text("#specPay"), "USDC");
+    assert.equal(await page.$("[data-act=faucet]"), null, "no test dollars on the real network");
+    assert.equal(await page.$("[data-act=solFaucet]"), null, "no free SOL on the real network");
+    await click("#rows .row");
+    await has("#trade", "USDC");
+    assert(!(await text("#v-coin")).includes("test $"));
+    assert.deepEqual(errors, [], "the page threw errors: " + errors.join(" | "));
+    step("real-network mode: the page shows USDC and offers no test money, free SOL or setup");
 
     console.log("\n  " + steps + " page steps passed against the program " + programId.toBase58());
   } finally { await browser.close(); server.close(); }

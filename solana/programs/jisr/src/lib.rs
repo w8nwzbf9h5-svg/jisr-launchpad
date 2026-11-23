@@ -364,7 +364,12 @@ pub struct CreateCoin<'info> {
     pub market: Box<Account<'info, Market>>,
     #[account(init, payer = creator, associated_token::mint = coin_mint, associated_token::authority = market)]
     pub coin_vault: Box<Account<'info, TokenAccount>>,
-    #[account(init, payer = creator, associated_token::mint = stable_mint, associated_token::authority = market)]
+    /// The market's stablecoin account. Its address is known before the coin exists, and anyone may create
+    /// a token account for any owner, so it is accepted if it is already there. With plain `init`, a
+    /// stranger who created it first would block this coin number, and with it every later launch.
+    /// It can only be the market's own standard account: the mint, the owner and the address are checked.
+    /// Whatever it already holds is a gift that `reinforce` adds to the floor reserve.
+    #[account(init_if_needed, payer = creator, associated_token::mint = stable_mint, associated_token::authority = market)]
     pub stable_vault: Box<Account<'info, TokenAccount>>,
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
