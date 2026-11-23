@@ -92,9 +92,16 @@ pub mod jisr {
     ///
     /// `uri` is the coin's details as the Jisr page stores them. `metadata_uri` is the link written into the
     /// coin's Metaplex metadata, where wallets look for its picture; it may be empty.
-    pub fn create_coin(ctx: Context<CreateCoin>, name: String, symbol: String, uri: String, metadata_uri: String) -> Result<()> {
+    ///
+    /// With `metadata_uri` absent, no Metaplex metadata is written at all. The Metaplex program belongs to
+    /// someone else and can be changed by them; this program cannot be changed. If that program ever stops
+    /// accepting this call, coins can still be launched without it, and trading never depends on it.
+    pub fn create_coin(ctx: Context<CreateCoin>, name: String, symbol: String, uri: String, metadata_uri: Option<String>) -> Result<()> {
         require!(
-            (2..=32).contains(&name.len()) && (2..=10).contains(&symbol.len()) && uri.len() <= 400 && metadata_uri.len() <= MAX_METADATA_URI,
+            (2..=32).contains(&name.len())
+                && (2..=10).contains(&symbol.len())
+                && uri.len() <= 400
+                && metadata_uri.as_ref().map_or(true, |link| link.len() <= MAX_METADATA_URI),
             JisrError::BadName
         );
 
@@ -131,42 +138,44 @@ pub mod jisr {
 
         // The coin's name and ticker for wallets and explorers. Metaplex requires the mint authority to sign,
         // so this happens before that authority is removed. Marked unchangeable; no royalty, no creators.
-        let mut data = Vec::with_capacity(32 + name.len() + symbol.len() + metadata_uri.len());
-        data.push(33u8); // Metaplex instruction: CreateMetadataAccountV3
-        for text in [name.as_str(), symbol.as_str(), metadata_uri.as_str()] {
-            data.extend_from_slice(&(text.len() as u32).to_le_bytes());
-            data.extend_from_slice(text.as_bytes());
+        if let Some(metadata_uri) = metadata_uri.as_deref() {
+            let mut data = Vec::with_capacity(32 + name.len() + symbol.len() + metadata_uri.len());
+            data.push(33u8); // Metaplex instruction: CreateMetadataAccountV3
+            for text in [name.as_str(), symbol.as_str(), metadata_uri] {
+                data.extend_from_slice(&(text.len() as u32).to_le_bytes());
+                data.extend_from_slice(text.as_bytes());
+            }
+            data.extend_from_slice(&0u16.to_le_bytes()); // seller fee: none
+            data.push(0); // creators: none
+            data.push(0); // collection: none
+            data.push(0); // uses: none
+            data.push(0); // is_mutable: false
+            data.push(0); // collection details: none
+            let market_key = ctx.accounts.market.key();
+            let create_metadata = Instruction {
+                program_id: metaplex::ID,
+                accounts: vec![
+                    AccountMeta::new(ctx.accounts.metadata.key(), false),
+                    AccountMeta::new_readonly(coin_mint, false),
+                    AccountMeta::new_readonly(market_key, true), // mint authority
+                    AccountMeta::new(ctx.accounts.creator.key(), true), // pays the account's rent and Metaplex's fee
+                    AccountMeta::new_readonly(market_key, false), // update authority: the market, which has no key
+                    AccountMeta::new_readonly(ctx.accounts.system_program.key(), false),
+                ],
+                data,
+            };
+            invoke_signed(
+                &create_metadata,
+                &[
+                    ctx.accounts.metadata.to_account_info(),
+                    ctx.accounts.coin_mint.to_account_info(),
+                    ctx.accounts.market.to_account_info(),
+                    ctx.accounts.creator.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                ],
+                &[seeds],
+            )?;
         }
-        data.extend_from_slice(&0u16.to_le_bytes()); // seller fee: none
-        data.push(0); // creators: none
-        data.push(0); // collection: none
-        data.push(0); // uses: none
-        data.push(0); // is_mutable: false
-        data.push(0); // collection details: none
-        let market_key = ctx.accounts.market.key();
-        let create_metadata = Instruction {
-            program_id: metaplex::ID,
-            accounts: vec![
-                AccountMeta::new(ctx.accounts.metadata.key(), false),
-                AccountMeta::new_readonly(coin_mint, false),
-                AccountMeta::new_readonly(market_key, true), // mint authority
-                AccountMeta::new(ctx.accounts.creator.key(), true), // pays the account's rent and Metaplex's fee
-                AccountMeta::new_readonly(market_key, false), // update authority: the market, which has no key
-                AccountMeta::new_readonly(ctx.accounts.system_program.key(), false),
-            ],
-            data,
-        };
-        invoke_signed(
-            &create_metadata,
-            &[
-                ctx.accounts.metadata.to_account_info(),
-                ctx.accounts.coin_mint.to_account_info(),
-                ctx.accounts.market.to_account_info(),
-                ctx.accounts.creator.to_account_info(),
-                ctx.accounts.system_program.to_account_info(),
-            ],
-            &[seeds],
-        )?;
 
         token::set_authority(
             CpiContext::new_with_signer(
@@ -437,10 +446,12 @@ pub struct CreateCoin<'info> {
     pub system_program: Program<'info, System>,
     /// CHECK: The coin's Metaplex metadata account. It does not exist yet; the Metaplex program creates it
     /// and refuses any address but the one derived from the mint. The address is also checked here.
+    /// Left untouched when the launch asks for no wallet metadata.
     #[account(mut, seeds = [METADATA_SEED, metaplex::ID.as_ref(), coin_mint.key().as_ref()], bump, seeds::program = metaplex::ID)]
     pub metadata: UncheckedAccount<'info>,
-    /// CHECK: The Metaplex Token Metadata program. Only this one address is accepted.
-    #[account(address = metaplex::ID, executable)]
+    /// CHECK: The Metaplex Token Metadata program. Only this one address is accepted. It is called only when
+    /// the launch asks for wallet metadata.
+    #[account(address = metaplex::ID)]
     pub metadata_program: UncheckedAccount<'info>,
 }
 

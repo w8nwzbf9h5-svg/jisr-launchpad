@@ -303,9 +303,10 @@
     if (bad) return;
     await run("Confirm the launch in your wallet…", async () => {
       const cfg = await J.getConfig(S.conn, S.programId);
-      // what wallets will show for this coin; the first devnet build has no such step (metadata: false)
+      // what wallets will show for this coin. Settings: metadata "off" launches with no wallet metadata;
+      // metadata false is the first devnet build, which has no such step
       const market = J.marketAddress(S.programId, J.coinMintAddress(S.programId, cfg.coinCount));
-      const link = C.metadata === false ? undefined : J.metadataUri(C.metadataBase, market);
+      const link = C.metadata === false ? undefined : C.metadata === "off" ? null : J.metadataUri(C.metadataBase, market);
       if (link && J.byteLength(link) > J.MAX_METADATA_URI) throw new Error("The metadata service address in the settings is too long.");
       const made = J.createCoinIxs(S.programId, S.wallet, cfg.stableMint, cfg.coinCount, name, symbol, details, link);
       await send(made.ixs);

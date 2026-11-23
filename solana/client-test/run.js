@@ -223,6 +223,12 @@ function raise(n) {
 
   // 7. a second coin: listing order and independent markets
   cfg = await J.getConfig(conn, programId);
+  // a coin launched with no wallet metadata: the Metaplex program is not called, and the coin is a normal coin
+  const bare = J.createCoinIxs(programId, alice.publicKey, stableMint, cfg.coinCount, "Bare Coin", "BARE", "", null);
+  await send(bare.ixs, alice);
+  assert.equal(await conn.getAccountInfo(bare.metadata), null, "no metadata account was made");
+  assert.deepEqual([J.decodeMint(await conn.getAccountInfo(bare.coinMint)).authority, (await market(bare.coinMint)).symbol], [null, "BARE"]);
+  cfg = await J.getConfig(conn, programId);
   const second = J.createCoinIxs(programId, alice.publicKey, stableMint, cfg.coinCount, "Second Coin", "TWO", "", "");
   // a stranger creates the new market's stablecoin account first and puts $3 in it; the launch must still work
   await send(J.testDollarFaucetIxs(bob.publicKey, second.market, 3n * U), bob, [J.TEST_DOLLAR.faucetKey()]);
@@ -230,8 +236,8 @@ function raise(n) {
   assert.equal(J.tokenAmount(await conn.getAccountInfo(J.ata(second.market, stableMint))), 3n * U);
   await send([J.reinforceIx(programId, stableMint, second.coinMint)], bob);
   assert.equal((await market(second.coinMint)).floorReserve, 3n * U, "money sent to a market outside a trade can only become floor reserve");
-  const list = await J.getMarkets(conn, programId, 2n, 10);
-  assert.deepEqual(list.map((x) => x.symbol), ["TWO", "HUMP"], "newest first");
+  const list = await J.getMarkets(conn, programId, 3n, 10);
+  assert.deepEqual(list.map((x) => x.symbol), ["TWO", "BARE", "HUMP"], "newest first");
   assert.deepEqual(state(list[0]).slice(0, 6), ["0", "0", "3000000", "0", "0", "0"]);
   const md2 = J.decodeMetadata(await conn.getAccountInfo(second.metadata));
   assert.deepEqual([md2.name, md2.symbol, md2.uri, md2.isMutable], ["Second Coin", "TWO", "", false], "a coin with no metadata service still has its name and ticker for wallets");

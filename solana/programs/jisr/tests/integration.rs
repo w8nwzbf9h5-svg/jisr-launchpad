@@ -76,7 +76,11 @@ impl Env {
         pt.prefer_bpf(false);
         // The real Metaplex Token Metadata program, as deployed on Solana. The file is fetched from the
         // network by scripts/solana-fetch-metaplex.sh into tests/fixtures/ before the tests run.
+        // (The test bank loads a program from a file only while "prefer BPF" is on. Jisr itself was added
+        // above as native code and stays that way.)
+        pt.prefer_bpf(true);
         pt.add_program("mpl_token_metadata", jisr::metaplex::ID, None);
+        pt.prefer_bpf(false);
         let (banks, payer, _) = pt.start().await;
         let stable = Keypair::new();
         let config = Pubkey::find_program_address(&[jisr::CONFIG_SEED], &jisr::ID).0;
@@ -129,10 +133,10 @@ impl Env {
     }
 
     async fn create_coin(&mut self, creator: &Keypair, name: &str, symbol: &str) -> std::result::Result<Coin, BanksClientError> {
-        self.create_coin_with(creator, name, symbol, "https://meta.example/coin").await
+        self.create_coin_with(creator, name, symbol, Some("https://meta.example/coin")).await
     }
 
-    async fn create_coin_with(&mut self, creator: &Keypair, name: &str, symbol: &str, metadata_uri: &str) -> std::result::Result<Coin, BanksClientError> {
+    async fn create_coin_with(&mut self, creator: &Keypair, name: &str, symbol: &str, metadata_uri: Option<&str>) -> std::result::Result<Coin, BanksClientError> {
         let cfg: jisr::Config = self.load(self.config).await;
         let mint = Pubkey::find_program_address(&[jisr::COIN_SEED, &cfg.coin_count.to_le_bytes()], &jisr::ID).0;
         let market = Pubkey::find_program_address(&[jisr::MARKET_SEED, mint.as_ref()], &jisr::ID).0;
@@ -145,7 +149,7 @@ impl Env {
                 token_program: spl_token::id(), associated_token_program: spl_associated_token_account::id(), system_program: solana_sdk::system_program::id(),
                 metadata: coin.metadata, metadata_program: jisr::metaplex::ID,
             }.to_account_metas(None),
-            data: jisr::instruction::CreateCoin { name: name.into(), symbol: symbol.into(), uri: "".into(), metadata_uri: metadata_uri.into() }.data(),
+            data: jisr::instruction::CreateCoin { name: name.into(), symbol: symbol.into(), uri: "".into(), metadata_uri: metadata_uri.map(|link| link.to_string()) }.data(),
         };
         self.send(vec![ix], &[creator]).await.map(|_| coin)
     }
@@ -245,12 +249,23 @@ async fn full_lifecycle_of_a_coin() {
     assert!(!meta.is_mutable, "the metadata can never be edited");
     assert_eq!((meta.seller_fee, meta.has_creators), (0, false));
     let long_link = "x".repeat(201);
-    assert!(env.create_coin_with(&creator, "Long Link", "LINK", &long_link).await.is_err(), "a metadata link over 200 bytes is refused");
-    // a coin may have no link at all, and the longest name and ticker fit
-    let plain = env.create_coin_with(&creator, &"N".repeat(32), &"T".repeat(10), "").await.unwrap();
+    assert!(env.create_coin_with(&creator, "Long Link", "LINK", Some(&long_link)).await.is_err(), "a metadata link over 200 bytes is refused");
+    // a coin may have an empty link, and the longest name and ticker fit
+    let plain = env.create_coin_with(&creator, &"N".repeat(32), &"T".repeat(10), Some("")).await.unwrap();
     let plain_acc = env.banks.get_account(plain.metadata).await.unwrap().unwrap();
     let plain_meta = parse_metadata(&plain_acc.data);
     assert_eq!((plain_meta.name, plain_meta.symbol, plain_meta.uri.as_str()), ("N".repeat(32), "T".repeat(10), ""));
+    // A launch can ask for no wallet metadata at all. The Metaplex program is then never called, so launching
+    // does not depend on it. The coin is a normal coin: fixed supply, no mint authority, and it trades.
+    let bare = env.create_coin_with(&creator, "Bare Coin", "BARE", None).await.unwrap();
+    assert!(env.banks.get_account(bare.metadata).await.unwrap().is_none(), "no metadata account was made");
+    let bare_mint_acc = env.banks.get_account(bare.mint).await.unwrap().unwrap();
+    let bare_mint = spl_token::state::Mint::unpack(&bare_mint_acc.data).unwrap();
+    assert!(bare_mint.mint_authority.is_none() && bare_mint.supply == TOTAL_SUPPLY);
+    let carol = env.user(1_000).await;
+    env.buy(&bare, &carol, M, u64::MAX).await.unwrap();
+    env.sell(&bare, &carol, M).await.unwrap();
+    env.check(&bare).await;
 
     // $1,000 buys 9.5M coins; a later buyer pays the same; selling back returns $902.50.
     let coins = 9_500_000 * COIN;

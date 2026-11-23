@@ -201,10 +201,11 @@
     return ix(programId, "accept_admin", [meta(newAdmin, false, true), meta(configAddress(programId), true)]);
   }
   /* Launch coin number `index` (the config's current coin count). Returns the instructions and the new addresses.
-     `metadataLink` is the link for the coin's wallet metadata (see metadataUri); pass "" for none.
-     Leave it out only for the first devnet build, which wrote no wallet metadata and takes one argument less. */
+     `metadataLink` is the link for the coin's wallet metadata (see metadataUri); "" writes the name and ticker
+     with no link; null writes no wallet metadata at all, so the Metaplex program is not called.
+     Leave it out (undefined) only for the first devnet build, which had no such step and takes one argument less. */
   function createCoinIxs(programId, creator, stableMint, index, name, symbol, uri, metadataLink) {
-    const coinMint = coinMintAddress(programId, index), market = marketAddress(programId, coinMint), withMeta = typeof metadataLink === "string";
+    const coinMint = coinMintAddress(programId, index), market = marketAddress(programId, coinMint), withMeta = metadataLink !== undefined;
     return {
       coinMint, market, metadata: metadataAddress(coinMint),
       ixs: [
@@ -213,7 +214,7 @@
           meta(creator, true, true), meta(configAddress(programId), true), meta(stableMint), meta(coinMint, true), meta(market, true),
           meta(ata(market, coinMint), true), meta(ata(market, stableMint), true), meta(TOKEN_PROGRAM), meta(ATA_PROGRAM), meta(SystemProgram.programId)
         ].concat(withMeta ? [meta(metadataAddress(coinMint), true), meta(METADATA_PROGRAM)] : []),
-        [text(name), text(symbol), text(uri)].concat(withMeta ? [text(metadataLink)] : []))
+        [text(name), text(symbol), text(uri)].concat(!withMeta ? [] : metadataLink === null ? [Uint8Array.from([0])] : [Uint8Array.from([1]), text(metadataLink)]))
       ]
     };
   }
