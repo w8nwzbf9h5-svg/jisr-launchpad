@@ -39,3 +39,9 @@ The math tests cover the fixed price ($1,000 in, $902.50 out), graduation, the r
 4. Add token metadata (name, ticker, picture) so wallets display the coin.
 5. Add Solana to the web app: wallet connection, the instructions, and the SOL swap.
 6. Independent audit, then remove the upgrade authority.
+
+## Built in CI
+
+The workflow `.github/workflows/solana.yml` builds the program for deployment (`anchor build`, Anchor 0.31.1) and runs the tests above on every change under `solana/`. Each run attaches `jisr-solana-program`, which holds `jisr.so` (the deployable program, about 350 KB) and `jisr.json` (its interface file).
+
+Still to do before the program can be used: choose the program's real address and put it in `declare_id!` and `Anchor.toml`, deploy to devnet, call `initialize`, and add Solana to the web app.
