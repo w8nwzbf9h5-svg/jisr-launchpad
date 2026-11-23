@@ -15,11 +15,12 @@ The plain-language description of the product is in [WHITEPAPER.md](WHITEPAPER.m
 | EVM | `contracts/Coin.sol` | 40 | Fixed-supply ERC-20 with a 2.5% wallet limit. |
 | EVM | `contracts/periphery/BridgeSeller.sol` | 151 | Optional helper: sell a coin and send the USDC to another network with Circle CCTP V2. |
 | Solana | `solana/crates/jisr-math/src/lib.rs` | about 270 without tests | Pricing, fees and reserve accounting. No dependencies. |
-| Solana | `solana/programs/jisr/src/lib.rs` | about 530 | The program: accounts, checks and token transfers around the math. |
+| Solana | `solana/programs/jisr/src/lib.rs` | about 600 | The program: accounts, checks and token transfers around the math, and the one call that writes a coin's wallet metadata. |
 
 Out of scope: `contracts/mocks/*` (test stand-ins), the web pages under `web/` (they hold no keys and
 no funds; a reviewer may still want to look at how they build transactions: `web/app.js`,
-`web/wallet.js`, `web/solana/jisr-solana.js`).
+`web/wallet.js`, `web/solana/jisr-solana.js`), and `metadata-service/worker.mjs` (a read-only service that
+answers the link in a coin's wallet metadata; it holds no keys).
 
 Versions: Solidity 0.8.26, OpenZeppelin Contracts 5.1 (`Initializable`, `ReentrancyGuard`,
 `SafeERC20`, `Math`, `Clones`, `Ownable2Step`, `ERC20Upgradeable`), Anchor 0.31.1 with the
@@ -61,6 +62,9 @@ Things a reviewer should try to break:
   templates call `_disableInitializers()`. Clones are initialized in the transaction that creates them.
 - On Solana each market is a program-derived address. Its two token accounts are its associated token
   accounts. The coin's mint authority is removed inside `create_coin`; there is never a freeze authority.
+- On Solana a coin's wallet metadata (name, ticker, link) is a Metaplex metadata account written inside
+  `create_coin`. It is marked unchangeable and its update authority is the market address, which has
+  no private key.
 - On Solana, "nobody can change the rules" holds only after the upgrade authority is removed. The
   deployment script does that as its last step and checks it (section 6, S2).
 
@@ -76,6 +80,7 @@ Things a reviewer should try to break:
 | I6 | Reserve tokens leave a market only to a seller (by formula), to the creator (the 1%), to the platform wallet (the 2%). | "exposes no function that could move or freeze the reserve"; "pays fees only to the creator and to the platform wallet"; Solana `full_lifecycle_of_a_coin` |
 | I7 | Coin supply is fixed at creation and cannot grow. | launch tests on both sides |
 | I8 | All rounding favours the reserve: buys round up, sells round down. | random-trading tests compare against exact expectations |
+| I10 | A Solana coin's wallet metadata cannot be edited by anyone after launch. | Rust `full_lifecycle_of_a_coin`; client test step 2 |
 | I9 | The same inputs give the same numbers on EVM, in `jisr-math`, and in the page's JavaScript. | `solana/client-test/run.js` compares the program's state with the page's math after each of 40 random trades; the EVM browser tests compare the page's quote with the contract |
 
 Numeric ranges. EVM: prices are reserve base units per whole coin scaled by 1e18; all products go
@@ -94,6 +99,12 @@ through OpenZeppelin `Math.mulDiv`. Solana: amounts are `u64`, prices `u128`, in
   the router, not by the market.
 - **Circle CCTP V2 (BridgeSeller only).** The helper hands USDC to Circle's `TokenMessengerV2`.
   Delivery on the other network depends on Circle. The markets do not depend on the helper.
+- **Metaplex Token Metadata (Solana, optional per launch).** `create_coin` calls it once to write the
+  coin's name, ticker and link, with a hand-built `CreateMetadataAccountV3` instruction. That program
+  is owned and can be upgraded by Metaplex, and it charges its own fee per metadata account. If it
+  ever stops accepting this call, a launch can pass no metadata link and the call is skipped; the coin
+  is then created without wallet metadata. Buying, selling and fees never touch Metaplex. The tests
+  run against the Metaplex program as deployed on Solana, fetched from the network.
 - **Solana token program.** Only the original SPL Token program is supported. Token-2022 stablecoins
   cannot be used as the reserve.
 
@@ -140,10 +151,13 @@ the limit applies to every transfer, so a contract that needs to hold more than 
 pool, an exchange wallet) cannot. On Solana SPL tokens cannot restrict transfers, so the limit is
 checked only when buying, on the buyer's associated token account.
 
-**L2. Coins on Solana carry no Metaplex metadata.** The name, ticker and details are stored in the
-market account, and the Jisr page shows them. Wallets and explorers that read Metaplex metadata will
-show an unnamed token. Adding it means a change to `create_coin` and a hosted metadata file per coin.
-Recommended before a real-network launch; not done.
+**L2. A Solana coin's picture in wallets depends on a service outside the chain.** The name and the
+ticker are on-chain and permanent. The picture and description reach a wallet through the link in the
+metadata, which points to the metadata service (`metadata-service/`). The link is written once and
+cannot be changed, so if that address stops answering, wallets keep the name and ticker and lose the
+picture. A coin launched while no service address is configured has an empty link for good. A creator
+who builds the transaction by hand can put any link there; like the rest of a coin's details it is
+unverified.
 
 **L3. Coin details are written by the creator and checked by nobody.** The pages show them as text
 (never as markup), force `https` on links and pictures, and label them as unverified. A picture

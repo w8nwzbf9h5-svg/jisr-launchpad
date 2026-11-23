@@ -33,7 +33,7 @@ The technical package for the security review is [AUDIT.md](AUDIT.md).
    | Platform wallet | Receives the 2% fee. It can be changed later by the admin. |
    | Admin wallet | The only power is changing the platform wallet. Keep it safe: whoever holds it can redirect future fees. |
    | Your own RPC provider | The public endpoints are rate-limited. The pages need one address per network. |
-   | Coin names in wallets on Solana | Coins currently have no Metaplex metadata, so Phantom shows an unnamed token (AUDIT.md, L2). Recommended to add before Solana goes live. |
+   | Address of the metadata service (Solana) | Wallets get a coin's picture through it. It is written into each coin at launch and can never be changed, so choose an address you will keep, ideally on your own domain, **before** any real coin is launched. See `metadata-service/README.md`. |
 
 ## 2. Deploying on an EVM network (Ethereum, Base, Arbitrum, BNB Chain and others)
 
@@ -74,14 +74,17 @@ so it uses a **new wallet made only for this**, which is emptied afterwards.
    settings, names your admin wallet, and removes the upgrade authority. If anything does not read
    back exactly as asked, it takes the program down and returns the SOL. The run's summary shows the
    program's address.
-6. Put the program's address in `web/solana/config.js` (`mainnet.programId`) and the RPC address in `mainnet.rpcUrl`.
-7. Open the Solana page with your admin wallet. The **Launchpad admin** card offers **Accept the admin role**. Accept.
-8. Send what is left in the deployer wallet back to yourself, and delete the secret
-   `SOLANA_MAINNET_DEPLOYER` on GitHub. After step 7 that key has no power over anything.
+6. Set up the metadata service (`metadata-service/README.md`) with the program's address, and put its
+   address in `web/solana/config.js` as `mainnet.metadataBase`. Do this before the page is switched on:
+   a coin launched without it has no picture in wallets, for good.
+7. Put the program's address in `web/solana/config.js` (`mainnet.programId`) and the RPC address in `mainnet.rpcUrl`.
+8. Open the Solana page with your admin wallet. The **Launchpad admin** card offers **Accept the admin role**. Accept.
+9. Send what is left in the deployer wallet back to yourself, and delete the secret
+   `SOLANA_MAINNET_DEPLOYER` on GitHub. After step 8 that key has no power over anything.
 
 What the job cannot protect against: a private key pasted into GitHub is visible to anyone who can
 administer this repository. That is why the wallet must be new, hold only the deployment money, and
-be emptied in step 8.
+be emptied in step 9.
 
 ## 4. After going live
 

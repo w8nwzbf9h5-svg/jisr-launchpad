@@ -20,7 +20,7 @@ Status: the program is written and its instructions run correctly against the re
 
 - **Paying with SOL** is composed by the app: a swap from SOL to the stablecoin and the `buy` instruction go in one transaction, so both succeed or neither does. The program itself only touches the stablecoin.
 - **The 2.5% wallet limit** is checked when buying, on the buyer's associated token account. Plain SPL tokens cannot block transfers between wallets, so a holder can receive more than 2.5% by transfer. On every chain the limit is per address in any case.
-- **Coin name and ticker** are stored in the `Market` account. Wallets will not show them until token metadata is added (see below).
+- **Coin name and ticker** are stored in the `Market` account and also written, once and unchangeably, into a Metaplex metadata account, which is where wallets and explorers read them. The picture reaches wallets through a link in that metadata, answered by the metadata service in `metadata-service/`. A launch may skip the Metaplex step entirely; the coin then has no wallet metadata.
 
 ## Run the tests
 
@@ -34,7 +34,7 @@ The math tests cover the fixed price ($1,000 in, $902.50 out), graduation, the r
 ## Before this can go live
 
 1. Independent audit. The package for the reviewer is [`AUDIT.md`](../AUDIT.md).
-2. Token metadata (name, ticker, picture) so wallets display the coin. Not built.
+2. The metadata service, so wallets show a coin's picture: [`metadata-service/README.md`](../metadata-service/README.md). Its address must be in the page's settings before real coins are launched.
 3. The real-network deployment, described below and in [`GO-LIVE.md`](../GO-LIVE.md).
 
 ## Deploying to the real network

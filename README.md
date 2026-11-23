@@ -20,6 +20,7 @@ Status: tested locally end to end and deployed on two test networks. **Not audit
 | `scripts/` | Deploy, local demo, local web server |
 | `solana/` | The same launchpad as a Solana program (Anchor), with Rust tests, a client test and a browser test against a local node. `web/solana.html` is its page |
 | `DEPLOY-AR.md` | Arabic guide: deploy from a wallet and link the site |
+| `metadata-service/` | A small read-only service that gives wallets a Solana coin's picture and description. One file, no keys |
 | `AUDIT.md` | Package for a security review: scope, who can do what, what must always be true and where it is tested, known weak points |
 | `GO-LIVE.md` | What has to happen before real money, and how each real-network deployment is done |
 | `WHITEPAPER.md`, `WHITEPAPER-XX.md` | The white paper in ten languages. `npm run whitepaper` rebuilds `web/whitepaper.html` from them |
@@ -170,6 +171,5 @@ The full list, with the steps for each deployment, is in [GO-LIVE.md](GO-LIVE.md
 
 ## Not built yet
 
-- Token metadata for Solana coins, so that wallets show the coin's name and picture (AUDIT.md, L2).
 - Paying with SOL on Solana (a swap in the same transaction as the buy).
 - Everything in the launch checklist above.
