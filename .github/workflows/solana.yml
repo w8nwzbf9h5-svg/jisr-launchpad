@@ -70,14 +70,21 @@ jobs:
       - name: Rehearse the real-network deployment against a local node
         run: |
           # The same script the real deployment uses: deploy, start, hand the admin role on, make final.
-          # It needs the program built for an address whose key we hold, so build once more for a new one.
+          # It needs the program built for an address whose key we hold, so build again for new ones:
+          # one for the normal case, one for the case where a stranger starts the program first.
+          mkdir -p /tmp/rehearsal
           cd solana
-          solana-keygen new --no-bip39-passphrase --silent --force -o target/deploy/jisr-keypair.json
-          anchor keys sync
-          anchor build
+          for n in 1 2; do
+            solana-keygen new --no-bip39-passphrase --silent --force -o target/deploy/jisr-keypair.json
+            anchor keys sync
+            anchor build
+            cp target/deploy/jisr-keypair.json "/tmp/rehearsal/key$n.json"
+            cp target/deploy/jisr.so "/tmp/rehearsal/jisr$n.so"
+          done
           cd ..
           pkill -f solana-test-validator || true
           sleep 3
           solana-test-validator --reset --quiet --ledger /tmp/jisr-ledger > /tmp/validator.log 2>&1 &
-          PROGRAM_KEY="$PWD/solana/target/deploy/jisr-keypair.json" PROGRAM_SO="$PWD/solana/target/deploy/jisr.so" node solana/client-test/rehearsal.js || { echo "--- node log ---"; tail -40 /tmp/validator.log; exit 1; }
-          rm -f solana/target/deploy/jisr-keypair.json
+          PROGRAM_KEY=/tmp/rehearsal/key1.json PROGRAM_SO=/tmp/rehearsal/jisr1.so PROGRAM_KEY_2=/tmp/rehearsal/key2.json PROGRAM_SO_2=/tmp/rehearsal/jisr2.so \
+            node solana/client-test/rehearsal.js || { echo "--- node log ---"; tail -40 /tmp/validator.log; exit 1; }
+          rm -rf /tmp/rehearsal solana/target/deploy/jisr-keypair.json

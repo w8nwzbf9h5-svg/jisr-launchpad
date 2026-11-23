@@ -6,8 +6,9 @@ A launchpad for meme coins where every coin is sold at one fixed price and has a
 - **Site:** https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
 - **Test deployment:** Sepolia test network, factory `0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647`. Test money only, no value.
 - **Solana test deployment:** devnet, program `7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU`, deployed as final. [Solana page](https://w8nwzbf9h5-svg.github.io/jisr-launchpad/solana.html). Test money only, no value.
+- **For a security reviewer:** [AUDIT.md](AUDIT.md). **Before real money:** [GO-LIVE.md](GO-LIVE.md).
 
-Status: tested locally end to end and deployed on a test network. **Not audited and not deployed on any real network.** Do not put real money in before an independent security audit.
+Status: tested locally end to end and deployed on two test networks. **Not audited and not deployed on any real network.** Do not put real money in before an independent security audit.
 
 | Folder | What it is |
 |---|---|
@@ -19,6 +20,8 @@ Status: tested locally end to end and deployed on a test network. **Not audited 
 | `scripts/` | Deploy, local demo, local web server |
 | `solana/` | The same launchpad as a Solana program (Anchor), with Rust tests, a client test and a browser test against a local node. `web/solana.html` is its page |
 | `DEPLOY-AR.md` | Arabic guide: deploy from a wallet and link the site |
+| `AUDIT.md` | Package for a security review: scope, who can do what, what must always be true and where it is tested, known weak points |
+| `GO-LIVE.md` | What has to happen before real money, and how each real-network deployment is done |
 | `WHITEPAPER.md`, `WHITEPAPER-XX.md` | The white paper in ten languages. `npm run whitepaper` rebuilds `web/whitepaper.html` from them |
 
 ## What is here
@@ -157,16 +160,16 @@ Developers can deploy from the command line instead with `scripts/deploy.js` (se
 
 ## Launch checklist
 
-- [ ] Independent security audit of the three contracts, and fixes re-tested
-- [ ] Testnet deployment on Sepolia and BNB testnet, exercised by hand with real wallets
-- [ ] Multisig set up for the factory owner and for the platform wallet
-- [ ] Stablecoin and router chosen per chain, addresses confirmed from official sources
-- [ ] Your own RPC provider for the web app
-- [ ] Mainnet deployment, contracts verified on the block explorers
+The full list, with the steps for each deployment, is in [GO-LIVE.md](GO-LIVE.md). In short:
+
+- [ ] Finish the hand tests on the test networks (Sepolia from a wallet; the cross-network sale on Circle's test bridge)
+- [ ] Independent security audit of the contracts and the Solana program ([AUDIT.md](AUDIT.md)), and fixes re-tested
+- [ ] Platform wallet, admin wallet, reserve currency and RPC provider chosen per network
+- [ ] Real-network deployment, sources published on the block explorers
 - [ ] Monitoring of reserve cover per coin
 
 ## Not built yet
 
-- Solana: on-chain build, devnet run, token metadata, and web app support (the program and its tests are in `solana/`).
-- Cross-chain payout (sell on one chain, receive on another).
+- Token metadata for Solana coins, so that wallets show the coin's name and picture (AUDIT.md, L2).
+- Paying with SOL on Solana (a swap in the same transaction as the buy).
 - Everything in the launch checklist above.

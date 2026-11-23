@@ -127,7 +127,9 @@ Handling: `scripts/solana-deploy.sh` deploys the program still changeable, sends
 reads the settings back and compares every field, and only then removes the upgrade authority. If the
 settings are not ours the program is closed and its SOL returns to the deployer. A stranger can make a
 deployment fail (cost to us: transaction fees) but cannot get wrong settings made permanent.
-The script is rehearsed against a local node on every change (`solana/client-test/rehearsal.js`).
+The script is rehearsed against a local node on every change (`solana/client-test/rehearsal.js`),
+including the case where a stranger sends `initialize` first: the script notices, closes the program,
+and the SOL returns.
 A reviewer may prefer a check in the program itself (only the upgrade authority may call
 `initialize`). We would welcome that recommendation.
 
@@ -166,9 +168,6 @@ recipient come from the seller. A wrong recipient on the other network cannot be
 - The cross-network sale has run only against test stand-ins of Circle's contracts, not against
   Circle's live test bridge.
 - Nothing has run on a real network.
-- The "take the program down" branch of the Solana deployment script (taken when `initialize` was
-  sent by a stranger) has not been run end to end. If it fails, the program is still changeable by the
-  deployer key and can be closed by hand.
 
 ## 7. Tests and how to run them
 
@@ -180,7 +179,7 @@ recipient come from the seller. A wrong recipient on the other network cannot be
 | Solana program, in-process | 3 | `cd solana && cargo test -p jisr --release` |
 | Solana program through the page's client file, local node | 7 steps | `.github/workflows/solana.yml` |
 | Solana page in a real browser, local node | 9 steps | same workflow |
-| Solana real-network deployment rehearsal, local node | 5 steps | same workflow |
+| Solana real-network deployment rehearsal, local node | 6 steps | same workflow |
 
 The Solana program is built and tested in GitHub Actions (`.github/workflows/solana.yml`); the built
 program is attached to each run.

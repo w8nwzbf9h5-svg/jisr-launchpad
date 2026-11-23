@@ -2,8 +2,9 @@
 // real deployment uses (scripts/solana-deploy.sh): deploy, start, hand the admin role on, make final.
 // Then it checks the result from the outside and uses the deployed program.
 // Run by .github/workflows/solana.yml. Needs a fresh local node WITHOUT the program, and:
-//   PROGRAM_KEY  key file of the program's address (the program was built for it)
-//   PROGRAM_SO   the built program
+//   PROGRAM_KEY    key file of the program's address (the program was built for it)
+//   PROGRAM_SO     the built program
+//   PROGRAM_KEY_2, PROGRAM_SO_2   a second build for a second address, for the "stranger got there first" case
 const assert = require("assert");
 const fs = require("fs");
 const path = require("path");
@@ -75,6 +76,7 @@ function deploy(env) {
   // 2. the deployment script: deploy, start, hand over, final
   r = deploy(env);
   assert.equal(r.status, 0, "the deployment script failed");
+  assert(!/seed phrase/i.test(r.stdout + r.stderr), "no recovery phrase is printed into the log");
   assert(r.stdout.includes("JISR_PROGRAM_ID=" + programId.toBase58()));
   const info = await conn.getAccountInfo(programId);
   assert(info && info.executable, "the program is on the network");
@@ -112,6 +114,24 @@ function deploy(env) {
   assert.equal(r.status, 3, "a program started with other settings is reported, so it is never made final by mistake: " + r.stderr);
   step("the start step is safe to repeat and reports a program that was started with other settings");
 
-  fs.unlinkSync(deployerFile);
+  // 6. a stranger starts a freshly deployed program before we do: it must be taken down, never made final
+  const key2 = process.env.PROGRAM_KEY_2, so2 = process.env.PROGRAM_SO_2;
+  const program2 = web3.Keypair.fromSecretKey(Uint8Array.from(JSON.parse(fs.readFileSync(key2, "utf8")))).publicKey;
+  const stranger = web3.Keypair.generate(), strangerFile = "/tmp/jisr-rehearsal-stranger.json";
+  fs.writeFileSync(strangerFile, JSON.stringify(Array.from(stranger.secretKey)));
+  await fund(stranger.publicKey, 2);
+  const before = await conn.getBalance(deployer.publicKey);
+  const strangerStart = ["node", path.join(ROOT, "scripts", "solana-start.js"), strangerFile, stableMint.toBase58(), stranger.publicKey.toBase58(), stranger.publicKey.toBase58()].join(" ");
+  r = deploy(Object.assign({}, env, { PROGRAM_KEY: key2, PROGRAM_SO: so2, REHEARSAL_AFTER_DEPLOY: strangerStart }));
+  assert.notEqual(r.status, 0, "the script must fail when the program was started by someone else");
+  assert(r.stdout.includes("Taking it down"), "the script says it is taking the program down");
+  assert(!r.stdout.includes("JISR_PROGRAM_ID="), "no program address is reported as deployed");
+  const [data2] = web3.PublicKey.findProgramAddressSync([program2.toBytes()], new web3.PublicKey("BPFLoaderUpgradeab1e11111111111111111111111"));
+  assert.equal(await conn.getAccountInfo(data2), null, "the program's data is gone: it cannot run and was never made final");
+  const lost = before - (await conn.getBalance(deployer.publicKey));
+  assert(lost < 0.05 * web3.LAMPORTS_PER_SOL, "the program's SOL came back to the deployer; only fees were lost: " + lost + " lamports");
+  step("a stranger starting the program first: the script notices, takes the program down, and the SOL comes back");
+
+  fs.unlinkSync(deployerFile); fs.unlinkSync(strangerFile);
   console.log("\n  " + steps + " rehearsal steps passed for the program " + programId.toBase58());
 })().catch((e) => { console.error(e); process.exit(1); });

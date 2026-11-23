@@ -41,9 +41,10 @@ You do this yourself from the deploy page, with your wallet. No key leaves your 
 
 1. Open `admin.html` in MetaMask's browser and connect.
 2. Switch MetaMask to the network. The wallet needs that network's coin for fees.
-3. In the deploy section enter the reserve currency's address (the page fills in USDC where it knows
-   it), your platform wallet, and the owner wallet. Leave the swap router empty unless you want
-   people to pay with ETH or BNB.
+3. In section 3 enter the reserve currency's address (native USDC for each network is listed in
+   `web/config.js`; confirm it against the issuer's own site), your platform wallet, and the owner
+   wallet. Leave the swap router empty unless you want people to pay with ETH or BNB. Press the
+   check button: the page reads the token and shows what it found before anything is deployed.
 4. Confirm the transactions. The page shows the new launchpad's address and a short text to paste.
 5. Send that text to be put in `web/deployments.js`, together with the RPC address for that network.
    The site then shows the network.

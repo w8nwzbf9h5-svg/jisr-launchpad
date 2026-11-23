@@ -33,12 +33,25 @@ The math tests cover the fixed price ($1,000 in, $902.50 out), graduation, the r
 
 ## Before this can go live
 
-1. Build with the Anchor toolchain (`anchor build`). This has not been done here; it produces the on-chain bytecode and may ask for small changes (stack size, compute budget).
-2. Replace the placeholder program id: `anchor keys sync`.
-3. Run on a local validator and on devnet. Send `initialize` in the same transaction as the deployment, so nobody else can call it first; check `Config.admin` afterwards.
-4. Add token metadata (name, ticker, picture) so wallets display the coin.
-5. Add Solana to the web app: wallet connection, the instructions, and the SOL swap.
-6. Independent audit, then remove the upgrade authority.
+1. Independent audit. The package for the reviewer is [`AUDIT.md`](../AUDIT.md).
+2. Token metadata (name, ticker, picture) so wallets display the coin. Not built.
+3. The real-network deployment, described below and in [`GO-LIVE.md`](../GO-LIVE.md).
+
+## Deploying to the real network
+
+`.github/workflows/solana-mainnet.yml` runs only when started by hand with a confirmation sentence. It
+reads the deployer wallet's key from a repository secret and changes nothing in the repository. It
+calls `scripts/solana-deploy.sh`, which:
+
+1. deploys the program, still changeable;
+2. sends `initialize` and reads the settings back (`scripts/solana-start.js`). `initialize` can be
+   sent by anyone, once, so the script compares every field with what was asked for;
+3. names the admin wallet, which takes over when it accepts on the Solana page;
+4. removes the upgrade authority and checks that it is gone.
+
+If step 2 does not read back our settings, the program is closed, its SOL returns to the deployer,
+and nothing is made final. The same script is rehearsed against a local node on every change
+(`solana/client-test/rehearsal.js`).
 
 ## Built and tested in CI
 

@@ -31,7 +31,23 @@ fee=()
 if [ -n "${PRIORITY:-}" ] && [ "${PRIORITY}" != "0" ]; then fee=(--with-compute-unit-price "$PRIORITY"); fi
 
 echo "--- 1. deploy (still changeable)"
-solana program deploy "$PROGRAM_SO" --program-id "$PROGRAM_KEY" -k "$DEPLOYER_KEY" -u "$RPC_URL" --max-sign-attempts 60 "${fee[@]}"
+# The upload goes through a temporary account. Naming its key file here keeps the tool from printing
+# a recovery phrase for it into the log. That account's money is controlled by the deployer key either way.
+buffer_key="$(mktemp -u /tmp/jisr-buffer-XXXXXX.json)"
+solana-keygen new --no-bip39-passphrase --silent --force -o "$buffer_key"
+trap 'rm -f "$buffer_key"' EXIT
+if ! solana program deploy "$PROGRAM_SO" --program-id "$PROGRAM_KEY" --buffer "$buffer_key" -k "$DEPLOYER_KEY" -u "$RPC_URL" --max-sign-attempts 60 "${fee[@]}"; then
+  echo "The upload did not finish. Returning what was paid for it to $DEPLOYER."
+  solana program close --buffers -k "$DEPLOYER_KEY" -u "$RPC_URL" || echo "Closing the upload account failed. Its SOL is still controlled by $DEPLOYER: run 'solana program close --buffers' with that key."
+  exit 1
+fi
+
+# Used only by the rehearsal (solana/client-test/rehearsal.js) to play a stranger who starts the program
+# before we do. The real deployment never sets it.
+if [ -n "${REHEARSAL_AFTER_DEPLOY:-}" ]; then
+  echo "--- rehearsal only: $REHEARSAL_AFTER_DEPLOY"
+  RPC_URL="$RPC_URL" PROGRAM_ID="$PROGRAM_ID" bash -c "$REHEARSAL_AFTER_DEPLOY"
+fi
 
 echo "--- 2. start the program and check its settings"
 if ! RPC_URL="$RPC_URL" PROGRAM_ID="$PROGRAM_ID" PRIORITY="${PRIORITY:-0}" node "$here/solana-start.js" "$DEPLOYER_KEY" "$STABLE_MINT" "$PLATFORM_WALLET" "$ADMIN_WALLET"; then
