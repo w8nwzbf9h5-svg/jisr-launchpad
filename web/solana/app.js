@@ -303,7 +303,11 @@
     if (bad) return;
     await run("Confirm the launch in your wallet…", async () => {
       const cfg = await J.getConfig(S.conn, S.programId);
-      const made = J.createCoinIxs(S.programId, S.wallet, cfg.stableMint, cfg.coinCount, name, symbol, details);
+      // what wallets will show for this coin; the first devnet build has no such step (metadata: false)
+      const market = J.marketAddress(S.programId, J.coinMintAddress(S.programId, cfg.coinCount));
+      const link = C.metadata === false ? undefined : J.metadataUri(C.metadataBase, market);
+      if (link && J.byteLength(link) > J.MAX_METADATA_URI) throw new Error("The metadata service address in the settings is too long.");
+      const made = J.createCoinIxs(S.programId, S.wallet, cfg.stableMint, cfg.coinCount, name, symbol, details, link);
       await send(made.ixs);
       for (const id of ["#lName", "#lTicker", "#lDesc", "#lImg", "#l-x", "#l-telegram", "#l-website"]) $(id).value = "";
       S.cur = made.coinMint.toBase58(); S.view = "coin"; location.hash = "coin/" + S.cur;

@@ -76,8 +76,14 @@ function raise(n) {
   // 2. launch a coin with details
   const details = J.packMeta({ description: "The first coin on the local node.", image: "https://example.org/camel.png", x: "https://x.com/camel", telegram: "https://t.me/camel", website: "https://camel.example" });
   assert(J.byteLength(details) <= J.MAX_URI_BYTES);
-  const made = J.createCoinIxs(programId, creator.publicKey, stableMint, cfg.coinCount, "Camel Cash", "HUMP", details);
+  const service = "https://meta.example", site = "https://site.example/solana.html";
+  const link = J.metadataUri(service + "/", J.marketAddress(programId, J.coinMintAddress(programId, cfg.coinCount)));
+  const creatorSol = await conn.getBalance(creator.publicKey);
+  const made = J.createCoinIxs(programId, creator.publicKey, stableMint, cfg.coinCount, "Camel Cash", "HUMP", details, link);
   await send(made.ixs, creator);
+  const launchCost = (creatorSol - (await conn.getBalance(creator.publicKey))) / LAMPORTS_PER_SOL;
+  console.log("      launching a coin cost the creator " + launchCost.toFixed(4) + " SOL");
+  assert(launchCost < 0.04, "the page tells creators a launch costs about 0.03 SOL");
   cfg = await J.getConfig(conn, programId);
   assert.equal(cfg.coinCount, 1n);
   const [listed] = await J.getMarkets(conn, programId, cfg.coinCount, 10);
@@ -88,8 +94,27 @@ function raise(n) {
   const coinMintInfo = J.decodeMint(await conn.getAccountInfo(coin));
   assert.deepEqual([coinMintInfo.decimals, coinMintInfo.supply, coinMintInfo.authority], [6, J.TOTAL_SUPPLY, null], "the whole supply exists and nobody can mint more");
   assert.equal(J.tokenAmount(await conn.getAccountInfo(J.ata(made.market, coin))), J.TOTAL_SUPPLY, "every coin starts in the market; the creator has none");
-  await fails(send(J.createCoinIxs(programId, creator.publicKey, stableMint, 1n, "Too Long", "LONG", "x".repeat(401)).ixs, creator), "details over 400 bytes");
-  step("launch: coin created with its details, listed, whole supply in the market");
+  await fails(send(J.createCoinIxs(programId, creator.publicKey, stableMint, 1n, "Too Long", "LONG", "x".repeat(401), "").ixs, creator), "details over 400 bytes");
+  await fails(send(J.createCoinIxs(programId, creator.publicKey, stableMint, 1n, "Long Link", "LINK", "", "https://meta.example/" + "x".repeat(180)).ixs, creator), "a metadata link over 200 bytes");
+  await fails(send(J.createCoinIxs(programId, creator.publicKey, stableMint, 1n, "No Meta", "NOMETA", "").ixs, creator), "a launch without the metadata accounts");
+  // what wallets and explorers show: written by the real Metaplex program, once, and unchangeable
+  assert.equal(link, service + "/" + made.market.toBase58());
+  const md = J.decodeMetadata(await conn.getAccountInfo(made.metadata));
+  assert(md, "the coin has a Metaplex metadata account");
+  assert.deepEqual([md.name, md.symbol, md.uri, md.mint.toBase58(), md.updateAuthority.toBase58(), md.isMutable, md.sellerFee, md.hasCreators],
+    ["Camel Cash", "HUMP", link, coin.toBase58(), made.market.toBase58(), false, 0, false], "name, ticker and link as given; only the market, which has no key, is its authority; it cannot be edited");
+  // the metadata service answers that link from the chain alone
+  const { handle } = await import("../../metadata-service/worker.mjs");
+  const svcEnv = { RPC_URL: conn.rpcEndpoint, PROGRAM_ID: programId.toBase58(), SITE_URL: site };
+  let res = await handle(new Request(md.uri), svcEnv);
+  assert.equal(res.status, 200);
+  assert.deepEqual(await res.json(), { name: "Camel Cash", symbol: "HUMP", description: "The first coin on the local node.", image: "https://example.org/camel.png", external_url: "https://camel.example",
+    extensions: { website: "https://camel.example", twitter: "https://x.com/camel", telegram: "https://t.me/camel", launchpad: site + "#coin/" + coin.toBase58() } });
+  res = await handle(new Request(service + "/" + J.configAddress(programId).toBase58()), svcEnv);
+  assert.equal(res.status, 404, "an account of the program that is not a market gets no answer");
+  res = await handle(new Request(service + "/" + creator.publicKey.toBase58()), svcEnv);
+  assert.equal(res.status, 404, "a wallet address gets no answer");
+  step("launch: coin created with its details, listed, whole supply in the market; wallet metadata written and unchangeable; the metadata service answers its link");
 
   // 3. the white paper example: $1,000 buys 9.5M coins; selling them returns $902.50
   await dollars(alice, 5000n * U);
@@ -198,7 +223,7 @@ function raise(n) {
 
   // 7. a second coin: listing order and independent markets
   cfg = await J.getConfig(conn, programId);
-  const second = J.createCoinIxs(programId, alice.publicKey, stableMint, cfg.coinCount, "Second Coin", "TWO", "");
+  const second = J.createCoinIxs(programId, alice.publicKey, stableMint, cfg.coinCount, "Second Coin", "TWO", "", "");
   // a stranger creates the new market's stablecoin account first and puts $3 in it; the launch must still work
   await send(J.testDollarFaucetIxs(bob.publicKey, second.market, 3n * U), bob, [J.TEST_DOLLAR.faucetKey()]);
   await send(second.ixs, alice);
@@ -208,6 +233,8 @@ function raise(n) {
   const list = await J.getMarkets(conn, programId, 2n, 10);
   assert.deepEqual(list.map((x) => x.symbol), ["TWO", "HUMP"], "newest first");
   assert.deepEqual(state(list[0]).slice(0, 6), ["0", "0", "3000000", "0", "0", "0"]);
+  const md2 = J.decodeMetadata(await conn.getAccountInfo(second.metadata));
+  assert.deepEqual([md2.name, md2.symbol, md2.uri, md2.isMutable], ["Second Coin", "TWO", "", false], "a coin with no metadata service still has its name and ticker for wallets");
   step("listing: a second coin appears first; an account made for it in advance cannot block its launch");
 
   console.log("\n  " + steps + " client steps passed against the program " + programId.toBase58());

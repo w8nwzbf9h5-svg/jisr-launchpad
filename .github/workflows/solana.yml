@@ -5,7 +5,7 @@ name: Solana program
 on:
   push:
     branches: [main]
-    paths: ["solana/**", "web/solana/**", "scripts/solana-deploy.sh", "scripts/solana-start.js", ".github/workflows/solana.yml"]
+    paths: ["solana/**", "web/solana/**", "metadata-service/**", "scripts/solana-deploy.sh", "scripts/solana-start.js", "scripts/solana-fetch-metaplex.sh", ".github/workflows/solana.yml"]
   workflow_dispatch:
 
 permissions:
@@ -40,6 +40,12 @@ jobs:
         run: |
           anchor build
           ls -la target/deploy/jisr.so target/idl/jisr.json
+      - uses: actions/cache@v4
+        with:
+          path: solana/programs/jisr/tests/fixtures
+          key: metaplex-token-metadata-v1
+      - name: Fetch the Metaplex program the coins' wallet metadata is written by
+        run: bash scripts/solana-fetch-metaplex.sh
       - name: Program tests
         working-directory: solana
         run: cargo test -p jisr --release
@@ -53,9 +59,11 @@ jobs:
           fresh_node() {
             pkill -f solana-test-validator || true
             sleep 3
-            solana-test-validator --reset --quiet --ledger /tmp/jisr-ledger --bpf-program "$PROGRAM_ID" solana/target/deploy/jisr.so > /tmp/validator.log 2>&1 &
+            solana-test-validator --reset --quiet --ledger /tmp/jisr-ledger --bpf-program "$PROGRAM_ID" solana/target/deploy/jisr.so \
+              --bpf-program metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s solana/programs/jisr/tests/fixtures/mpl_token_metadata.so > /tmp/validator.log 2>&1 &
           }
           npm install --no-save --no-package-lock --no-audit --no-fund @solana/web3.js@1
+          node metadata-service/test.mjs
           fresh_node
           PROGRAM_ID="$PROGRAM_ID" node solana/client-test/run.js || { echo "--- node log ---"; tail -40 /tmp/validator.log; exit 1; }
           fresh_node
@@ -84,7 +92,8 @@ jobs:
           cd ..
           pkill -f solana-test-validator || true
           sleep 3
-          solana-test-validator --reset --quiet --ledger /tmp/jisr-ledger > /tmp/validator.log 2>&1 &
+          solana-test-validator --reset --quiet --ledger /tmp/jisr-ledger \
+            --bpf-program metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s solana/programs/jisr/tests/fixtures/mpl_token_metadata.so > /tmp/validator.log 2>&1 &
           PROGRAM_KEY=/tmp/rehearsal/key1.json PROGRAM_SO=/tmp/rehearsal/jisr1.so PROGRAM_KEY_2=/tmp/rehearsal/key2.json PROGRAM_SO_2=/tmp/rehearsal/jisr2.so \
             node solana/client-test/rehearsal.js || { echo "--- node log ---"; tail -40 /tmp/validator.log; exit 1; }
           rm -rf /tmp/rehearsal solana/target/deploy/jisr-keypair.json

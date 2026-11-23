@@ -96,7 +96,7 @@ function deploy(env) {
   step("hand-over: the admin wallet accepts, and the deployer key can no longer change anything");
 
   // 4. the deployed program works: launch, buy $1,000, sell back for $902.50, pay the platform wallet
-  const made = J.createCoinIxs(programId, buyer.publicKey, stableMint, 0n, "Rehearsal Coin", "REH", "");
+  const made = J.createCoinIxs(programId, buyer.publicKey, stableMint, 0n, "Rehearsal Coin", "REH", "", "");
   await send(made.ixs, buyer);
   await send(J.testDollarFaucetIxs(buyer.publicKey, buyer.publicKey, 5000n * U), buyer, [J.TEST_DOLLAR.faucetKey()]);
   await send(J.buyIxs(programId, buyer.publicKey, stableMint, made.coinMint, 9500000n * J.COIN, 1000n * U), buyer);

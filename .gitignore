@@ -5,3 +5,6 @@ cache
 .env.*
 solana/target
 e2e/*.png
+
+# fetched for the tests by scripts/solana-fetch-metaplex.sh
+solana/programs/jisr/tests/fixtures/

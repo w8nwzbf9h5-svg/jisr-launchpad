@@ -33,12 +33,50 @@ struct Coin {
     market: Pubkey,
     coin_vault: Pubkey,
     stable_vault: Pubkey,
+    metadata: Pubkey,
+}
+
+/// What wallets read about a coin: the fields of its Metaplex metadata account.
+struct Metadata {
+    update_authority: Pubkey,
+    mint: Pubkey,
+    name: String,
+    symbol: String,
+    uri: String,
+    seller_fee: u16,
+    has_creators: bool,
+    is_mutable: bool,
+}
+
+fn metadata_address(mint: &Pubkey) -> Pubkey {
+    Pubkey::find_program_address(&[jisr::METADATA_SEED, jisr::metaplex::ID.as_ref(), mint.as_ref()], &jisr::metaplex::ID).0
+}
+
+fn parse_metadata(data: &[u8]) -> Metadata {
+    assert_eq!(data[0], 4, "a Metaplex metadata account");
+    let key = |o: usize| Pubkey::new_from_array(data[o..o + 32].try_into().unwrap());
+    let mut o = 65;
+    let text = |o: &mut usize| {
+        let n = u32::from_le_bytes(data[*o..*o + 4].try_into().unwrap()) as usize;
+        let t = String::from_utf8(data[*o + 4..*o + 4 + n].to_vec()).unwrap();
+        *o += 4 + n;
+        t.trim_end_matches('\0').to_string() // older Metaplex versions pad these fields with zero bytes
+    };
+    let (name, symbol, uri) = (text(&mut o), text(&mut o), text(&mut o));
+    let seller_fee = u16::from_le_bytes(data[o..o + 2].try_into().unwrap());
+    let has_creators = data[o + 2] != 0;
+    assert!(!has_creators, "the layout below assumes no creators");
+    // then: primary_sale_happened (1 byte), is_mutable (1 byte)
+    Metadata { update_authority: key(1), mint: key(33), name, symbol, uri, seller_fee, has_creators, is_mutable: data[o + 4] != 0 }
 }
 
 impl Env {
     async fn new() -> Env {
         let mut pt = ProgramTest::new("jisr", jisr::ID, processor!(entry));
         pt.prefer_bpf(false);
+        // The real Metaplex Token Metadata program, as deployed on Solana. The file is fetched from the
+        // network by scripts/solana-fetch-metaplex.sh into tests/fixtures/ before the tests run.
+        pt.add_program("mpl_token_metadata", jisr::metaplex::ID, None);
         let (banks, payer, _) = pt.start().await;
         let stable = Keypair::new();
         let config = Pubkey::find_program_address(&[jisr::CONFIG_SEED], &jisr::ID).0;
@@ -91,18 +129,23 @@ impl Env {
     }
 
     async fn create_coin(&mut self, creator: &Keypair, name: &str, symbol: &str) -> std::result::Result<Coin, BanksClientError> {
+        self.create_coin_with(creator, name, symbol, "https://meta.example/coin").await
+    }
+
+    async fn create_coin_with(&mut self, creator: &Keypair, name: &str, symbol: &str, metadata_uri: &str) -> std::result::Result<Coin, BanksClientError> {
         let cfg: jisr::Config = self.load(self.config).await;
         let mint = Pubkey::find_program_address(&[jisr::COIN_SEED, &cfg.coin_count.to_le_bytes()], &jisr::ID).0;
         let market = Pubkey::find_program_address(&[jisr::MARKET_SEED, mint.as_ref()], &jisr::ID).0;
-        let coin = Coin { mint, market, coin_vault: get_associated_token_address(&market, &mint), stable_vault: get_associated_token_address(&market, &self.stable_mint) };
+        let coin = Coin { mint, market, coin_vault: get_associated_token_address(&market, &mint), stable_vault: get_associated_token_address(&market, &self.stable_mint), metadata: metadata_address(&mint) };
         let ix = Instruction {
             program_id: jisr::ID,
             accounts: jisr::accounts::CreateCoin {
                 creator: creator.pubkey(), config: self.config, stable_mint: self.stable_mint, coin_mint: mint, market,
                 coin_vault: coin.coin_vault, stable_vault: coin.stable_vault,
                 token_program: spl_token::id(), associated_token_program: spl_associated_token_account::id(), system_program: solana_sdk::system_program::id(),
+                metadata: coin.metadata, metadata_program: jisr::metaplex::ID,
             }.to_account_metas(None),
-            data: jisr::instruction::CreateCoin { name: name.into(), symbol: symbol.into(), uri: "".into() }.data(),
+            data: jisr::instruction::CreateCoin { name: name.into(), symbol: symbol.into(), uri: "".into(), metadata_uri: metadata_uri.into() }.data(),
         };
         self.send(vec![ix], &[creator]).await.map(|_| coin)
     }
@@ -191,6 +234,23 @@ async fn full_lifecycle_of_a_coin() {
     let vault_acc = env.banks.get_account(coin.stable_vault).await.unwrap().unwrap();
     assert_eq!(spl_token::state::Account::unpack(&vault_acc.data).unwrap().owner, coin.market, "the vault belongs to the market PDA");
     assert!(env.create_coin(&creator, "x", "HUMP").await.is_err(), "a one-letter name is refused");
+
+    // What wallets and explorers read: the name, the ticker and the link, written once and unchangeable.
+    let meta_acc = env.banks.get_account(coin.metadata).await.unwrap().expect("the coin has a Metaplex metadata account");
+    assert_eq!(meta_acc.owner, jisr::metaplex::ID);
+    let meta = parse_metadata(&meta_acc.data);
+    assert_eq!((meta.name.as_str(), meta.symbol.as_str(), meta.uri.as_str()), ("Camel Cash", "HUMP", "https://meta.example/coin"));
+    assert_eq!(meta.mint, coin.mint);
+    assert_eq!(meta.update_authority, coin.market, "the only authority over the metadata is the market, which has no key");
+    assert!(!meta.is_mutable, "the metadata can never be edited");
+    assert_eq!((meta.seller_fee, meta.has_creators), (0, false));
+    let long_link = "x".repeat(201);
+    assert!(env.create_coin_with(&creator, "Long Link", "LINK", &long_link).await.is_err(), "a metadata link over 200 bytes is refused");
+    // a coin may have no link at all, and the longest name and ticker fit
+    let plain = env.create_coin_with(&creator, &"N".repeat(32), &"T".repeat(10), "").await.unwrap();
+    let plain_acc = env.banks.get_account(plain.metadata).await.unwrap().unwrap();
+    let plain_meta = parse_metadata(&plain_acc.data);
+    assert_eq!((plain_meta.name, plain_meta.symbol, plain_meta.uri.as_str()), ("N".repeat(32), "T".repeat(10), ""));
 
     // $1,000 buys 9.5M coins; a later buyer pays the same; selling back returns $902.50.
     let coins = 9_500_000 * COIN;

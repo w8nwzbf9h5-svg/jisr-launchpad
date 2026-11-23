@@ -103,7 +103,8 @@ jobs:
         working-directory: solana
         run: |
           anchor build
-          test "$(grep -oP 'declare_id!\("\K[^"]+' programs/jisr/src/lib.rs)" = "$PROGRAM_ID"
+          test "$(grep -oP 'declare_id!\("\K[^"]+' programs/jisr/src/lib.rs | head -1)" = "$PROGRAM_ID"
+          bash ../scripts/solana-fetch-metaplex.sh
           cargo test -p jisr --release
           ls -la target/deploy/jisr.so
       - name: Check the deployer wallet holds enough SOL

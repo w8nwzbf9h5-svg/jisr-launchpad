@@ -56,7 +56,7 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
     page.on("pageerror", (e) => errors.push(String(e)));
     await page.setViewport({ width: 393, height: 852, isMobile: true });
     // the page's settings, pointed at the local node
-    const settings = { name: "Local Solana node", rpcUrl: RPC, explorer: "https://explorer.solana.com", clusterParam: "?cluster=custom", programId: programId.toBase58(), feeHelperSeed: helperSeed };
+    const settings = { name: "Local Solana node", rpcUrl: RPC, explorer: "https://explorer.solana.com", clusterParam: "?cluster=custom", programId: programId.toBase58(), feeHelperSeed: helperSeed, metadataBase: "https://meta.example" };
     await page.setRequestInterception(true);
     page.on("request", (req) => {
       if (new URL(req.url()).pathname.endsWith("/solana/config.js")) {
@@ -133,7 +133,9 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
     assert.equal(await page.$eval("#v-coin .chead img", (el) => el.getAttribute("src")), "https://example.org/camel.png");
     const [m0] = await J.getMarkets(conn, programId, 1n, 1);
     assert.deepEqual([m0.name, m0.symbol, m0.creator.toBase58()], ["Camel Cash", "CAMEL", wallet.publicKey.toBase58()]);
-    step("launch from the page: the coin is on the network with its picture, description and links");
+    const md = J.decodeMetadata(await conn.getAccountInfo(J.metadataAddress(m0.coinMint)));
+    assert.deepEqual([md.name, md.symbol, md.uri, md.isMutable], ["Camel Cash", "CAMEL", "https://meta.example/" + m0.address.toBase58(), false], "what wallets will show: the name, the ticker and the link to the metadata service");
+    step("launch from the page: the coin is on the network with its picture, description and links, and with its name for wallets");
 
     // 4. buy: $1,000 for 9.5M coins
     await fill("#buyAmt", "1000");

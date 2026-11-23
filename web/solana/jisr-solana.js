@@ -11,6 +11,9 @@
 
   const TOKEN_PROGRAM = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
   const ATA_PROGRAM = new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
+  /* Metaplex Token Metadata: where wallets and explorers read a token's name, ticker and picture link. */
+  const METADATA_PROGRAM = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
+  const MAX_METADATA_URI = 200;
   const enc = new TextEncoder(), dec = new TextDecoder();
 
   /* ---------- the model, as in solana/crates/jisr-math (every formula and rounding is the same) ---------- */
@@ -78,6 +81,11 @@
   const configAddress = (programId) => pda([enc.encode("config")], programId);
   const coinMintAddress = (programId, index) => pda([enc.encode("coin"), le8(index)], programId);
   const marketAddress = (programId, coinMint) => pda([enc.encode("market"), coinMint.toBytes()], programId);
+  const metadataAddress = (coinMint) => pda([enc.encode("metadata"), METADATA_PROGRAM.toBytes(), coinMint.toBytes()], METADATA_PROGRAM);
+  /* The link written into a coin's wallet metadata: the metadata service's address, then the market's
+     address. The service (metadata-service/worker.mjs) answers it with the coin's name, picture and links.
+     With no service the link is empty, and wallets show the name and ticker without a picture. */
+  const metadataUri = (base, market) => base ? String(base).replace(/\/+$/, "") + "/" + market.toBase58() : "";
   /* A wallet's one standard token account for a mint. `owner` may be a program address (the market's vaults). */
   const ata = (owner, mint) => pda([owner.toBytes(), TOKEN_PROGRAM.toBytes(), mint.toBytes()], ATA_PROGRAM);
 
@@ -121,6 +129,17 @@
     if (!info || !info.data || info.data.length < 82 || !info.owner.equals(TOKEN_PROGRAM)) return null;
     const d = info.data, v = new DataView(d.buffer, d.byteOffset, d.byteLength);
     return { authority: v.getUint32(0, true) === 1 ? new PublicKey(d.slice(4, 36)) : null, decimals: d[44], supply: v.getBigUint64(36, true) };
+  }
+
+  /* A coin's Metaplex metadata account: what wallets show. Null if the account is missing or is not one. */
+  function decodeMetadata(info) {
+    if (!info || !info.owner.equals(METADATA_PROGRAM) || info.data.length < 80 || info.data[0] !== 4) return null;
+    const d = info.data, v = new DataView(d.buffer, d.byteOffset, d.byteLength);
+    let o = 65;
+    const str = () => { const n = v.getUint32(o, true); const t = dec.decode(d.slice(o + 4, o + 4 + n)); o += 4 + n; return t.replace(/\0+$/, ""); };
+    const name = str(), symbol = str(), uri = str(), sellerFee = v.getUint16(o, true), hasCreators = d[o + 2] !== 0;
+    // with no creators the next two bytes are "primary sale happened" and "is mutable"
+    return { updateAuthority: new PublicKey(d.slice(1, 33)), mint: new PublicKey(d.slice(33, 65)), name, symbol, uri, sellerFee, hasCreators, isMutable: hasCreators ? null : d[o + 4] !== 0 };
   }
 
   async function getConfig(conn, programId) {
@@ -181,17 +200,20 @@
   function acceptAdminIx(programId, newAdmin) {
     return ix(programId, "accept_admin", [meta(newAdmin, false, true), meta(configAddress(programId), true)]);
   }
-  /* Launch coin number `index` (the config's current coin count). Returns the instructions and the new addresses. */
-  function createCoinIxs(programId, creator, stableMint, index, name, symbol, uri) {
-    const coinMint = coinMintAddress(programId, index), market = marketAddress(programId, coinMint);
+  /* Launch coin number `index` (the config's current coin count). Returns the instructions and the new addresses.
+     `metadataLink` is the link for the coin's wallet metadata (see metadataUri); pass "" for none.
+     Leave it out only for the first devnet build, which wrote no wallet metadata and takes one argument less. */
+  function createCoinIxs(programId, creator, stableMint, index, name, symbol, uri, metadataLink) {
+    const coinMint = coinMintAddress(programId, index), market = marketAddress(programId, coinMint), withMeta = typeof metadataLink === "string";
     return {
-      coinMint, market,
+      coinMint, market, metadata: metadataAddress(coinMint),
       ixs: [
         ComputeBudgetProgram.setComputeUnitLimit({ units: 400000 }),
         ix(programId, "create_coin", [
           meta(creator, true, true), meta(configAddress(programId), true), meta(stableMint), meta(coinMint, true), meta(market, true),
           meta(ata(market, coinMint), true), meta(ata(market, stableMint), true), meta(TOKEN_PROGRAM), meta(ATA_PROGRAM), meta(SystemProgram.programId)
-        ], [text(name), text(symbol), text(uri)])
+        ].concat(withMeta ? [meta(metadataAddress(coinMint), true), meta(METADATA_PROGRAM)] : []),
+        [text(name), text(symbol), text(uri)].concat(withMeta ? [text(metadataLink)] : []))
       ]
     };
   }
@@ -280,10 +302,10 @@
   const byteLength = (s) => enc.encode(s).length;
 
   return {
-    TOKEN_PROGRAM, ATA_PROGRAM, COIN, COIN_DECIMALS, TOTAL_SUPPLY, SALE_SUPPLY, CURVE_SUPPLY, CURVE_MAX, MAX_WALLET, PRICE_SCALE, MAX_URI_BYTES: 400,
+    TOKEN_PROGRAM, ATA_PROGRAM, METADATA_PROGRAM, MAX_METADATA_URI, COIN, COIN_DECIMALS, TOTAL_SUPPLY, SALE_SUPPLY, CURVE_SUPPLY, CURVE_MAX, MAX_WALLET, PRICE_SCALE, MAX_URI_BYTES: 400,
     quoteBuy, quoteSell, coinsForBudget, currentPrice, marketCap, outstanding,
-    configAddress, coinMintAddress, marketAddress, ata,
-    decodeConfig, decodeMarket, decodeMint, tokenAmount, getConfig, getMarkets, getMarket, getBalances,
+    configAddress, coinMintAddress, marketAddress, metadataAddress, metadataUri, ata,
+    decodeConfig, decodeMarket, decodeMint, decodeMetadata, tokenAmount, getConfig, getMarkets, getMarket, getBalances,
     ensureAtaIx, initializeIx, setPlatformWalletIx, proposeAdminIx, acceptAdminIx, createCoinIxs, buyIxs, sellIxs, claimCreatorFeesIxs, sweepPlatformFeesIxs, reinforceIx,
     TEST_DOLLAR, createTestDollarIxs, testDollarFaucetIxs, packMeta, unpackMeta, byteLength
   };

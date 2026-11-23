@@ -14,13 +14,18 @@
     devnet: {
       name: "Solana devnet", rpcUrl: "https://api.devnet.solana.com", explorer: "https://explorer.solana.com", clusterParam: "?cluster=devnet",
       programId: "7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU", test: true,
+      // This first devnet build wrote no wallet metadata for coins. Remove the next line when devnet moves to the current build.
+      metadata: false,
       // Devnet only: the public deployer key left over from the deployment. The page uses it to hand a
       // little SOL for network fees to a wallet that has none. It guards nothing of value.
       feeHelperSeed: "064291e20f163c014a27b8e346d730d9d73d4d8c55365839b7b563c6f602c19f"
     },
     mainnet: {
       name: "Solana", rpcUrl: "https://api.mainnet-beta.solana.com", explorer: "https://explorer.solana.com", clusterParam: "",
-      programId: "", test: false, stableName: "USDC"
+      programId: "", test: false, stableName: "USDC",
+      // The address of the metadata service (metadata-service/README.md). Wallets get a coin's picture through it.
+      // Set it BEFORE coins are launched: the link is written into each coin once and can never be changed.
+      metadataBase: ""
     }
   };
   let asked = "";

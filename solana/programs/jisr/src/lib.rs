@@ -16,10 +16,16 @@
 //!   * For "nobody can change the rules" to hold, the program's upgrade authority must be removed after
 //!     deployment. Until then, whoever holds it can replace this code.
 //!
+//! Wallets and explorers learn a coin's name and ticker from a Metaplex metadata account. `create_coin`
+//! writes it once, marked unchangeable, with the market's address as its authority: an address with no
+//! private key. Nobody can edit it afterwards.
+//!
 //! Paying with SOL is done by the app, not here: it puts a swap (SOL to the stablecoin) and `buy` in one
 //! transaction, so both succeed or neither does. This program only ever touches the stablecoin.
 
 use anchor_lang::prelude::*;
+use anchor_lang::solana_program::instruction::{AccountMeta, Instruction};
+use anchor_lang::solana_program::program::invoke_signed;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::spl_token::instruction::AuthorityType;
 use anchor_spl::token::{self, Mint, MintTo, SetAuthority, Token, TokenAccount, Transfer};
@@ -30,6 +36,15 @@ declare_id!("7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU");
 pub const CONFIG_SEED: &[u8] = b"config";
 pub const COIN_SEED: &[u8] = b"coin";
 pub const MARKET_SEED: &[u8] = b"market";
+
+/// The Metaplex Token Metadata program, which wallets and explorers read a token's name from.
+pub mod metaplex {
+    use anchor_lang::prelude::Pubkey;
+    pub const ID: Pubkey = anchor_lang::solana_program::pubkey!("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
+}
+pub const METADATA_SEED: &[u8] = b"metadata";
+/// Metaplex accepts a link of at most 200 bytes.
+pub const MAX_METADATA_URI: usize = 200;
 
 #[program]
 pub mod jisr {
@@ -74,8 +89,14 @@ pub mod jisr {
     /// Launch a coin. The caller becomes its creator and earns the 1% creator fee.
     /// The creator receives no coins. The whole supply is minted to the market's vault and the
     /// mint authority is removed before this instruction ends.
-    pub fn create_coin(ctx: Context<CreateCoin>, name: String, symbol: String, uri: String) -> Result<()> {
-        require!((2..=32).contains(&name.len()) && (2..=10).contains(&symbol.len()) && uri.len() <= 400, JisrError::BadName);
+    ///
+    /// `uri` is the coin's details as the Jisr page stores them. `metadata_uri` is the link written into the
+    /// coin's Metaplex metadata, where wallets look for its picture; it may be empty.
+    pub fn create_coin(ctx: Context<CreateCoin>, name: String, symbol: String, uri: String, metadata_uri: String) -> Result<()> {
+        require!(
+            (2..=32).contains(&name.len()) && (2..=10).contains(&symbol.len()) && uri.len() <= 400 && metadata_uri.len() <= MAX_METADATA_URI,
+            JisrError::BadName
+        );
 
         let coin_mint = ctx.accounts.coin_mint.key();
         let index = ctx.accounts.config.coin_count;
@@ -107,6 +128,46 @@ pub mod jisr {
             ),
             TOTAL_SUPPLY,
         )?;
+
+        // The coin's name and ticker for wallets and explorers. Metaplex requires the mint authority to sign,
+        // so this happens before that authority is removed. Marked unchangeable; no royalty, no creators.
+        let mut data = Vec::with_capacity(32 + name.len() + symbol.len() + metadata_uri.len());
+        data.push(33u8); // Metaplex instruction: CreateMetadataAccountV3
+        for text in [name.as_str(), symbol.as_str(), metadata_uri.as_str()] {
+            data.extend_from_slice(&(text.len() as u32).to_le_bytes());
+            data.extend_from_slice(text.as_bytes());
+        }
+        data.extend_from_slice(&0u16.to_le_bytes()); // seller fee: none
+        data.push(0); // creators: none
+        data.push(0); // collection: none
+        data.push(0); // uses: none
+        data.push(0); // is_mutable: false
+        data.push(0); // collection details: none
+        let market_key = ctx.accounts.market.key();
+        let create_metadata = Instruction {
+            program_id: metaplex::ID,
+            accounts: vec![
+                AccountMeta::new(ctx.accounts.metadata.key(), false),
+                AccountMeta::new_readonly(coin_mint, false),
+                AccountMeta::new_readonly(market_key, true), // mint authority
+                AccountMeta::new(ctx.accounts.creator.key(), true), // pays the account's rent and Metaplex's fee
+                AccountMeta::new_readonly(market_key, false), // update authority: the market, which has no key
+                AccountMeta::new_readonly(ctx.accounts.system_program.key(), false),
+            ],
+            data,
+        };
+        invoke_signed(
+            &create_metadata,
+            &[
+                ctx.accounts.metadata.to_account_info(),
+                ctx.accounts.coin_mint.to_account_info(),
+                ctx.accounts.market.to_account_info(),
+                ctx.accounts.creator.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+            ],
+            &[seeds],
+        )?;
+
         token::set_authority(
             CpiContext::new_with_signer(
                 ctx.accounts.token_program.to_account_info(),
@@ -374,6 +435,13 @@ pub struct CreateCoin<'info> {
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
+    /// CHECK: The coin's Metaplex metadata account. It does not exist yet; the Metaplex program creates it
+    /// and refuses any address but the one derived from the mint. The address is also checked here.
+    #[account(mut, seeds = [METADATA_SEED, metaplex::ID.as_ref(), coin_mint.key().as_ref()], bump, seeds::program = metaplex::ID)]
+    pub metadata: UncheckedAccount<'info>,
+    /// CHECK: The Metaplex Token Metadata program. Only this one address is accepted.
+    #[account(address = metaplex::ID, executable)]
+    pub metadata_program: UncheckedAccount<'info>,
 }
 
 #[derive(Accounts)]
@@ -506,7 +574,7 @@ pub enum JisrError {
     NotOutstanding,
     #[msg("One wallet can hold 2.5% of supply at most")]
     WalletLimit,
-    #[msg("Name must be 2 to 32 bytes, symbol 2 to 10, details up to 400")]
+    #[msg("Name must be 2 to 32 bytes, symbol 2 to 10, details up to 400, metadata link up to 200")]
     BadName,
     #[msg("Only the admin can do this")]
     NotAdmin,
