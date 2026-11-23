@@ -42,6 +42,7 @@
     $("aDeploy").disabled = !ready || !S.checked || (!n.test && !$("aAck").checked);
     $("aLoad").disabled = !on;
     $("aSetWallet").disabled = !on || !S.factory;
+    $("aBrDeploy").disabled = !on;
     $("aAckWrap").hidden = !S.signer || n.test;
     if (S.signer) $("aNet").textContent = (n.name || "شبكة غير معرّفة") + " (" + S.chainId + ")" + (n.test ? " · تجريبية" : " · شبكة حقيقية");
   }
@@ -71,6 +72,8 @@
       if (!val("aOwner")) $("aOwner").value = S.account;
       const c = CFG.chains[S.chainId];
       if (c && ethers.isAddress(c.factory || "") && !val("aFactory")) $("aFactory").value = c.factory;
+      if (c && ethers.isAddress(c.factory || "") && !val("aBrFactory")) $("aBrFactory").value = c.factory;
+      if (!val("aBrMessenger") && CFG.chains[S.chainId] && CFG.chains[S.chainId].cctp != null && S.chainId !== "31337") $("aBrMessenger").value = CFG.cctp[CFG.chains[S.chainId].test ? "test" : "main"].messenger;
       if (window.ethereum.on) { window.ethereum.on("chainChanged", () => location.reload()); window.ethereum.on("accountsChanged", () => location.reload()); }
       const restored = restoreResult();
       status(restored ? "المحفظة مرتبطة. آخر نشر من هذا الجهاز محفوظ: النص جاهز للنسخ في الخطوة 4." : k ? "المحفظة مرتبطة على " + k.name + "." : "المحفظة مرتبطة. هذه شبكة جديدة على الموقع: اكتب اسمها ورمز عملتها في الخطوة 1.", "good");
@@ -82,7 +85,7 @@
   }
 
   /* Gas to offer when neither the wallet nor the public endpoint can estimate it (measured use plus a margin). */
-  const GAS = { MockStable: 800000n, MockRouter: 1200000n, LaunchpadFactory: 4800000n };
+  const GAS = { MockStable: 800000n, MockRouter: 1200000n, LaunchpadFactory: 4800000n, BridgeSeller: 1500000n };
   async function deployContract(name, args, label) {
     const data = (await new ethers.ContractFactory(ART[name].abi, ART[name].bytecode).getDeployTransaction(...args)).data;
     let addr = null, hash;
@@ -120,12 +123,14 @@
     return false;
   }
   function writeSnippet() {
-    if (!S.factoryOut) return;
+    if (!S.factoryOut && !S.bridgeOut) return;
     const cur = JSON.parse(JSON.stringify(window.JISR_DEPLOYMENTS || {}));
     const prev = cur[S.chainId] || {}, entry = Object.assign({}, prev), n = net();
-    const hasOther = ethers.isAddress(prev.factory || "") && prev.factory.toLowerCase() !== S.factoryOut.toLowerCase();
+    const hasOther = !!S.factoryOut && ethers.isAddress(prev.factory || "") && prev.factory.toLowerCase() !== S.factoryOut.toLowerCase();
     $("aReplaceWrap").hidden = !hasOther;
-    if (hasOther && !$("aReplace").checked) {
+    if (!S.factoryOut) {
+      // only a helper was deployed: the factories already linked stay exactly as they are
+    } else if (hasOther && !$("aReplace").checked) {
       // keep the factory already linked and add this one beside it, as another currency on the same network
       entry.extraFactories = (prev.extraFactories || []).filter((f) => f.toLowerCase() !== S.factoryOut.toLowerCase()).concat([S.factoryOut]);
     } else {
@@ -134,10 +139,32 @@
     }
     if (!n.listed) { entry.name = n.name; entry.native = n.native; if (n.test) entry.test = true; }
     if (S.testKit) entry.faucet = true;
+    if (S.bridgeOut) entry.bridges = Object.assign({}, prev.bridges, { [S.bridgeOut.factory]: S.bridgeOut.seller });
     const rpc = val("aRpc");
     if (/^https?:\/\//.test(rpc)) entry.rpcUrl = rpc;
     cur[S.chainId] = entry;
     $("aOut").value = "// Maps a chain id to the LaunchpadFactory deployed there.\nwindow.JISR_DEPLOYMENTS = " + JSON.stringify(cur, null, 2) + ";\n";
+  }
+
+  /* The helper for selling here and receiving on another network. One per factory. */
+  async function deployBridge() {
+    await guarded("نشر عقد البيع عبر الشبكات…", async () => {
+      const n = CFG.chains[S.chainId] || {};
+      if (n.cctp == null) throw new Error("Circle لا تدعم هذه الشبكة، فالبيع عبر الشبكات غير متاح عليها.");
+      const factory = val("aBrFactory"), messenger = val("aBrMessenger");
+      if (!ethers.isAddress(factory) || !ethers.isAddress(messenger)) throw new Error("اكتب عنوان المصنع وعنوان عقد Circle بصيغة صحيحة.");
+      if (!(await W.hasCode(S.chainId, factory))) throw new Error("لا يوجد عقد على عنوان المصنع في هذه الشبكة.");
+      if (!(await W.hasCode(S.chainId, messenger))) throw new Error("لا يوجد عقد على عنوان Circle في هذه الشبكة.");
+      const stable = await new ethers.Contract(factory, ART.LaunchpadFactory.abi, S.provider).stable();
+      if (n.usdc && stable.toLowerCase() !== n.usdc.toLowerCase()) throw new Error("عملة احتياط هذا المصنع ليست USDC الأصلية على هذه الشبكة، وجسر Circle ينقل USDC فقط. انشر مصنعاً احتياطه USDC أولاً.");
+      const seller = await deployContract("BridgeSeller", [factory, messenger], "عقد البيع عبر الشبكات");
+      S.bridgeOut = { factory: ethers.getAddress(factory), seller: seller.target };
+      $("aBrOut").textContent = "العقد: " + seller.target;
+      $("aFactoryOut").textContent = S.factoryOut || ethers.getAddress(factory);
+      $("aResult").hidden = false;
+      writeSnippet();
+      status("تم نشر عقد البيع عبر الشبكات. انسخ النص من الخطوة 4 إلى الملف deployments.js.", "good");
+    });
   }
 
   /* kind "usd": a 6-decimal test dollar, supply priced at 100,000. kind "stock": an 18-decimal test stock, supply priced at 400 shares. */
@@ -238,6 +265,7 @@
 
   $("aConnect").addEventListener("click", connect);
   $("aReconnect").addEventListener("click", reconnect);
+  $("aBrDeploy").addEventListener("click", deployBridge);
   $("aTestKit").addEventListener("click", () => testKit("usd"));
   $("aTestKitStock").addEventListener("click", () => testKit("stock"));
   $("aCheck").addEventListener("click", check);

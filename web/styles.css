@@ -190,3 +190,10 @@ footer{color:var(--muted);font-size:12.5px;padding:30px 0 44px}
 .busy{opacity:.6;pointer-events:none}
 @media (prefers-reduced-motion:no-preference){.runway i{transition:width .35s ease}}
 @media (prefers-reduced-motion:reduce){.row{transition:none}.row:hover{transform:none}}
+
+/* sales sent to another network */
+.xfers{margin-top:18px}
+.xfers h2{font-size:16px;font-weight:700;margin:0 0 6px}
+.xfer{display:grid;gap:4px;padding:10px 0;border-top:1px solid var(--line);font-size:14.5px;line-height:1.5}
+.xfer:first-of-type{border-top:0}
+.xfer .ok{color:var(--good,#2ecc8f)}

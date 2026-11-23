@@ -32,12 +32,17 @@ jobs:
         with:
           node-version: 22
       - name: Install Anchor
-        run: npm install -g @coral-xyz/anchor-cli@0.31.1
+        run: |
+          npm install -g @coral-xyz/anchor-cli@0.31.1
+          # the package ships its program without permission to run
+          chmod +x "$(npm root -g)/@coral-xyz/anchor-cli/anchor"
       - name: Versions
         run: solana --version && anchor --version && cargo --version
       - name: Build the program
         working-directory: solana
-        run: anchor build
+        run: |
+          anchor build
+          ls -la target/deploy/jisr.so target/idl/jisr.json
       - name: Program tests
         working-directory: solana
         run: cargo test -p jisr --release

@@ -64,6 +64,12 @@
     "function approve(address,uint256)",
     "function mint(address,uint256)"
   ];
+  // The helper that sells a coin here and sends the USDC to another network through Circle's CCTP.
+  const BRIDGE_ABI = [
+    "function sellAndBridge(address coin, uint256 coinsIn, uint256 minStableOut, uint32 destinationDomain, bytes32 mintRecipient, uint256 maxFee, uint32 minFinalityThreshold, bool forward, uint256 deadline) returns (uint256)",
+    "error ZeroAmount()", "error UnknownCoin()", "error NoRecipient()", "error FeeTooHigh()"
+  ];
+  const TRANSMITTER_ABI = ["function receiveMessage(bytes message, bytes attestation) returns (bool)"];
   const ROUTER_ABI = [
     "function getAmountsIn(uint256 amountOut, address[] path) view returns (uint256[])",
     "function getAmountsOut(uint256 amountIn, address[] path) view returns (uint256[])"
@@ -128,7 +134,7 @@
     chainId: null, cfg: null, ro: null, wallet: null, signer: null, account: null,
     factory: null, stable: null, router: null, weth: null,
     view: "board", cur: null, m: null, board: [],
-    tab: "buy", payWith: "stable", recvIn: "stable", buyAmt: "", sellAmt: "", plan: null, busy: false, quoteSeq: 0
+    tab: "buy", payWith: "stable", recvIn: "stable", recvOn: "", feeCache: {}, buyAmt: "", sellAmt: "", plan: null, busy: false, quoteSeq: 0
   };
   const $ = s => document.querySelector(s);
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -266,6 +272,10 @@
   async function setChain(key) {
     const mk = markets().find(x => x.key === key) || markets()[0];
     S.marketKey = mk.key; S.chainId = mk.id; S.cfg = Object.assign({}, CFG.chains[mk.id], { factory: mk.factory });
+    // the cross-network sale helper deployed for this factory, if any
+    const brs = CFG.chains[mk.id].bridges || {}, brKey = Object.keys(brs).find(k => k.toLowerCase() === mk.factory.toLowerCase());
+    S.cfg.bridge = brKey && ethers.isAddress(brs[brKey] || "") ? brs[brKey] : null;
+    S.recvOn = "";
     try { localStorage.setItem("jisr.market", mk.key); } catch (_) { /* optional */ }
     S.ro = S.cfg.rpcUrl ? new ethers.JsonRpcProvider(S.cfg.rpcUrl, Number(S.chainId), { staticNetwork: true }) : S.wallet;
     S.board = []; S.m = null; S.signer = null;
@@ -337,9 +347,11 @@
       if (window.ethereum.on && !S.listening) {
         S.listening = true;
         window.ethereum.on("accountsChanged", () => location.reload());
-        window.ethereum.on("chainChanged", () => location.reload());
+        // a claim switches the wallet to another network and back on purpose; do not restart the page for that
+        window.ethereum.on("chainChanged", () => { if (!S.holdReload) location.reload(); });
       }
       await refresh();
+      pollXfers();
     } catch (e) { toast(explain(e)); }
   }
 
@@ -410,6 +422,7 @@
     const faucet = S.cfg && S.cfg.faucet && S.account ? ' <button class="linkbtn" data-act="faucet">Get 10,000 test ' + esc(S.stable ? S.stable.symbol : "USD") + "</button>" : "";
     $("#foot").innerHTML = (S.cfg ? "Network: " + esc(S.cfg.name) + ". Factory <span class=\"addr\">" + esc(S.cfg.factory) + "</span>." : "No network configured.") + faucet +
       " Not audited. Use at your own risk. <a class=\"linkbtn\" href=\"whitepaper.html\">White paper</a>";
+    renderXfers();
     // on a test network, offer the test money at the top of the page too, where a new visitor sees it
     const oldFaucet = $("#stripFaucet"); if (oldFaucet) oldFaucet.remove();
     if (faucet && !$("#strip").hidden) $("#stripTxt").insertAdjacentHTML("beforeend", ' <span id="stripFaucet">' + faucet + "</span>");
@@ -489,7 +502,9 @@
     } else {
       h += '<div class="field"><label for="sellAmt">You sell</label><div class="amt-in"><input id="sellAmt" inputmode="decimal" autocomplete="off" placeholder="0" value="' + esc(S.sellAmt) + '"><span>' + esc(m.symbol) + "</span></div>" +
         '<div class="hint">You hold ' + (S.account ? fTok(m.held) : "nothing yet: connect a wallet") + '</div><div class="chips">' + [25, 50, 100].map(v => '<button class="chip sm" data-act="pct" data-v="' + v + '">' + v + "%</button>").join("") + "</div></div>" +
-        '<div class="stack"><div class="flabel">Receive in</div><div class="chips" role="group" aria-label="Receive in">' + payChips("recvIn", S.recvIn) + "</div></div>" +
+        (S.recvOn ? "" : '<div class="stack"><div class="flabel">Receive in</div><div class="chips" role="group" aria-label="Receive in">' + payChips("recvIn", S.recvIn) + "</div></div>") +
+        (bridgeDests().length ? '<div class="stack"><div class="flabel">Receive on</div><div class="chips" role="group" aria-label="Receive on">' +
+          [{ id: "", name: S.cfg.name.replace(/ testnet$/, "") }].concat(bridgeDests()).map(d => '<button class="chip" data-act="recvOn" data-v="' + esc(d.id) + '" aria-pressed="' + (S.recvOn === d.id) + '">' + esc(d.name) + "</button>").join("") + "</div></div>" : "") +
         '<div id="quote"></div><button class="btn sell wide" id="goBtn" data-act="sell">Sell $' + esc(m.symbol) + "</button>";
     }
     el.innerHTML = h;
@@ -537,6 +552,19 @@
     if (S.account && amt > m.held) return { html: '<div class="warn">You hold ' + fTok(m.held) + ". Lower the amount.</div>" };
     const q = quoteSell(m, amt);
     if (!q || q.net === 0n) return { html: '<div class="warn">That amount cannot be sold.</div>' };
+    const dest = S.recvOn ? bridgeDests().find(d => d.id === S.recvOn) : null;
+    if (dest) {
+      // sold here, paid out on another network through Circle
+      const f = await bridgeFees(dest.domain), maxFee = bridgeMaxFee(q.net, f), minOut = slipDown(q.net);
+      const top = '<div class="kv"><span>Sale value</span><b>' + fUsd(q.gross) + "</b></div>" + feeRows(q, q.gross);
+      if (maxFee >= minOut) return { html: top + '<div class="warn">This sale is too small to send to ' + esc(dest.name) + ": Circle's fee for the transfer is about " + fStable(maxFee) + ".</div>" };
+      return { ok: true, plan: { kind: "sell", coins: amt, q, nativeOut: 0n, bridge: { dest } }, html: top +
+        '<div class="kv"><span>Transfer fee (Circle), up to</span><b>' + fStable(maxFee) + "</b></div>" +
+        '<div class="kv big"><span>You receive on ' + esc(dest.name) + "</span><b>about " + fStable(q.net - maxFee) + "</b></div>" +
+        '<div class="sub">' + (f.forward
+          ? "Sent to your own address on " + esc(dest.name) + ". Circle delivers it there, usually within a few minutes."
+          : "Sent to your own address on " + esc(dest.name) + ". When Circle confirms it, usually within 20 minutes, you claim it from this page. Claiming needs a little " + esc(CFG.chains[dest.id].native) + " on " + esc(dest.name) + " for the network fee.") + "</div>" };
+    }
     let nativeOut = 0n;
     if (S.recvIn === "native") nativeOut = (await S.router.getAmountsOut(q.net, path(S.stable.addr, S.weth)))[1];
     const html = '<div class="kv"><span>Sale value</span><b>' + fUsd(q.gross) + "</b></div>" + feeRows(q, q.gross) +
@@ -559,6 +587,118 @@
   }
 
   /* ---------- transactions ---------- */
+  /* ---------- selling here, receiving on another network (Circle CCTP) ---------- */
+  const cctpEnv = () => S.cfg.cctpEnv || CFG.cctp[S.cfg.test ? "test" : "main"];
+  /* Networks the proceeds of a sale on this network can be sent to. */
+  function bridgeDests() {
+    if (!S.cfg || !S.cfg.bridge || S.cfg.cctp == null) return [];
+    return Object.keys(CFG.chains).filter(id => id !== String(S.chainId) && CFG.chains[id].cctp != null && CFG.chains[id].cctp !== S.cfg.cctp && !!CFG.chains[id].test === !!S.cfg.test)
+      .map(id => ({ id, name: CFG.chains[id].name.replace(/ testnet$/, ""), domain: CFG.chains[id].cctp }));
+  }
+  /* Circle's current fees for a route. Read from Circle each time, because the delivery fee follows gas prices. */
+  async function bridgeFees(dstDomain, fresh) {
+    const key = S.chainId + ":" + S.cfg.cctp + ">" + dstDomain, hit = S.feeCache[key];
+    if (!fresh && hit && Date.now() - hit.at < 60000) return hit.v;
+    let list;
+    try {
+      const r = await fetch(cctpEnv().api + "/v2/burn/USDC/fees/" + S.cfg.cctp + "/" + dstDomain + "?forward=true");
+      if (!r.ok) throw new Error("status " + r.status);
+      list = await r.json();
+    } catch (_) { throw new Error("Could not read Circle's transfer fees. Try again in a moment."); }
+    const pick = t => (Array.isArray(list) ? list : []).find(x => x && Number(x.finalityThreshold) === t);
+    const e = pick(1000) || pick(2000);
+    if (!e) throw new Error("Circle does not offer this route right now.");
+    const ff = e.forwardFee && typeof e.forwardFee === "object" ? e.forwardFee : null;
+    const fwdNum = ff ? Number(ff.med != null ? ff.med : ff.medium != null ? ff.medium : ff.high != null ? ff.high : ff.low) : 0;
+    const rate = Number(e.minimumFee);
+    if (!(rate >= 0) || rate > 100 || !(fwdNum >= 0)) throw new Error("Circle's fee answer was not understood. Try again in a moment.");
+    // rate is in basis points and may have decimals; keep it as hundredths of a basis point
+    const v = { threshold: Number(e.finalityThreshold), rateX100: BigInt(Math.ceil(rate * 100)), forwardFee: BigInt(Math.ceil(fwdNum)), forward: fwdNum > 0 };
+    S.feeCache[key] = { at: Date.now(), v };
+    return v;
+  }
+  /* The most Circle may take from an amount: its delivery fee plus its percentage fee, rounded up. */
+  const bridgeMaxFee = (amount, f) => f.forwardFee + (amount * f.rateX100 + 999999n) / 1000000n;
+
+  /* Cross-network sales made from this browser, kept so their progress can be shown and a delivery claimed. */
+  const XFER_KEY = "jisr.xfers", HEX = /^0x[0-9a-fA-F]+$/, TXH = /^0x[0-9a-fA-F]{64}$/;
+  function xfers() { try { const a = JSON.parse(localStorage.getItem(XFER_KEY) || "[]"); return Array.isArray(a) ? a.filter(x => x && TXH.test(x.hash || "")) : []; } catch (_) { return []; } }
+  function putXfers(a) { try { localStorage.setItem(XFER_KEY, JSON.stringify(a.slice(0, 20))); } catch (_) { /* optional */ } }
+  function saveXfer(x) { putXfers([x].concat(xfers().filter(y => y.hash !== x.hash))); renderXfers(); pollXfers(); }
+  function patchXfer(hash, patch) { putXfers(xfers().map(x => x.hash === hash ? Object.assign({}, x, patch) : x)); }
+  const myXfers = () => S.account ? xfers().filter(x => String(x.account).toLowerCase() === S.account.toLowerCase()) : [];
+  /* A transfer Circle should deliver is offered for claiming only if delivery has not happened after 15 minutes. */
+  const claimable = x => x.state === "ready" && (!x.forward || Date.now() - x.at > 15 * 60000);
+  function renderXfers() {
+    const el = $("#xfers"); if (!el) return;
+    const list = myXfers();
+    el.hidden = !list.length;
+    if (!list.length) { el.innerHTML = ""; return; }
+    const link = (chainId, hash, text) => { const ex = (CFG.chains[chainId] || {}).explorer; return ex && TXH.test(hash || "") ? ' <a class="linkbtn" target="_blank" rel="noopener" href="' + esc(ex + "/tx/" + hash) + '">' + esc(text) + "</a>" : ""; };
+    el.innerHTML = "<h2>Sales sent to another network</h2>" + list.map(x => {
+      const dst = CFG.chains[x.dst] || { name: "another network", native: "ETH" }, name = String(dst.name).replace(/ testnet$/, "");
+      let amt; try { amt = Number(ethers.formatUnits(BigInt(x.amount) - BigInt(x.fee || "0"), Number(x.dec) || 6)).toLocaleString("en-US", { maximumFractionDigits: 2 }); } catch (_) { amt = "?"; }
+      const status = x.state === "delivered" ? "<b class=\"ok\">Delivered on " + esc(name) + ".</b>" + link(x.dst, x.doneTx, "View")
+        : claimable(x) ? "Ready on " + esc(name) + '. <button class="chip sm" data-act="claimXfer" data-v="' + esc(x.hash) + '">Claim on ' + esc(name) + "</button><span class=\"sub\"> Needs a little " + esc(dst.native) + " there for the network fee.</span>"
+        : x.state === "ready" ? "Confirmed. Circle is delivering it on " + esc(name) + "…"
+        : "Waiting for Circle to confirm the sale. This usually takes a few minutes…";
+      return '<div class="xfer"><div><b class="num">about ' + esc(amt) + " " + esc(x.sym || "USDC") + "</b> to " + esc(name) + ' <span class="sub">from selling $' + esc(x.coin || "") + "</span>" + link(x.src, x.hash, "Sale") + "</div><div>" + status +
+        (x.state === "delivered" ? ' <button class="linkbtn" data-act="hideXfer" data-v="' + esc(x.hash) + '">Hide</button>' : "") + "</div></div>";
+    }).join("");
+  }
+  let xferTimer = null;
+  async function pollXfers() {
+    clearTimeout(xferTimer);
+    const open = myXfers().filter(x => x.state !== "delivered");
+    if (!open.length) return;
+    for (const x of open) {
+      try {
+        if (!/^https:\/\//.test(x.api || "")) continue;
+        const r = await fetch(x.api + "/v2/messages/" + Number(x.srcDomain) + "?transactionHash=" + x.hash);
+        if (!r.ok) continue; // not seen by Circle yet
+        const j = await r.json(), m = j && Array.isArray(j.messages) ? j.messages[0] : null;
+        if (!m) continue;
+        if (TXH.test(m.forwardTxHash || "")) patchXfer(x.hash, { state: "delivered", doneTx: m.forwardTxHash });
+        else if (m.status === "complete" && HEX.test(m.attestation || "") && HEX.test(m.message || "") && m.message.length > 2) patchXfer(x.hash, { state: "ready", message: m.message, attestation: m.attestation });
+      } catch (_) { /* try again on the next round */ }
+    }
+    renderXfers();
+    if (myXfers().some(x => x.state !== "delivered")) xferTimer = setTimeout(pollXfers, 15000);
+  }
+  /* Complete a transfer on the destination network from the user's own wallet. Anyone may do this for any transfer. */
+  async function claimXfer(hash) {
+    const x = myXfers().find(y => y.hash === hash);
+    if (!x || !claimable(x) || S.busy || !window.ethereum) return;
+    const dst = CFG.chains[x.dst]; if (!dst || !ethers.isAddress(x.transmitter || "")) return;
+    const name = dst.name.replace(/ testnet$/, ""), hex = "0x" + Number(x.dst).toString(16);
+    S.busy = true; S.holdReload = true; document.body.classList.add("busy");
+    try {
+      toast("Switch your wallet to " + name + " to claim…", 60000);
+      try { await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hex }] }); }
+      catch (e) {
+        if (window.JISR_WALLET.rejected(e) || !dst.rpcUrl) throw e;
+        const add = { chainId: hex, chainName: dst.name, nativeCurrency: { name: dst.native, symbol: dst.native, decimals: 18 }, rpcUrls: [dst.rpcUrl] };
+        if (dst.explorer) add.blockExplorerUrls = [dst.explorer];
+        await window.ethereum.request({ method: "wallet_addEthereumChain", params: [add] });
+      }
+      const signer = window.JISR_WALLET.signer(new ethers.BrowserProvider(window.ethereum), S.account);
+      toast("Confirm the claim in your wallet…", 60000);
+      const tx = await new ethers.Contract(x.transmitter, TRANSMITTER_ABI, signer).receiveMessage(x.message, x.attestation);
+      toast("Claiming… waiting for the network.", 60000);
+      await tx.wait();
+      patchXfer(hash, { state: "delivered", doneTx: tx.hash });
+      toast("Claimed on " + name + ".");
+    } catch (e) {
+      if (/nonce already used/i.test(window.JISR_WALLET.detail(e) + " " + String(e && e.message))) { patchXfer(hash, { state: "delivered" }); toast("This transfer was already delivered."); }
+      else toast(explain(e), 8000);
+    } finally {
+      // go back to the network this page trades on
+      try { S.wallet = new ethers.BrowserProvider(window.ethereum); await bindSigner(); } catch (_) { S.signer = null; }
+      S.busy = false; S.holdReload = false; document.body.classList.remove("busy");
+      renderXfers(); pollXfers();
+    }
+  }
+
   async function run(label, fn) {
     if (S.busy) return;
     if (!S.signer) { await connect(); if (!S.signer) return; }
@@ -572,7 +712,7 @@
     const has = await t.allowance(S.account, spender);
     if (has >= need) return;
     if (has > 0n) await (await t.approve(spender, 0n)).wait(); // some stablecoins require a reset first
-    toast("Step 1 of 2: allow the market to take the payment…", 60000);
+    toast("Step 1 of 2: allow this trade in your wallet…", 60000);
     await (await t.approve(spender, need)).wait();
   }
   const deadline = () => BigInt(Math.floor(Date.now() / 1000) + CFG.deadlineSeconds);
@@ -601,6 +741,22 @@
       S.m = await readMarket(S.cur, true);
       const r = await buildPlan(); if (!r.ok) { toast("The quote changed. Check it and try again."); return; }
       const p = r.plan, mk = new ethers.Contract(S.m.marketAddr, MARKET_ABI, S.signer);
+      if (p.bridge) {
+        const dest = p.bridge.dest, env = cctpEnv();
+        const f = await bridgeFees(dest.domain, true), minOut = slipDown(p.q.net), maxFee = bridgeMaxFee(p.q.net, f);
+        if (maxFee >= minOut) { toast("This sale is too small to cover the transfer fee."); return; }
+        await ensureAllowance(S.m.coinAddr, S.cfg.bridge, p.coins);
+        toast("Confirm the sale in your wallet…", 60000);
+        const br = new ethers.Contract(S.cfg.bridge, BRIDGE_ABI, S.signer);
+        const btx = await br.sellAndBridge(S.m.coinAddr, p.coins, minOut, dest.domain, ethers.zeroPadValue(S.account, 32), maxFee, f.threshold, f.forward, deadline());
+        toast("Selling… waiting for the network.", 60000);
+        await btx.wait();
+        saveXfer({ hash: btx.hash, account: S.account, src: String(S.chainId), srcDomain: S.cfg.cctp, dst: dest.id, amount: p.q.net.toString(), fee: maxFee.toString(),
+          sym: S.stable.symbol, dec: S.stable.dec, coin: S.m.symbol, forward: f.forward, at: Date.now(), api: env.api, transmitter: env.transmitter, state: "pending" });
+        S.sellAmt = "";
+        toast("Sold " + fTok(p.coins) + " " + S.m.symbol + ". " + fStable(p.q.net) + " is on its way to " + dest.name + ".", 8000);
+        return;
+      }
       await ensureAllowance(S.m.coinAddr, S.m.marketAddr, p.coins);
       toast("Confirm the sale in your wallet…", 60000);
       const tx = S.recvIn === "native"
@@ -674,6 +830,9 @@
     else if (a === "tab") { S.tab = v; renderTrade(); }
     else if (a === "payWith") { S.payWith = v; S.buyAmt = ""; renderTrade(); }
     else if (a === "recvIn") { S.recvIn = v; renderTrade(); }
+    else if (a === "recvOn") { S.recvOn = v; if (v) S.recvIn = "stable"; renderTrade(); }
+    else if (a === "claimXfer") claimXfer(v);
+    else if (a === "hideXfer") { putXfers(xfers().filter(x => x.hash !== v)); renderXfers(); }
     else if (a === "pct") { if (S.m && S.m.held > 0n) { S.sellAmt = ethers.formatUnits(S.m.held * BigInt(v) / 100n, 18); renderTrade(); } }
     else if (a === "buy") doBuy();
     else if (a === "sell") doSell();
@@ -723,6 +882,6 @@
       if (!S.busy && !document.hidden && !typing && !midTrade) refresh();
     }, 20000);
   }
-  window.JISR_APP = { state: S, refresh };
+  window.JISR_APP = { state: S, refresh, pollXfers };
   start();
 })();

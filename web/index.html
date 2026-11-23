@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=54fee9d5">
+<link rel="stylesheet" href="styles.css?v=fa305785">
 </head>
 <body>
 
@@ -118,6 +118,7 @@
   </div>
 </section>
 
+<section id="xfers" class="card xfers" hidden aria-live="polite"></section>
 <footer id="foot"></footer>
 </main>
 
@@ -126,7 +127,7 @@
 <script>
 /* Load the scripts in order. deployments.js is always fetched fresh, so a newly linked contract shows at once. */
 (function () {
-  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=6feae430", "wallet.js?v=52c21746", "app.js?v=5a3fb56d"];
+  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "wallet.js?v=52c21746", "app.js?v=958620ab"];
   (function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");

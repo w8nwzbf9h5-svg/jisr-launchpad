@@ -454,6 +454,114 @@ function waitFor(child, text, ms) {
     await page.screenshot({ path: path.join(__dirname, "admin.png"), fullPage: true });
     step("linking: the pasted snippet points the site at the new factory, and launching and buying work there");
 
+    // 18. Sell on this network and receive on another, through Circle's bridge (stand-ins for Circle's contracts and API).
+    const deployer = await provider.getSigner(accounts[0]);
+    const mock = (n) => { const a = require(path.join(ROOT, "artifacts", "contracts", "mocks", n + ".sol", n + ".json")); return new ethers.ContractFactory(a.abi, a.bytecode, deployer); };
+    const messenger = await (await mock("MockMessenger").deploy()).waitForDeployment();
+    const transmitter = await (await mock("MockTransmitter").deploy()).waitForDeployment();
+    const linked = JSON.parse(snippet.slice(snippet.indexOf("{"), snippet.lastIndexOf("}") + 1));
+    Object.assign(linked[31337], { cctp: 0, cctpEnv: { messenger: messenger.target, transmitter: transmitter.target, api: "https://iris.test" } });
+    fs.writeFileSync(DEPLOYMENTS, "window.JISR_DEPLOYMENTS = " + JSON.stringify(linked, null, 2) + ";\n");
+    // the deploy page publishes the helper beside the factory and adds it to the linking text
+    await page.goto(WEB + "/admin.html", { waitUntil: "networkidle0" });
+    await click("#aConnect"); await aStatus("المحفظة مرتبطة");
+    await type("#aBrFactory", realFactory2); await type("#aBrMessenger", messenger.target);
+    await click("#aBrDeploy"); await aStatus("تم نشر عقد البيع عبر الشبكات");
+    const withBridge = await page.$eval("#aOut", (el) => el.value);
+    const linked2 = JSON.parse(withBridge.slice(withBridge.indexOf("{"), withBridge.lastIndexOf("}") + 1));
+    const sellerAddr = linked2[31337].bridges[realFactory2];
+    assert(ethers.isAddress(sellerAddr), "the linking text names the helper for this factory");
+    assert.deepEqual([linked2[31337].factory, linked2[31337].extraFactories, linked2[31337].cctp], [linked[31337].factory, linked[31337].extraFactories, 0], "the factories already linked are unchanged");
+    const sellerC = new ethers.Contract(sellerAddr, ["function factory() view returns (address)", "function messenger() view returns (address)"], provider);
+    assert.deepEqual([await sellerC.factory(), await sellerC.messenger()], [realFactory2, messenger.target]);
+    fs.writeFileSync(DEPLOYMENTS, withBridge);
+
+    // Circle's API, answered locally
+    const iris = { forward: true, msgs: {}, feeUrls: [] };
+    await page.setRequestInterception(true);
+    page.on("request", (req) => {
+      const u = req.url();
+      if (!u.startsWith("https://iris.test/")) return req.continue();
+      const json = (status, body) => req.respond({ status, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(body) });
+      if (u.includes("/v2/burn/USDC/fees/")) {
+        iris.feeUrls.push(u);
+        const fwd = iris.forward ? { forwardFee: { low: 56035, med: 57543, high: 59052 } } : {};
+        return json(200, [Object.assign({ finalityThreshold: 1000, minimumFee: 1.3 }, fwd), Object.assign({ finalityThreshold: 2000, minimumFee: 0 }, fwd)]);
+      }
+      if (u.includes("/v2/messages/")) {
+        const m = iris.msgs[new URL(u).searchParams.get("transactionHash")];
+        return m ? json(200, { messages: [m] }) : json(404, { code: 404, message: "not found" });
+      }
+      return json(404, {});
+    });
+    const openLinkedCoin = async () => {
+      await page.goto("about:blank"); // a full reload, so the page starts with no remembered fees
+      await page.goto(WEB + "/#board", { waitUntil: "networkidle0" });
+      await click("#walletBtn");
+      await page.waitForFunction(() => document.querySelector("#walletTxt").textContent.includes("0x"));
+      await click("#rows .row"); await page.waitForSelector("#goBtn"); await settle();
+      await click("[data-act=tab][data-v=sell]");
+    };
+    const lastXfer = () => page.evaluate(() => JSON.parse(localStorage.getItem("jisr.xfers"))[0]);
+    const poll = async () => { await page.evaluate(() => window.JISR_APP.pollXfers()); await sleep(300); };
+    const messengerC = new ethers.Contract(messenger.target, mock("MockMessenger").interface, provider);
+    const pad32 = (a) => ethers.zeroPadValue(a, 32);
+
+    await openLinkedCoin();
+    await page.waitForSelector("[data-act=recvOn][data-v='84532']");
+    assert.equal(await page.$("[data-act=recvOn][data-v='11155111']"), null, "a network with the same Circle number as this one is not offered");
+    await click("[data-act=recvOn][data-v='84532']");
+    assert.equal(await page.$("[data-act=recvIn]"), null, "across networks the payout is always the reserve dollar");
+    await type("#sellAmt", "500000"); await quoteReady("You receive on Base Sepolia");
+    const bq = await text("#quote");
+    assert(bq.includes("Transfer fee (Circle), up to") && bq.includes("0.06 mUSD") && bq.includes("about 47.44 mUSD") && bq.includes("Circle delivers it there"), "bridge quote: " + bq);
+    await hush(); await click("#goBtn"); await toast("on its way to Base Sepolia"); await settle();
+    let burn = await messengerC.burns(0);
+    // 500,000 coins x $0.0001 = $50, less 5% = $47.50; Circle's cap = 0.057543 delivery + 0.013% of the amount, rounded up
+    assert.deepEqual([burn.from, burn.amount, burn.destinationDomain, burn.mintRecipient, burn.destinationCaller, burn.maxFee, burn.minFinalityThreshold, burn.withHook, burn.hookData].map(String),
+      [sellerAddr, 47500000n, 6n, pad32(account), ethers.ZeroHash, 57543n + 6175n, 1000n, true, "0x636374702d666f72776172640000000000000000000000000000000000000000"].map(String));
+    assert(iris.feeUrls.every((u) => u.endsWith("/v2/burn/USDC/fees/0/6?forward=true")), "fees are asked for this route: " + iris.feeUrls[0]);
+    assert.equal(await linkedMarket.floorReserve(), 97n * 10n ** 6n - 49n * 10n ** 6n, "the reserve paid out as in any sale: $50 less the 2% it keeps");
+    let x = await lastXfer();
+    assert((await text("#xfers")).includes("Waiting for Circle"), "the transfer is listed as waiting");
+    iris.msgs[x.hash] = { message: "0x", attestation: "PENDING", status: "pending_confirmations" };
+    await poll(); assert((await text("#xfers")).includes("Waiting for Circle"));
+    iris.msgs[x.hash] = { message: "0x1234", attestation: "0xabcd", status: "complete" };
+    await poll(); assert((await text("#xfers")).includes("Circle is delivering it on Base Sepolia"), "confirmed but not yet delivered: no claim button for a delivery Circle owes");
+    assert.equal(await page.$("[data-act=claimXfer]"), null);
+    iris.msgs[x.hash] = { message: "0x1234", attestation: "0xabcd", status: "complete", forwardState: "CONFIRMED", forwardTxHash: "0x" + "ab".repeat(32) };
+    await poll();
+    const done = await text("#xfers");
+    assert(done.includes("Delivered on Base Sepolia") && done.includes("about 47.44 mUSD"), "delivered: " + done);
+    assert((await page.$eval("#xfers a[href*='sepolia.basescan.org/tx/0xabab']", (el) => el.textContent)) === "View");
+    await click("[data-act=hideXfer]");
+    assert.equal(await page.$eval("#xfers", (el) => el.hidden), true);
+    step("cross-network sale: sold here, Circle asked to deliver on another network, progress shown until delivered");
+
+    // the same sale where Circle offers no delivery: the seller claims on the other network from the page
+    iris.forward = false;
+    await openLinkedCoin();
+    await click("[data-act=recvOn][data-v='84532']");
+    await type("#sellAmt", "200000"); await quoteReady("You receive on Base Sepolia");
+    assert((await text("#quote")).includes("you claim it from this page"));
+    await hush(); await click("#goBtn"); await toast("on its way to Base Sepolia"); await settle();
+    burn = await messengerC.burns(1);
+    assert.deepEqual([burn.amount, burn.maxFee, burn.withHook, burn.hookData].map(String), [19000000n, 2470n, false, "0x"].map(String));
+    x = await lastXfer();
+    iris.msgs[x.hash] = { message: "0x5678", attestation: "0xef01", status: "complete" };
+    await poll();
+    await hush(); await click("[data-act=claimXfer]"); await toast("Claimed on Base Sepolia"); await settle();
+    const transmitterC = new ethers.Contract(transmitter.target, mock("MockTransmitter").interface, provider);
+    assert.equal(await transmitterC.received(), 1n);
+    assert.equal(await transmitterC.used(ethers.keccak256("0x5678")), true, "the claim carried Circle's message");
+    assert((await text("#xfers")).includes("Delivered on Base Sepolia"));
+    // the page is still trading on its own network afterwards
+    await click("[data-act=recvOn][data-v='']");
+    await type("#sellAmt", "1000"); await quoteReady("You receive");
+    await hush(); await click("#goBtn"); await toast("Sold"); await settle();
+    await page.setRequestInterception(false);
+    step("cross-network sale without delivery: the seller claims on the other network, then keeps trading here");
+
     assert.deepEqual(pageErrors, [], "the page threw errors: " + pageErrors.join(" | "));
     console.log(`\n  ${steps.length} end-to-end steps passed`);
   } catch (e) {

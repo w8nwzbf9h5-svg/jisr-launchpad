@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=54fee9d5">
+<link rel="stylesheet" href="styles.css?v=fa305785">
 <style>
 body{font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;line-height:1.7}
 .adm{max-width:720px;margin:0 auto;padding:18px 16px 60px;display:grid;gap:14px}
@@ -109,13 +109,24 @@ body{font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahom
     <p class="muted" style="margin-top:8px">هذه هي الصلاحية الوحيدة للمالك. لا يستطيع المالك لمس أي عملة أو أي احتياطي.</p>
   </section>
 
+  <section class="card">
+    <h2>6. البيع عبر الشبكات (اختياري)</h2>
+    <p>ينشر عقداً مساعداً بجانب المصنع: يبيع المستخدم عملته على هذه الشبكة ويستلم الدولار على شبكة أخرى، عبر جسر USDC الرسمي من Circle. العقد بلا مالك ولا يحتفظ بأي أموال. يعمل فقط إذا كانت عملة احتياط المصنع هي USDC الأصلية على شبكة تدعمها Circle.</p>
+    <label for="aBrFactory">عنوان المصنع</label>
+    <input type="text" id="aBrFactory" placeholder="0x…" autocomplete="off">
+    <label for="aBrMessenger">عنوان عقد Circle على هذه الشبكة (TokenMessengerV2)</label>
+    <input type="text" id="aBrMessenger" placeholder="0x…" autocomplete="off">
+    <div class="row2"><button class="btn" id="aBrDeploy" disabled>انشر عقد البيع عبر الشبكات</button></div>
+    <div id="aBrOut" class="muted" style="margin-top:10px"></div>
+  </section>
+
   <p class="muted"><a href="index.html">الرجوع إلى الموقع</a></p>
 </main>
 
 <script>
 /* Load the scripts in order. deployments.js is always fetched fresh, so a newly linked contract shows at once. */
 (function () {
-  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=6feae430", "wallet.js?v=52c21746", "contracts.js?v=608eda7b", "admin.js?v=c06576cc"];
+  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "wallet.js?v=52c21746", "contracts.js?v=46b4daef", "admin.js?v=454d26e8"];
   (function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");
