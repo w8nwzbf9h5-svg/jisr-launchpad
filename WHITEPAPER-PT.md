@@ -129,7 +129,7 @@ Leia esta seção antes de usar a plataforma com qualquer coisa de valor.
 | Implantação de teste | No ar na rede de testes Sepolia, com dinheiro de teste sem valor |
 | Auditoria de segurança independente | Não realizada |
 | Implantação em redes reais | Não realizada. Vem depois da auditoria |
-| Solana | Programa escrito e testado localmente. Não implantado, ainda não está na aplicação web |
+| Solana | Programa e página construídos e testados juntos em um nó local da Solana. Ainda não implantado em uma rede pública |
 | Vender em uma rede e receber em outra (ponte) | Construído e testado com substitutos dos contratos da Circle. Ainda não executado na ponte real da Circle |
 
 Implantação de teste na Sepolia:

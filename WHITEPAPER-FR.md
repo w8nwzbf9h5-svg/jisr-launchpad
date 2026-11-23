@@ -129,7 +129,7 @@ Lisez cette section avant d'utiliser la plateforme avec quoi que ce soit de vale
 | Déploiement de test | En ligne sur le réseau de test Sepolia, avec de l'argent de test sans valeur |
 | Audit de sécurité indépendant | Non réalisé |
 | Déploiement sur des réseaux réels | Non réalisé. Il vient après l'audit |
-| Solana | Programme écrit et testé en local. Non déployé, pas encore dans l'application web |
+| Solana | Programme et page construits, et testés ensemble sur un nœud Solana local. Pas encore déployé sur un réseau public |
 | Vendre sur un réseau et recevoir sur un autre (pont) | Construit et testé avec des substituts des contrats de Circle. Pas encore exécuté sur le pont réel de Circle |
 
 Déploiement de test sur Sepolia :

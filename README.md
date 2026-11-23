@@ -16,7 +16,7 @@ Status: tested locally end to end and deployed on a test network. **Not audited 
 | `web/` | The web app. Static files, no build step, no server |
 | `e2e/` | A browser test (24 steps) that drives the web app against a local chain |
 | `scripts/` | Deploy, local demo, local web server |
-| `solana/` | The Solana program and its pricing library, with tests. Not yet built to on-chain bytecode, and not yet in the web app. See `solana/README.md` |
+| `solana/` | The same launchpad as a Solana program (Anchor), with Rust tests, a client test and a browser test against a local node. `web/solana.html` is its page |
 | `DEPLOY-AR.md` | Arabic guide: deploy from a wallet and link the site |
 | `WHITEPAPER.md`, `WHITEPAPER-XX.md` | The white paper in ten languages. `npm run whitepaper` rebuilds `web/whitepaper.html` from them |
 

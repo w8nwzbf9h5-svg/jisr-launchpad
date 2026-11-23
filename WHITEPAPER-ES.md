@@ -129,7 +129,7 @@ Lee esta sección antes de usar la plataforma con algo de valor.
 | Despliegue de prueba | En línea en la red de pruebas Sepolia, con dinero de prueba sin valor |
 | Auditoría de seguridad independiente | No realizada |
 | Despliegue en redes reales | No realizado. Va después de la auditoría |
-| Solana | Programa escrito y probado localmente. No desplegado, aún no está en la aplicación web |
+| Solana | Programa y página construidos y probados juntos en un nodo local de Solana. Aún no desplegado en una red pública |
 | Vender en una red y recibir en otra (puente) | Construido y probado con sustitutos de los contratos de Circle. Aún no se ha ejecutado en el puente real de Circle |
 
 Despliegue de prueba en Sepolia:

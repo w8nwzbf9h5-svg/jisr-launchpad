@@ -129,7 +129,7 @@ Read this section before using the launchpad with anything of value.
 | Test deployment | Live on the Sepolia test network, with test money that has no value |
 | Independent security audit | Not done |
 | Deployment on real networks | Not done. It follows the audit |
-| Solana | Program written and tested locally. Not deployed, not yet in the web app |
+| Solana | Program and page built, and tested together against a local Solana node. Not deployed on a public network yet |
 | Selling on one network and receiving on another (bridge) | Built and tested against stand-ins for Circle's contracts. Not yet run through Circle's live bridge |
 
 Test deployment on Sepolia:

@@ -129,7 +129,7 @@ Baca bagian ini sebelum menggunakan platform dengan apa pun yang bernilai.
 | Pemasangan uji | Daring di jaringan uji Sepolia, dengan uang uji yang tidak bernilai |
 | Audit keamanan independen | Belum dilakukan |
 | Pemasangan di jaringan sungguhan | Belum dilakukan. Menyusul setelah audit |
-| Solana | Program sudah ditulis dan diuji secara lokal. Belum dipasang, belum ada di aplikasi web |
+| Solana | Program dan halamannya sudah dibangun dan diuji bersama pada node Solana lokal. Belum dipasang di jaringan publik |
 | Menjual di satu jaringan dan menerima di jaringan lain (jembatan) | Sudah dibangun dan diuji dengan pengganti kontrak Circle. Belum dijalankan di jembatan Circle yang sesungguhnya |
 
 Pemasangan uji di Sepolia:

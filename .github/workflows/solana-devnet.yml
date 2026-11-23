@@ -1,10 +1,12 @@
 # Deploys the Solana program to devnet (the public test network). Test money only.
 #
-# How it works, and why nobody has to hold a key:
-#   - the job makes a new deployer key and a new program address for itself and throws both away when it ends;
-#   - it asks devnet's public faucet for the SOL the deployment needs;
-#   - it deploys the program as final, so nobody can ever change it, including whoever held those keys.
-# The program's address is printed in the run summary and attached as "jisr-devnet-deployment".
+#   - The deployment is paid from the devnet deployer address (scripts/devnet-deployer.js). Its key is
+#     public on purpose and used on devnet only, so anyone can fund it with free devnet SOL from
+#     https://faucet.solana.com and no secret has to be stored anywhere.
+#   - The job makes a new program address, builds the program for it and deploys it as final:
+#     nobody can change the program afterwards, including whoever knows the deployer key.
+#   - The program's address is printed in the run summary and attached as "jisr-devnet-deployment".
+#     This job changes nothing in the repository.
 # Start it by changing solana/deploy-devnet.txt, or from the Actions tab.
 name: Deploy Solana program to devnet
 
@@ -42,15 +44,14 @@ jobs:
       - name: Install Anchor
         run: |
           if [ "$(anchor --version 2>/dev/null)" != "anchor-cli 0.31.1" ]; then cargo install anchor-cli --version 0.31.1 --locked; fi
-      - name: New deployer key and program address
+      - name: Deployer address and a new program address
         working-directory: solana
         run: |
           mkdir -p target/deploy
-          solana-keygen new --no-bip39-passphrase --silent --force -o /tmp/deployer.json
+          echo "DEPLOYER=$(node ../scripts/devnet-deployer.js /tmp/deployer.json)" >> "$GITHUB_ENV"
           solana-keygen new --no-bip39-passphrase --silent --force -o target/deploy/jisr-keypair.json
           anchor keys sync
           echo "PROGRAM_ID=$(solana address -k target/deploy/jisr-keypair.json)" >> "$GITHUB_ENV"
-          echo "DEPLOYER=$(solana address -k /tmp/deployer.json)" >> "$GITHUB_ENV"
           grep -n "declare_id" programs/jisr/src/lib.rs
       - name: Build the program for this address
         working-directory: solana
@@ -58,19 +59,22 @@ jobs:
           anchor build
           ls -la target/deploy/jisr.so
           test "$(grep -oP 'declare_id!\("\K[^"]+' programs/jisr/src/lib.rs)" = "$PROGRAM_ID"
-      - name: Get devnet SOL from the public faucet
+      - name: Check the deployer has enough devnet SOL
         run: |
-          # the deployment needs about 5 SOL for a moment and keeps about 2.5 as the program's rent
-          need=5200000000
-          for i in $(seq 1 30); do
-            bal=$(solana balance "$DEPLOYER" -u devnet --lamports | awk '{print $1}')
-            echo "balance: $bal lamports"
-            if [ "${bal:-0}" -ge "$need" ]; then break; fi
-            solana airdrop 2 "$DEPLOYER" -u devnet || solana airdrop 1 "$DEPLOYER" -u devnet || true
-            sleep 20
-          done
+          # about 2.44 SOL of rent stays with the program for good; the same again is held during the upload and returned
+          need=4950000000
           bal=$(solana balance "$DEPLOYER" -u devnet --lamports | awk '{print $1}')
-          if [ "${bal:-0}" -lt "$need" ]; then echo "::error::The devnet faucet did not give enough SOL (have $bal lamports, need $need). Run this again later."; exit 1; fi
+          echo "Deployer $DEPLOYER holds ${bal:-0} lamports; the deployment needs $need."
+          if [ "${bal:-0}" -lt "$need" ]; then
+            # the public faucet usually refuses requests from shared machines, but it costs nothing to ask once
+            solana airdrop 2 "$DEPLOYER" -u devnet || true
+            sleep 20
+            bal=$(solana balance "$DEPLOYER" -u devnet --lamports | awk '{print $1}')
+          fi
+          if [ "${bal:-0}" -lt "$need" ]; then
+            echo "::error::The deployer address $DEPLOYER holds ${bal:-0} lamports and needs $need (4.95 SOL). Fund it at https://faucet.solana.com (devnet), then run this again."
+            exit 1
+          fi
       - name: Deploy, final
         working-directory: solana
         run: |

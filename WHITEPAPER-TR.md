@@ -129,7 +129,7 @@ Platformu değeri olan herhangi bir şeyle kullanmadan önce bu bölümü okuyun
 | Test kurulumu | Sepolia test ağında yayında, değeri olmayan test parasıyla |
 | Bağımsız güvenlik denetimi | Yapılmadı |
 | Gerçek ağlarda kurulum | Yapılmadı. Denetimden sonra gelir |
-| Solana | Program yazıldı ve yerelde test edildi. Kurulmadı, henüz web uygulamasında yok |
+| Solana | Program ve sayfa yazıldı ve yerel bir Solana düğümünde birlikte test edildi. Henüz herkese açık bir ağa kurulmadı |
 | Bir ağda satıp başka bir ağda almak (köprü) | Yazıldı ve Circle sözleşmelerinin yerine geçen test sözleşmeleriyle test edildi. Henüz Circle'ın canlı köprüsünde çalıştırılmadı |
 
 Sepolia'daki test kurulumu:

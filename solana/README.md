@@ -40,8 +40,33 @@ The math tests cover the fixed price ($1,000 in, $902.50 out), graduation, the r
 5. Add Solana to the web app: wallet connection, the instructions, and the SOL swap.
 6. Independent audit, then remove the upgrade authority.
 
-## Built in CI
+## Built and tested in CI
 
-The workflow `.github/workflows/solana.yml` builds the program for deployment (`anchor build`, Anchor 0.31.1) and runs the tests above on every change under `solana/`. Each run attaches `jisr-solana-program`, which holds `jisr.so` (the deployable program, about 350 KB) and `jisr.json` (its interface file).
+The workflow `.github/workflows/solana.yml` runs on every change under `solana/` or `web/solana/`:
 
-Still to do before the program can be used: choose the program's real address and put it in `declare_id!` and `Anchor.toml`, deploy to devnet, call `initialize`, and add Solana to the web app.
+1. builds the program for deployment (`anchor build`, Anchor 0.31.1) and runs the Rust tests above;
+2. starts a local Solana node with the program and runs `client-test/run.js`: the same client file the web page uses (`web/solana/jisr-solana.js`) sets the program up, launches coins, trades through the sale and the curve, and checks every result against the page's own price math, to the last unit;
+3. starts a fresh node and runs `client-test/page.js`: a real browser opens `web/solana.html` with a stand-in for the Phantom wallet and walks through setup, test dollars, a launch, a buy, a sale and the fee payouts.
+
+Each run attaches `jisr-solana-program`: `jisr.so` (the deployable program, about 350 KB) and `jisr.json` (its interface file).
+
+## The web page
+
+`web/solana.html` is the Solana side of the site: board, coin page, launch form, buy and sell, fee payouts, and a one-time setup card. It asks the visitor's Phantom wallet to sign and sends through its own connection, so the wallet's network setting does not matter. Coin details (description, picture link, X, Telegram, website) are stored with the coin in up to 400 bytes.
+
+On test networks the reserve currency is a test dollar that anyone can mint from the page. Its two keys are derived from fixed public phrases in `jisr-solana.js`; they are not secrets and guard nothing of value.
+
+## Deploying to devnet
+
+`.github/workflows/solana-devnet.yml` deploys the program to devnet as **final** (it can never be changed) at a new address. It pays from the devnet deployer address, whose key is public on purpose (`scripts/devnet-deployer.js`):
+
+```
+BoQdaWDQ79SWtoarTiptPk7MMjVYy8NeXsb8z7vN2Y5K
+```
+
+1. Send about 5 devnet SOL to that address from https://faucet.solana.com.
+2. Start the workflow (change `solana/deploy-devnet.txt`, or use the Actions tab).
+3. Put the program address it reports into `web/solana/config.js`, `declare_id!` in `programs/jisr/src/lib.rs` and `Anchor.toml`.
+4. Open `solana.html`, connect Phantom, and do the one-time setup. The wallet that does it becomes the admin and the platform wallet.
+
+Devnet only. For a real network, `initialize` must be sent together with the deployment so nobody else can call it first, the reserve must be a real stablecoin, and the program needs an independent audit first.
