@@ -100,7 +100,8 @@
     S.busy = true; document.body.classList.add("busy");
     try { toast(label, 60000); await fn(); }
     catch (e) { toast(explain(e), 8000); }
-    finally { S.busy = false; document.body.classList.remove("busy"); try { await refresh(); } catch (_) { /* shown on next load */ } }
+    // the page counts as busy until it shows the new state, so nothing can be pressed against old numbers
+    finally { try { await refresh(); } catch (_) { /* shown on next load */ } S.busy = false; document.body.classList.remove("busy"); }
   }
 
   /* ---------- reading ---------- */
@@ -382,7 +383,8 @@
       if (res.value.err) throw new Error(JSON.stringify(res.value.err));
       toast("0.2 SOL added to your wallet for network fees.");
     } catch (e) { toast(explain(e), 8000); }
-    finally { S.busy = false; document.body.classList.remove("busy"); try { await refresh(); } catch (_) { /* shown on next load */ } }
+    // the page counts as busy until it shows the new state, so nothing can be pressed against old numbers
+    finally { try { await refresh(); } catch (_) { /* shown on next load */ } S.busy = false; document.body.classList.remove("busy"); }
   }
 
   /* ---------- wiring ---------- */
