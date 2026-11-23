@@ -74,7 +74,7 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
 
     // 2. test dollars
     await click("[data-act=faucet]"); await toast("10,000 test dollars"); await idle();
-    await has("#walletTxt", "$10,000.00");
+    await has("#walletTxt", "$10.0K");
     step("test dollars: 10,000 arrive in the wallet");
 
     // 3. launch a coin with a description and links
