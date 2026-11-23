@@ -1,0 +1,4 @@
+Changing this file starts a deployment of the Solana program to devnet (test network).
+See .github/workflows/solana-devnet.yml. Each deployment gets a new address.
+
+deployment 1: 2026-11-23
