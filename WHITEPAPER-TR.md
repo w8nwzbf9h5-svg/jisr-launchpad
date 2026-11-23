@@ -129,12 +129,13 @@ Platformu değeri olan herhangi bir şeyle kullanmadan önce bu bölümü okuyun
 | Test kurulumu | Sepolia test ağında yayında, değeri olmayan test parasıyla |
 | Bağımsız güvenlik denetimi | Yapılmadı |
 | Gerçek ağlarda kurulum | Yapılmadı. Denetimden sonra gelir |
-| Solana | Program ve sayfa yazıldı ve yerel bir Solana düğümünde birlikte test edildi. Henüz herkese açık bir ağa kurulmadı |
+| Solana | Program ve sayfa yazıldı ve birlikte test edildi. Test parasıyla çalışan bir test ağı olan Solana devnet üzerinde yayında ve bir daha değiştirilemeyecek şekilde kuruldu. Gerçek ağda değil |
 | Bir ağda satıp başka bir ağda almak (köprü) | Yazıldı ve Circle sözleşmelerinin yerine geçen test sözleşmeleriyle test edildi. Henüz Circle'ın canlı köprüsünde çalıştırılmadı |
 
 Sepolia'daki test kurulumu:
 
 - Platform fabrikası: `0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647`
+- Solana devnet: `7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU`
 - Site: https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
 - Kod: https://github.com/w8nwzbf9h5-svg/jisr-launchpad
 

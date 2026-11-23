@@ -129,12 +129,13 @@ Leia esta seção antes de usar a plataforma com qualquer coisa de valor.
 | Implantação de teste | No ar na rede de testes Sepolia, com dinheiro de teste sem valor |
 | Auditoria de segurança independente | Não realizada |
 | Implantação em redes reais | Não realizada. Vem depois da auditoria |
-| Solana | Programa e página construídos e testados juntos em um nó local da Solana. Ainda não implantado em uma rede pública |
+| Solana | Programa e página construídos e testados juntos. No ar na Solana devnet, uma rede de testes com dinheiro de teste, e implantado de forma que nunca pode ser alterado. Não está na rede real |
 | Vender em uma rede e receber em outra (ponte) | Construído e testado com substitutos dos contratos da Circle. Ainda não executado na ponte real da Circle |
 
 Implantação de teste na Sepolia:
 
 - Fábrica da plataforma: `0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647`
+- Solana devnet: `7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU`
 - Site: https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
 - Código: https://github.com/w8nwzbf9h5-svg/jisr-launchpad
 

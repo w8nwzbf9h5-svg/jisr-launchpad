@@ -129,12 +129,13 @@ Jisr 取消了早期的低价代币，并在每个代币下面放入真实资金
 | 测试部署 | 已在 Sepolia 测试网上线，使用没有价值的测试资金 |
 | 独立安全审计 | 尚未进行 |
 | 在正式网络上部署 | 尚未进行。将在审计之后 |
-| Solana | 程序和页面已建成，并在本地 Solana 节点上一起通过测试。尚未部署到公共网络 |
+| Solana | 程序和页面已建成并一起通过测试。已在 Solana devnet（使用测试资金的测试网络）上线，并以永久不可更改的方式部署。尚未部署到正式网络 |
 | 在一个网络卖出、在另一个网络收款（跨链桥） | 已建成，并用 Circle 合约的替身完成测试。尚未在 Circle 的正式跨链桥上运行 |
 
 Sepolia 上的测试部署：
 
 - 平台工厂合约：`0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647`
+- Solana devnet: `7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU`
 - 网站：https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
 - 代码：https://github.com/w8nwzbf9h5-svg/jisr-launchpad
 

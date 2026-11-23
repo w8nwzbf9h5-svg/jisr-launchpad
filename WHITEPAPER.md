@@ -129,12 +129,13 @@ Read this section before using the launchpad with anything of value.
 | Test deployment | Live on the Sepolia test network, with test money that has no value |
 | Independent security audit | Not done |
 | Deployment on real networks | Not done. It follows the audit |
-| Solana | Program and page built, and tested together against a local Solana node. Not deployed on a public network yet |
+| Solana | Program and page built and tested together. Live on Solana devnet, a test network, with test money, and deployed so that it can never be changed. Not on the real network |
 | Selling on one network and receiving on another (bridge) | Built and tested against stand-ins for Circle's contracts. Not yet run through Circle's live bridge |
 
 Test deployment on Sepolia:
 
 - Launchpad factory: `0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647`
+- Solana devnet: `7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU`
 - Site: https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
 - Code: https://github.com/w8nwzbf9h5-svg/jisr-launchpad
 

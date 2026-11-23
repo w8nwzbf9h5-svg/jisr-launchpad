@@ -129,12 +129,13 @@ Baca bagian ini sebelum menggunakan platform dengan apa pun yang bernilai.
 | Pemasangan uji | Daring di jaringan uji Sepolia, dengan uang uji yang tidak bernilai |
 | Audit keamanan independen | Belum dilakukan |
 | Pemasangan di jaringan sungguhan | Belum dilakukan. Menyusul setelah audit |
-| Solana | Program dan halamannya sudah dibangun dan diuji bersama pada node Solana lokal. Belum dipasang di jaringan publik |
+| Solana | Program dan halamannya sudah dibangun dan diuji bersama. Daring di Solana devnet, jaringan uji dengan uang uji, dan dipasang sedemikian rupa sehingga tidak bisa diubah lagi. Belum ada di jaringan sungguhan |
 | Menjual di satu jaringan dan menerima di jaringan lain (jembatan) | Sudah dibangun dan diuji dengan pengganti kontrak Circle. Belum dijalankan di jembatan Circle yang sesungguhnya |
 
 Pemasangan uji di Sepolia:
 
 - Pabrik platform: `0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647`
+- Solana devnet: `7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU`
 - Situs: https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
 - Kode: https://github.com/w8nwzbf9h5-svg/jisr-launchpad
 

@@ -129,12 +129,13 @@ Lisez cette section avant d'utiliser la plateforme avec quoi que ce soit de vale
 | Déploiement de test | En ligne sur le réseau de test Sepolia, avec de l'argent de test sans valeur |
 | Audit de sécurité indépendant | Non réalisé |
 | Déploiement sur des réseaux réels | Non réalisé. Il vient après l'audit |
-| Solana | Programme et page construits, et testés ensemble sur un nœud Solana local. Pas encore déployé sur un réseau public |
+| Solana | Programme et page construits et testés ensemble. En ligne sur Solana devnet, un réseau de test avec de l'argent de test, et déployé de façon à ne jamais pouvoir être modifié. Pas sur le réseau réel |
 | Vendre sur un réseau et recevoir sur un autre (pont) | Construit et testé avec des substituts des contrats de Circle. Pas encore exécuté sur le pont réel de Circle |
 
 Déploiement de test sur Sepolia :
 
 - Fabrique de la plateforme : `0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647`
+- Solana devnet: `7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU`
 - Site : https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
 - Code : https://github.com/w8nwzbf9h5-svg/jisr-launchpad
 
