@@ -103,6 +103,7 @@ Bu tasarımın bedeli: çıkıştan sonra bir hata bulunursa, kimse çalışan b
 - **Ağlar.** Sözleşmeler herhangi bir EVM ağında çalışır: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain ve diğerleri. Bir coin, çıkarıldığı ağda yaşar.
 - **Rezerv para birimi.** Platformun her kurulumu, coinlerini tek bir token ile fiyatlar ve karşılar: dolar bazlı bir stablecoin (USDT veya USDC) ya da tokenleştirilmiş hisse gibi başka bir standart token. Tokenleştirilmiş hissede taban bir hisse adedidir; bu yüzden dolar değeri hisseyle birlikte hareket eder.
 - **Ağın kendi para birimiyle ödeme.** Bir takas yönlendiricisinin bağlı olduğu yerlerde alıcılar ETH veya BNB ile ödeyebilir ve ödeme alabilir. Ödeme girişte ve çıkışta dönüştürülür; rezervde yalnızca rezerv tokeni tutulur.
+- **Başka bir ağda alma.** USDC ile karşılanan bir platformda satıcı, coini kendi ağında satıp dolarları başka bir ağda alabilir. Transfer Circle'ın kendi USDC köprüsünden (CCTP) geçer ve platform arada hiçbir şey tutmaz. Circle kendi ücretini tutardan alır. Bu özellik USDT veya tokenleştirilmiş hisseyle karşılanan platformlarda, ayrıca Circle köprüsünün hizmet vermediği BNB Chain ve Robinhood Chain üzerinde kullanılamaz.
 
 ## 6. Riskler
 
@@ -114,6 +115,7 @@ Platformu değeri olan herhangi bir şeyle kullanmadan önce bu bölümü okuyun
 - **Prim riski.** Taban, taban fiyatı korur. Tabanın üstünde ödenen para korunmaz.
 - **Rezerv tokeni riski.** Bir stablecoin sabitini kaybedebilir ve onu çıkaran kurum bir adresi dondurabilir. Tokenleştirilmiş bir hisse kendi hissesini izler ve kimin tutabileceğini kısıtlayabilir. Sözleşmeler bunların hiçbirine karşı savunma yapamaz.
 - **Takas riski.** Ağın kendi para birimiyle ödeme, yönlendiriciye ve onun likiditesine bağlıdır ve rezerv tokeniyle ödemekten pahalı olabilir.
+- **Köprü riski.** Başka bir ağda ödenen bir satış, dolarların oraya ulaşması için Circle'ın köprüsüne bağlıdır. Circle yavaşlarsa veya durursa teslimat bekler. Sözleşmeler bunu hızlandıramaz ve satışı geri alamaz.
 - **Bağlantılı cüzdanlar.** %2.5 sınırı adres başınadır.
 - **Satış yerine düz transferle piyasaya gönderilen coinler** gönderen için kaybolur.
 - **Taban bir mekanizmadır.** Sözleşmenin bir coin için rezerv tokeniyle ödeyeceği tutardır. Kâr vaadi değildir ve sigorta değildir.
@@ -122,13 +124,13 @@ Platformu değeri olan herhangi bir şeyle kullanmadan önce bu bölümü okuyun
 
 | Bölüm | Durum |
 |---|---|
-| EVM sözleşmeleri | Yazıldı ve test edildi (35 sözleşme testi) |
-| Web uygulaması ve kurulum sayfası | Yazıldı ve test edildi (22 tarayıcı testi), yayında |
+| EVM sözleşmeleri | Yazıldı ve test edildi (44 sözleşme testi) |
+| Web uygulaması ve kurulum sayfası | Yazıldı ve test edildi (24 tarayıcı testi), yayında |
 | Test kurulumu | Sepolia test ağında yayında, değeri olmayan test parasıyla |
 | Bağımsız güvenlik denetimi | Yapılmadı |
 | Gerçek ağlarda kurulum | Yapılmadı. Denetimden sonra gelir |
 | Solana | Program yazıldı ve yerelde test edildi. Kurulmadı, henüz web uygulamasında yok |
-| Bir coini başka bir ağda satmak (köprü) | Planlandı. Yazılmadı |
+| Bir ağda satıp başka bir ağda almak (köprü) | Yazıldı ve Circle sözleşmelerinin yerine geçen test sözleşmeleriyle test edildi. Henüz Circle'ın canlı köprüsünde çalıştırılmadı |
 
 Sepolia'daki test kurulumu:
 

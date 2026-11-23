@@ -103,6 +103,7 @@ Harga dari rancangan ini: jika ditemukan bug setelah peluncuran, tidak ada yang 
 - **Jaringan.** Kontrak berjalan di jaringan EVM mana pun: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain, dan lainnya. Sebuah koin berada di jaringan tempat koin itu diluncurkan.
 - **Mata uang cadangan.** Setiap pemasangan platform menghargai dan menjamin koin-koinnya dengan satu token: stablecoin dolar (USDT atau USDC), atau token standar lain seperti saham yang ditokenisasi. Dengan saham yang ditokenisasi, harga dasar berupa sejumlah saham, sehingga nilai dolarnya bergerak mengikuti saham itu.
 - **Membayar dengan mata uang asli jaringan.** Jika router pertukaran terhubung, pembeli dapat membayar dan dibayar dalam ETH atau BNB. Pembayaran dikonversi saat masuk dan keluar; cadangan hanya memegang token cadangan.
+- **Menerima di jaringan lain.** Pada platform yang dijamin dengan USDC, penjual dapat menjual di jaringan koin dan menerima dolarnya di jaringan lain. Transfer berjalan melalui jembatan USDC milik Circle sendiri (CCTP), dan platform tidak menahan apa pun di tengah jalan. Circle mengambil biayanya sendiri dari jumlah tersebut. Fitur ini tidak tersedia pada platform yang dijamin dengan USDT atau saham yang ditokenisasi, juga tidak di BNB Chain dan Robinhood Chain, yang tidak dilayani jembatan Circle.
 
 ## 6. Risiko
 
@@ -114,6 +115,7 @@ Baca bagian ini sebelum menggunakan platform dengan apa pun yang bernilai.
 - **Risiko premi.** Harga dasar melindungi harga dasar. Uang yang dibayarkan di atas harga dasar tidak dilindungi.
 - **Risiko token cadangan.** Stablecoin bisa kehilangan patokannya, dan penerbitnya bisa membekukan alamat. Saham yang ditokenisasi mengikuti sahamnya dan bisa membatasi siapa yang boleh memegangnya. Kontrak tidak bisa melindungi dari hal-hal ini.
 - **Risiko pertukaran.** Membayar dengan mata uang asli jaringan bergantung pada router dan likuiditasnya, dan bisa lebih mahal daripada membayar dengan token cadangan.
+- **Risiko jembatan.** Penjualan yang dibayarkan di jaringan lain bergantung pada jembatan Circle untuk mengirimkan dolarnya ke sana. Jika Circle lambat atau berhenti, pengiriman menunggu. Kontrak tidak bisa mempercepatnya atau membatalkan penjualan.
 - **Dompet yang saling terkait.** Batas 2.5% berlaku per alamat.
 - **Koin yang dikirim ke pasar dengan transfer biasa**, bukan melalui penjualan, hilang bagi pengirimnya.
 - **Harga dasar adalah sebuah mekanisme.** Itu adalah jumlah yang akan dibayar kontrak, dalam token cadangan, untuk satu koin. Itu bukan janji keuntungan dan bukan asuransi.
@@ -122,13 +124,13 @@ Baca bagian ini sebelum menggunakan platform dengan apa pun yang bernilai.
 
 | Bagian | Keadaan |
 |---|---|
-| Kontrak EVM | Sudah dibangun dan diuji (35 pengujian kontrak) |
-| Aplikasi web dan halaman pemasangan | Sudah dibangun dan diuji (22 pengujian di peramban), sudah daring |
+| Kontrak EVM | Sudah dibangun dan diuji (44 pengujian kontrak) |
+| Aplikasi web dan halaman pemasangan | Sudah dibangun dan diuji (24 pengujian di peramban), sudah daring |
 | Pemasangan uji | Daring di jaringan uji Sepolia, dengan uang uji yang tidak bernilai |
 | Audit keamanan independen | Belum dilakukan |
 | Pemasangan di jaringan sungguhan | Belum dilakukan. Menyusul setelah audit |
 | Solana | Program sudah ditulis dan diuji secara lokal. Belum dipasang, belum ada di aplikasi web |
-| Menjual koin di jaringan lain (jembatan) | Direncanakan. Belum dibangun |
+| Menjual di satu jaringan dan menerima di jaringan lain (jembatan) | Sudah dibangun dan diuji dengan pengganti kontrak Circle. Belum dijalankan di jembatan Circle yang sesungguhnya |
 
 Pemasangan uji di Sepolia:
 

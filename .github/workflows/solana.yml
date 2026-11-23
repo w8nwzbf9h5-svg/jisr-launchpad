@@ -20,6 +20,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: |
+            ~/.cargo/bin/anchor
             ~/.cargo/registry
             ~/.cargo/git
             solana/target
@@ -28,14 +29,10 @@ jobs:
         run: |
           sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
           echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
       - name: Install Anchor
         run: |
-          npm install -g @coral-xyz/anchor-cli@0.31.1
-          # the package ships its program without permission to run
-          chmod +x "$(npm root -g)/@coral-xyz/anchor-cli/anchor"
+          # built from the published source on crates.io; kept by the cache step above for later runs
+          if [ "$(anchor --version 2>/dev/null)" != "anchor-cli 0.31.1" ]; then cargo install anchor-cli --version 0.31.1 --locked; fi
       - name: Versions
         run: solana --version && anchor --version && cargo --version
       - name: Build the program

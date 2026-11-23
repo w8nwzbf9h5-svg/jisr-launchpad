@@ -103,6 +103,7 @@ O custo desse desenho: se um erro for encontrado depois do lançamento, ninguém
 - **Redes.** Os contratos funcionam em qualquer rede EVM: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain e outras. Uma moeda vive na rede em que foi lançada.
 - **Moeda de reserva.** Cada implantação da plataforma precifica e cobre suas moedas em um único token: uma stablecoin em dólar (USDT ou USDC) ou outro token padrão, como uma ação tokenizada. Com uma ação tokenizada, o piso é um número de ações, então seu valor em dólares acompanha a ação.
 - **Pagar com a moeda própria da rede.** Onde houver um roteador de troca conectado, os compradores podem pagar e receber em ETH ou BNB. O pagamento é convertido na entrada e na saída; a reserva guarda apenas o token de reserva.
+- **Receber em outra rede.** Numa plataforma lastreada em USDC, quem vende pode vender na rede da moeda e receber os dólares em outra rede. A transferência passa pela ponte de USDC da própria Circle (CCTP), e a plataforma não guarda nada no caminho. A Circle cobra a própria taxa sobre o valor. Não está disponível numa plataforma lastreada em USDT ou em ação tokenizada, nem na BNB Chain e na Robinhood Chain, que a ponte da Circle não atende.
 
 ## 6. Riscos
 
@@ -114,6 +115,7 @@ Leia esta seção antes de usar a plataforma com qualquer coisa de valor.
 - **Risco do prêmio.** O piso protege o preço de piso. O dinheiro pago acima do piso não está protegido.
 - **Risco do token de reserva.** Uma stablecoin pode perder a paridade e seu emissor pode congelar um endereço. Uma ação tokenizada acompanha sua ação e pode restringir quem pode tê-la. Os contratos não conseguem defender contra nada disso.
 - **Risco de troca.** Pagar com a moeda própria da rede depende do roteador e da sua liquidez, e pode custar mais do que pagar com o token de reserva.
+- **Risco da ponte.** Uma venda paga em outra rede depende de a ponte da Circle entregar os dólares lá. Se a Circle atrasar ou parar, a entrega espera. Os contratos não conseguem acelerá-la nem desfazer a venda.
 - **Carteiras vinculadas.** O limite de 2.5% é por endereço.
 - **Moedas enviadas ao mercado por transferência simples**, em vez de uma venda, são perdidas por quem enviou.
 - **O piso é um mecanismo.** É o valor que o contrato pagará, no token de reserva, por uma moeda. Não é promessa de lucro e não é seguro.
@@ -122,13 +124,13 @@ Leia esta seção antes de usar a plataforma com qualquer coisa de valor.
 
 | Parte | Situação |
 |---|---|
-| Contratos EVM | Construídos e testados (35 testes de contratos) |
-| Aplicação web e página de implantação | Construídas e testadas (22 testes no navegador), no ar |
+| Contratos EVM | Construídos e testados (44 testes de contratos) |
+| Aplicação web e página de implantação | Construídas e testadas (24 testes no navegador), no ar |
 | Implantação de teste | No ar na rede de testes Sepolia, com dinheiro de teste sem valor |
 | Auditoria de segurança independente | Não realizada |
 | Implantação em redes reais | Não realizada. Vem depois da auditoria |
 | Solana | Programa escrito e testado localmente. Não implantado, ainda não está na aplicação web |
-| Vender uma moeda em outra rede (ponte) | Planejado. Não construído |
+| Vender em uma rede e receber em outra (ponte) | Construído e testado com substitutos dos contratos da Circle. Ainda não executado na ponte real da Circle |
 
 Implantação de teste na Sepolia:
 

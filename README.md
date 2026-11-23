@@ -11,9 +11,10 @@ Status: tested locally end to end and deployed on a test network. **Not audited 
 | Folder | What it is |
 |---|---|
 | `contracts/` | The three contracts, plus test-only mocks |
-| `test/` | 35 contract tests |
+| `contracts/periphery/BridgeSeller.sol` | Optional helper beside a factory: sell a coin here and receive the USDC on another network through Circle's CCTP. No owner, holds nothing between transactions |
+| `test/` | 44 contract tests |
 | `web/` | The web app. Static files, no build step, no server |
-| `e2e/` | A browser test (22 steps) that drives the web app against a local chain |
+| `e2e/` | A browser test (24 steps) that drives the web app against a local chain |
 | `scripts/` | Deploy, local demo, local web server |
 | `solana/` | The Solana program and its pricing library, with tests. Not yet built to on-chain bytecode, and not yet in the web app. See `solana/README.md` |
 | `DEPLOY-AR.md` | Arabic guide: deploy from a wallet and link the site |

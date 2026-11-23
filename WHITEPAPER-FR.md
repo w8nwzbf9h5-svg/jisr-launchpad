@@ -103,6 +103,7 @@ Le coût de cette conception : si un bug est découvert après le lancement, per
 - **Réseaux.** Les contrats fonctionnent sur tout réseau EVM : Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain et d'autres. Un jeton vit sur le réseau où il a été lancé.
 - **Monnaie de réserve.** Chaque déploiement de la plateforme fixe le prix de ses jetons et les couvre dans un seul token : un stablecoin en dollars (USDT ou USDC) ou un autre token standard, comme une action tokenisée. Avec une action tokenisée, le plancher est un nombre d'actions : sa valeur en dollars suit donc l'action.
 - **Payer avec la monnaie du réseau.** Là où un routeur d'échange est connecté, les acheteurs peuvent payer et être payés en ETH ou en BNB. Le paiement est converti à l'entrée et à la sortie ; la réserve ne contient que le token de réserve.
+- **Recevoir sur un autre réseau.** Sur une plateforme adossée à l'USDC, un vendeur peut vendre sur le réseau du jeton et recevoir les dollars sur un autre réseau. Le transfert passe par le pont USDC de Circle (CCTP), et la plateforme ne détient rien entre-temps. Circle prélève ses propres frais sur le montant. Ce n'est pas disponible sur une plateforme adossée à l'USDT ou à une action tokenisée, ni sur BNB Chain et Robinhood Chain, que le pont de Circle ne dessert pas.
 
 ## 6. Risques
 
@@ -114,6 +115,7 @@ Lisez cette section avant d'utiliser la plateforme avec quoi que ce soit de vale
 - **Risque de prime.** Le plancher protège le prix plancher. L'argent payé au-dessus du plancher n'est pas protégé.
 - **Risque du token de réserve.** Un stablecoin peut perdre sa parité et son émetteur peut geler une adresse. Une action tokenisée suit son action et peut restreindre qui a le droit de la détenir. Les contrats ne peuvent se défendre contre rien de cela.
 - **Risque d'échange.** Payer avec la monnaie du réseau dépend du routeur et de sa liquidité, et peut coûter plus cher que payer avec le token de réserve.
+- **Risque de pont.** Une vente payée sur un autre réseau dépend du pont de Circle pour y livrer les dollars. Si Circle est lent ou s'arrête, la livraison attend. Les contrats ne peuvent ni l'accélérer ni annuler la vente.
 - **Portefeuilles liés.** La limite de 2.5 % s'applique par adresse.
 - **Les jetons envoyés au marché par simple transfert**, au lieu d'une vente, sont perdus pour l'expéditeur.
 - **Le plancher est un mécanisme.** C'est le montant que le contrat paiera, en token de réserve, pour un jeton. Ce n'est pas une promesse de gain ni une assurance.
@@ -122,13 +124,13 @@ Lisez cette section avant d'utiliser la plateforme avec quoi que ce soit de vale
 
 | Partie | État |
 |---|---|
-| Contrats EVM | Construits et testés (35 tests de contrats) |
-| Application web et page de déploiement | Construites et testées (22 tests dans le navigateur), en ligne |
+| Contrats EVM | Construits et testés (44 tests de contrats) |
+| Application web et page de déploiement | Construites et testées (24 tests dans le navigateur), en ligne |
 | Déploiement de test | En ligne sur le réseau de test Sepolia, avec de l'argent de test sans valeur |
 | Audit de sécurité indépendant | Non réalisé |
 | Déploiement sur des réseaux réels | Non réalisé. Il vient après l'audit |
 | Solana | Programme écrit et testé en local. Non déployé, pas encore dans l'application web |
-| Vendre un jeton sur un autre réseau (pont) | Prévu. Non construit |
+| Vendre sur un réseau et recevoir sur un autre (pont) | Construit et testé avec des substituts des contrats de Circle. Pas encore exécuté sur le pont réel de Circle |
 
 Déploiement de test sur Sepolia :
 

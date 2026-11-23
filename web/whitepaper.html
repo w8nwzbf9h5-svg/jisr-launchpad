@@ -237,6 +237,7 @@
 <li><strong>Networks.</strong> The contracts work on any EVM network: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain and others. A coin lives on the network it was launched on.</li>
 <li><strong>Reserve currency.</strong> Each launchpad deployment prices and backs its coins in one token: a dollar stablecoin (USDT or USDC), or another standard token such as a tokenized stock. With a stock token the floor is a number of shares, so its dollar value moves with the stock.</li>
 <li><strong>Paying with the network&#39;s own currency.</strong> Where a swap router is connected, buyers can pay and be paid in ETH or BNB. The payment is converted on the way in and out; the reserve holds only the reserve token.</li>
+<li><strong>Receiving on another network.</strong> On a launchpad backed by USDC, a seller can sell on the coin&#39;s network and receive the dollars on another network. The transfer goes through Circle&#39;s own USDC bridge (CCTP), and the launchpad holds nothing in between. Circle takes its own fee from the amount. This is not available on a launchpad backed by USDT or a stock token, or on BNB Chain and Robinhood Chain, which Circle&#39;s bridge does not serve.</li>
 </ul>
 <h2>6. Risks</h2>
 <p>Read this section before using the launchpad with anything of value.</p>
@@ -247,6 +248,7 @@
 <li><strong>Premium risk.</strong> The floor protects the floor price. Money paid above the floor is not protected.</li>
 <li><strong>Reserve token risk.</strong> A stablecoin can lose its peg, and its issuer can freeze an address. A stock token follows its stock and may restrict who can hold it. The contracts cannot defend against any of these.</li>
 <li><strong>Swap risk.</strong> Paying in the network&#39;s own currency depends on the router and its liquidity, and can cost more than paying in the reserve token.</li>
+<li><strong>Bridge risk.</strong> A sale paid out on another network depends on Circle&#39;s bridge to deliver the dollars there. If Circle is slow or stops, the delivery waits. The contracts cannot speed it up or reverse the sale.</li>
 <li><strong>Linked wallets.</strong> The 2.5% limit is per address.</li>
 <li><strong>Coins sent to the market by plain transfer</strong> instead of through a sale are lost to the sender.</li>
 <li><strong>The floor is a mechanism.</strong> It is the amount the contract will pay, in the reserve token, for a coin. It is not a promise of profit and it is not insurance.</li>
@@ -261,11 +263,11 @@
 </thead>
 <tbody><tr>
 <td>EVM contracts</td>
-<td>Built and tested (35 contract tests)</td>
+<td>Built and tested (44 contract tests)</td>
 </tr>
 <tr>
 <td>Web app and deploy page</td>
-<td>Built and tested (22 browser tests), live</td>
+<td>Built and tested (24 browser tests), live</td>
 </tr>
 <tr>
 <td>Test deployment</td>
@@ -284,8 +286,8 @@
 <td>Program written and tested locally. Not deployed, not yet in the web app</td>
 </tr>
 <tr>
-<td>Selling a coin on a different network (bridge)</td>
-<td>Planned. Not built</td>
+<td>Selling on one network and receiving on another (bridge)</td>
+<td>Built and tested against stand-ins for Circle&#39;s contracts. Not yet run through Circle&#39;s live bridge</td>
 </tr>
 </tbody></table></div>
 <p>Test deployment on Sepolia:</p>
@@ -485,6 +487,7 @@
 <li><strong>الشبكات.</strong> العقود تعمل على أي شبكة EVM: إيثيريوم، BNB Chain، Base، Arbitrum، Optimism، Polygon، Avalanche، Robinhood Chain وغيرها. العملة تعيش على الشبكة التي أُطلقت عليها.</li>
 <li><strong>عملة الاحتياط.</strong> كل نشر للمنصة يسعّر عملاته ويغطيها بعملة واحدة: عملة مستقرة بالدولار (USDT أو USDC)، أو عملة قياسية أخرى مثل سهم مرمَّز. مع السهم المرمَّز تكون الأرضية عدداً من الأسهم، فقيمتها بالدولار تتحرك مع السهم.</li>
 <li><strong>الدفع بعملة الشبكة.</strong> حيث يوجد محوّل عملات موصول، يستطيع المشتري الدفع والاستلام بـ ETH أو BNB. المبلغ يُحوَّل عند الدخول والخروج، والاحتياطي يحمل عملة الاحتياط فقط.</li>
+<li><strong>الاستلام على شبكة أخرى.</strong> في منصة احتياطها USDC، يستطيع البائع أن يبيع على شبكة العملة ويستلم الدولار على شبكة أخرى. التحويل يمر عبر جسر USDC الخاص بشركة Circle (CCTP)، والمنصة لا تحتفظ بأي شيء في الطريق. تأخذ Circle رسومها من المبلغ. هذا غير متاح في منصة احتياطها USDT أو سهم مرمَّز، ولا على BNB Chain وRobinhood Chain، لأن جسر Circle لا يخدمهما.</li>
 </ul>
 <h2>6. المخاطر</h2>
 <p>اقرأ هذا القسم قبل استخدام المنصة بأي شيء له قيمة.</p>
@@ -495,6 +498,7 @@
 <li><strong>مخاطرة العلاوة.</strong> الأرضية تحمي سعر الأرضية. المال المدفوع فوق الأرضية غير محمي.</li>
 <li><strong>مخاطرة عملة الاحتياط.</strong> العملة المستقرة قد تفقد ارتباطها بالدولار، ومُصدرها يستطيع تجميد عنوان. والسهم المرمَّز يتبع سهمه وقد يقيّد من يحق له حمله. العقود لا تستطيع الحماية من أي من ذلك.</li>
 <li><strong>مخاطرة التحويل.</strong> الدفع بعملة الشبكة يعتمد على المحوّل وسيولته، وقد يكلّف أكثر من الدفع بعملة الاحتياط.</li>
+<li><strong>مخاطرة الجسر.</strong> البيع الذي يُدفع على شبكة أخرى يعتمد على جسر Circle لإيصال الدولار هناك. إذا تأخرت Circle أو توقفت، ينتظر التسليم. العقود لا تستطيع تسريعه ولا التراجع عن البيع.</li>
 <li><strong>المحافظ المترابطة.</strong> حد 2.5% يُحسب لكل عنوان.</li>
 <li><strong>العملات المرسلة للسوق بتحويل عادي</strong> بدل البيع تضيع على مرسلها.</li>
 <li><strong>الأرضية آلية.</strong> هي المبلغ الذي يدفعه العقد، بعملة الاحتياط، مقابل العملة. ليست وعداً بربح وليست تأميناً.</li>
@@ -509,11 +513,11 @@
 </thead>
 <tbody><tr>
 <td>عقود EVM</td>
-<td>مبنية ومختبرة (35 اختباراً للعقود)</td>
+<td>مبنية ومختبرة (44 اختباراً للعقود)</td>
 </tr>
 <tr>
 <td>الموقع وصفحة النشر</td>
-<td>مبنيان ومختبران (22 اختباراً في المتصفح)، ويعملان</td>
+<td>مبنيان ومختبران (24 اختباراً في المتصفح)، ويعملان</td>
 </tr>
 <tr>
 <td>النشر التجريبي</td>
@@ -532,8 +536,8 @@
 <td>البرنامج مكتوب ومختبر محلياً. غير منشور، وغير موصول بالموقع بعد</td>
 </tr>
 <tr>
-<td>بيع العملة على شبكة أخرى (الجسر)</td>
-<td>مخطط له. غير مبني</td>
+<td>البيع على شبكة والاستلام على أخرى (الجسر)</td>
+<td>مبني ومختبر مع بدائل تجريبية لعقود Circle. لم يُجرَّب بعد على جسر Circle الحي</td>
 </tr>
 </tbody></table></div>
 <p>النشر التجريبي على Sepolia:</p>
@@ -734,6 +738,7 @@
 <li><strong>网络。</strong> 合约可在任何 EVM 网络上运行：Ethereum、BNB Chain、Base、Arbitrum、Optimism、Polygon、Avalanche、Robinhood Chain 等。代币存在于它被发行的那个网络上。</li>
 <li><strong>储备货币。</strong> 平台的每次部署都用同一种代币为其代币定价并提供储备：美元稳定币（USDT 或 USDC），或其他标准代币，例如代币化股票。使用代币化股票时，底价是一定数量的股份，因此其美元价值随股价变动。</li>
 <li><strong>用网络原生货币支付。</strong> 在接入了兑换路由的地方，买家可以用 ETH 或 BNB 支付和收款。款项在进出时自动兑换；储备中只持有储备代币。</li>
+<li><strong>在另一个网络收款。</strong> 在以 USDC 为储备的平台上，卖家可以在代币所在的网络卖出，并在另一个网络收到美元。转账通过 Circle 自己的 USDC 跨链桥（CCTP）完成，平台在中途不持有任何资金。Circle 会从金额中收取自己的费用。以 USDT 或代币化股票为储备的平台不支持此功能，BNB Chain 和 Robinhood Chain 也不支持，因为 Circle 的跨链桥不覆盖这两个网络。</li>
 </ul>
 <h2>6. 风险</h2>
 <p>在用任何有价值的资产使用本平台之前，请阅读本节。</p>
@@ -744,6 +749,7 @@
 <li><strong>溢价风险。</strong> 底价保护的是底价。在底价之上支付的资金不受保护。</li>
 <li><strong>储备代币风险。</strong> 稳定币可能脱锚，其发行方可以冻结地址。代币化股票跟随其股票价格，并且可能限制谁可以持有。合约无法防范这些情况。</li>
 <li><strong>兑换风险。</strong> 用网络原生货币支付取决于路由及其流动性，成本可能高于用储备代币支付。</li>
+<li><strong>跨链桥风险。</strong> 在另一个网络收款的卖出，依赖 Circle 的跨链桥把美元送达。如果 Circle 变慢或停止，到账就会等待。合约无法加快到账，也无法撤销卖出。</li>
 <li><strong>关联钱包。</strong> 2.5% 的上限按地址计算。</li>
 <li><strong>以普通转账方式（而不是通过卖出）发送到市场合约的代币</strong>，发送者将无法取回。</li>
 <li><strong>底价是一种机制。</strong> 它是合约愿意用储备代币为一枚代币支付的金额。它不是盈利承诺，也不是保险。</li>
@@ -758,11 +764,11 @@
 </thead>
 <tbody><tr>
 <td>EVM 合约</td>
-<td>已建成并通过测试（35 项合约测试）</td>
+<td>已建成并通过测试（44 项合约测试）</td>
 </tr>
 <tr>
 <td>网页应用和部署页面</td>
-<td>已建成并通过测试（22 项浏览器测试），已上线</td>
+<td>已建成并通过测试（24 项浏览器测试），已上线</td>
 </tr>
 <tr>
 <td>测试部署</td>
@@ -781,8 +787,8 @@
 <td>程序已编写并在本地测试。尚未部署，尚未接入网页应用</td>
 </tr>
 <tr>
-<td>在另一个网络上卖出代币（跨链桥）</td>
-<td>已规划，尚未建成</td>
+<td>在一个网络卖出、在另一个网络收款（跨链桥）</td>
+<td>已建成，并用 Circle 合约的替身完成测试。尚未在 Circle 的正式跨链桥上运行</td>
 </tr>
 </tbody></table></div>
 <p>Sepolia 上的测试部署：</p>
@@ -983,6 +989,7 @@
 <li><strong>Redes.</strong> Los contratos funcionan en cualquier red EVM: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain y otras. Una moneda vive en la red en la que se lanzó.</li>
 <li><strong>Moneda de reserva.</strong> Cada despliegue de la plataforma valora y respalda sus monedas en un solo token: una stablecoin en dólares (USDT o USDC) u otro token estándar, como una acción tokenizada. Con una acción tokenizada, el mínimo es un número de acciones, así que su valor en dólares se mueve con la acción.</li>
 <li><strong>Pagar con la moneda propia de la red.</strong> Donde hay un enrutador de intercambio conectado, los compradores pueden pagar y cobrar en ETH o BNB. El pago se convierte al entrar y al salir; la reserva solo contiene el token de reserva.</li>
+<li><strong>Recibir en otra red.</strong> En una plataforma respaldada por USDC, quien vende puede vender en la red de la moneda y recibir los dólares en otra red. La transferencia pasa por el puente de USDC de la propia Circle (CCTP), y la plataforma no guarda nada por el camino. Circle cobra su propia comisión del importe. No está disponible en una plataforma respaldada por USDT o por una acción tokenizada, ni en BNB Chain y Robinhood Chain, a las que el puente de Circle no da servicio.</li>
 </ul>
 <h2>6. Riesgos</h2>
 <p>Lee esta sección antes de usar la plataforma con algo de valor.</p>
@@ -993,6 +1000,7 @@
 <li><strong>Riesgo de la prima.</strong> El mínimo protege el precio mínimo. El dinero pagado por encima del mínimo no está protegido.</li>
 <li><strong>Riesgo del token de reserva.</strong> Una stablecoin puede perder su paridad y su emisor puede congelar una dirección. Una acción tokenizada sigue a su acción y puede restringir quién puede tenerla. Los contratos no pueden defender contra nada de esto.</li>
 <li><strong>Riesgo de intercambio.</strong> Pagar con la moneda propia de la red depende del enrutador y de su liquidez, y puede costar más que pagar con el token de reserva.</li>
+<li><strong>Riesgo del puente.</strong> Una venta que se paga en otra red depende de que el puente de Circle entregue allí los dólares. Si Circle se retrasa o se detiene, la entrega espera. Los contratos no pueden acelerarla ni deshacer la venta.</li>
 <li><strong>Billeteras vinculadas.</strong> El límite del 2.5% es por dirección.</li>
 <li><strong>Las monedas enviadas al mercado por transferencia simple</strong>, en lugar de mediante una venta, se pierden para quien las envía.</li>
 <li><strong>El mínimo es un mecanismo.</strong> Es el importe que el contrato pagará, en el token de reserva, por una moneda. No es una promesa de ganancia y no es un seguro.</li>
@@ -1007,11 +1015,11 @@
 </thead>
 <tbody><tr>
 <td>Contratos EVM</td>
-<td>Construidos y probados (35 pruebas de contratos)</td>
+<td>Construidos y probados (44 pruebas de contratos)</td>
 </tr>
 <tr>
 <td>Aplicación web y página de despliegue</td>
-<td>Construidas y probadas (22 pruebas en navegador), en línea</td>
+<td>Construidas y probadas (24 pruebas en navegador), en línea</td>
 </tr>
 <tr>
 <td>Despliegue de prueba</td>
@@ -1030,8 +1038,8 @@
 <td>Programa escrito y probado localmente. No desplegado, aún no está en la aplicación web</td>
 </tr>
 <tr>
-<td>Vender una moneda en otra red (puente)</td>
-<td>Planificado. No construido</td>
+<td>Vender en una red y recibir en otra (puente)</td>
+<td>Construido y probado con sustitutos de los contratos de Circle. Aún no se ha ejecutado en el puente real de Circle</td>
 </tr>
 </tbody></table></div>
 <p>Despliegue de prueba en Sepolia:</p>
@@ -1232,6 +1240,7 @@
 <li><strong>नेटवर्क।</strong> कॉन्ट्रैक्ट किसी भी EVM नेटवर्क पर चलते हैं: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain और अन्य। कॉइन उसी नेटवर्क पर रहता है जिस पर वह लॉन्च हुआ।</li>
 <li><strong>रिज़र्व मुद्रा।</strong> प्लेटफ़ॉर्म का हर डिप्लॉयमेंट अपने कॉइन की कीमत और रिज़र्व एक ही टोकन में रखता है: डॉलर स्टेबलकॉइन (USDT या USDC), या कोई दूसरा मानक टोकन जैसे टोकनाइज़्ड शेयर। टोकनाइज़्ड शेयर के साथ फ़्लोर शेयरों की एक संख्या होता है, इसलिए उसका डॉलर मूल्य शेयर के साथ बदलता है।</li>
 <li><strong>नेटवर्क की अपनी मुद्रा से भुगतान।</strong> जहाँ स्वैप राउटर जुड़ा है, वहाँ ख़रीदार ETH या BNB में भुगतान कर सकते हैं और पा सकते हैं। भुगतान आते और जाते समय बदला जाता है; रिज़र्व में सिर्फ़ रिज़र्व टोकन रहता है।</li>
+<li><strong>दूसरे नेटवर्क पर पैसा पाना।</strong> USDC रिज़र्व वाले प्लेटफ़ॉर्म पर बेचने वाला कॉइन के नेटवर्क पर बेचकर डॉलर किसी दूसरे नेटवर्क पर पा सकता है। ट्रांसफ़र Circle के अपने USDC ब्रिज (CCTP) से होता है, और प्लेटफ़ॉर्म बीच में कुछ नहीं रखता। Circle अपना शुल्क राशि में से लेता है। यह सुविधा USDT या टोकनाइज़्ड शेयर रिज़र्व वाले प्लेटफ़ॉर्म पर उपलब्ध नहीं है, और BNB Chain तथा Robinhood Chain पर भी नहीं, क्योंकि Circle का ब्रिज इन पर काम नहीं करता।</li>
 </ul>
 <h2>6. जोखिम</h2>
 <p>किसी भी मूल्यवान चीज़ के साथ प्लेटफ़ॉर्म इस्तेमाल करने से पहले यह खंड पढ़ें।</p>
@@ -1242,6 +1251,7 @@
 <li><strong>प्रीमियम का जोखिम।</strong> फ़्लोर सिर्फ़ फ़्लोर कीमत की रक्षा करता है। फ़्लोर से ऊपर चुकाया गया पैसा सुरक्षित नहीं है।</li>
 <li><strong>रिज़र्व टोकन का जोखिम।</strong> स्टेबलकॉइन अपना पेग खो सकता है, और उसका जारीकर्ता किसी पते को फ़्रीज़ कर सकता है। टोकनाइज़्ड शेयर अपने शेयर के साथ चलता है और यह सीमित कर सकता है कि उसे कौन रख सकता है। कॉन्ट्रैक्ट इनमें से किसी से बचाव नहीं कर सकते।</li>
 <li><strong>स्वैप का जोखिम।</strong> नेटवर्क की अपनी मुद्रा से भुगतान राउटर और उसकी लिक्विडिटी पर निर्भर है, और रिज़र्व टोकन से भुगतान करने से महँगा पड़ सकता है।</li>
+<li><strong>ब्रिज का जोखिम।</strong> दूसरे नेटवर्क पर भुगतान वाली बिक्री इस पर निर्भर है कि Circle का ब्रिज डॉलर वहाँ पहुँचाए। अगर Circle धीमा पड़े या रुक जाए, तो डिलीवरी रुकी रहती है। कॉन्ट्रैक्ट इसे तेज़ नहीं कर सकते और बिक्री को वापस नहीं कर सकते।</li>
 <li><strong>जुड़े हुए वॉलेट।</strong> 2.5% की सीमा प्रति पता है।</li>
 <li><strong>बिक्री के बजाय सीधे ट्रांसफ़र से मार्केट को भेजे गए कॉइन</strong> भेजने वाले के लिए खो जाते हैं।</li>
 <li><strong>फ़्लोर एक व्यवस्था है।</strong> यह वह राशि है जो कॉन्ट्रैक्ट एक कॉइन के बदले रिज़र्व टोकन में चुकाएगा। यह मुनाफ़े का वादा नहीं है और बीमा नहीं है।</li>
@@ -1256,11 +1266,11 @@
 </thead>
 <tbody><tr>
 <td>EVM कॉन्ट्रैक्ट</td>
-<td>बन चुके हैं और टेस्ट हो चुके हैं (35 कॉन्ट्रैक्ट टेस्ट)</td>
+<td>बन चुके हैं और टेस्ट हो चुके हैं (44 कॉन्ट्रैक्ट टेस्ट)</td>
 </tr>
 <tr>
 <td>वेब ऐप और डिप्लॉय पेज</td>
-<td>बन चुके हैं और टेस्ट हो चुके हैं (22 ब्राउज़र टेस्ट), लाइव हैं</td>
+<td>बन चुके हैं और टेस्ट हो चुके हैं (24 ब्राउज़र टेस्ट), लाइव हैं</td>
 </tr>
 <tr>
 <td>टेस्ट डिप्लॉयमेंट</td>
@@ -1279,8 +1289,8 @@
 <td>प्रोग्राम लिखा जा चुका है और लोकल पर टेस्ट हो चुका है। डिप्लॉय नहीं हुआ, अभी वेब ऐप में नहीं है</td>
 </tr>
 <tr>
-<td>कॉइन को दूसरे नेटवर्क पर बेचना (ब्रिज)</td>
-<td>योजना में है। बना नहीं है</td>
+<td>एक नेटवर्क पर बेचना और दूसरे पर पैसा पाना (ब्रिज)</td>
+<td>बन चुका है और Circle के कॉन्ट्रैक्ट के टेस्ट विकल्पों के साथ टेस्ट हो चुका है। Circle के असली ब्रिज पर अभी चलाया नहीं गया</td>
 </tr>
 </tbody></table></div>
 <p>Sepolia पर टेस्ट डिप्लॉयमेंट:</p>
@@ -1481,6 +1491,7 @@
 <li><strong>Réseaux.</strong> Les contrats fonctionnent sur tout réseau EVM : Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain et d&#39;autres. Un jeton vit sur le réseau où il a été lancé.</li>
 <li><strong>Monnaie de réserve.</strong> Chaque déploiement de la plateforme fixe le prix de ses jetons et les couvre dans un seul token : un stablecoin en dollars (USDT ou USDC) ou un autre token standard, comme une action tokenisée. Avec une action tokenisée, le plancher est un nombre d&#39;actions : sa valeur en dollars suit donc l&#39;action.</li>
 <li><strong>Payer avec la monnaie du réseau.</strong> Là où un routeur d&#39;échange est connecté, les acheteurs peuvent payer et être payés en ETH ou en BNB. Le paiement est converti à l&#39;entrée et à la sortie ; la réserve ne contient que le token de réserve.</li>
+<li><strong>Recevoir sur un autre réseau.</strong> Sur une plateforme adossée à l&#39;USDC, un vendeur peut vendre sur le réseau du jeton et recevoir les dollars sur un autre réseau. Le transfert passe par le pont USDC de Circle (CCTP), et la plateforme ne détient rien entre-temps. Circle prélève ses propres frais sur le montant. Ce n&#39;est pas disponible sur une plateforme adossée à l&#39;USDT ou à une action tokenisée, ni sur BNB Chain et Robinhood Chain, que le pont de Circle ne dessert pas.</li>
 </ul>
 <h2>6. Risques</h2>
 <p>Lisez cette section avant d&#39;utiliser la plateforme avec quoi que ce soit de valeur.</p>
@@ -1491,6 +1502,7 @@
 <li><strong>Risque de prime.</strong> Le plancher protège le prix plancher. L&#39;argent payé au-dessus du plancher n&#39;est pas protégé.</li>
 <li><strong>Risque du token de réserve.</strong> Un stablecoin peut perdre sa parité et son émetteur peut geler une adresse. Une action tokenisée suit son action et peut restreindre qui a le droit de la détenir. Les contrats ne peuvent se défendre contre rien de cela.</li>
 <li><strong>Risque d&#39;échange.</strong> Payer avec la monnaie du réseau dépend du routeur et de sa liquidité, et peut coûter plus cher que payer avec le token de réserve.</li>
+<li><strong>Risque de pont.</strong> Une vente payée sur un autre réseau dépend du pont de Circle pour y livrer les dollars. Si Circle est lent ou s&#39;arrête, la livraison attend. Les contrats ne peuvent ni l&#39;accélérer ni annuler la vente.</li>
 <li><strong>Portefeuilles liés.</strong> La limite de 2.5 % s&#39;applique par adresse.</li>
 <li><strong>Les jetons envoyés au marché par simple transfert</strong>, au lieu d&#39;une vente, sont perdus pour l&#39;expéditeur.</li>
 <li><strong>Le plancher est un mécanisme.</strong> C&#39;est le montant que le contrat paiera, en token de réserve, pour un jeton. Ce n&#39;est pas une promesse de gain ni une assurance.</li>
@@ -1505,11 +1517,11 @@
 </thead>
 <tbody><tr>
 <td>Contrats EVM</td>
-<td>Construits et testés (35 tests de contrats)</td>
+<td>Construits et testés (44 tests de contrats)</td>
 </tr>
 <tr>
 <td>Application web et page de déploiement</td>
-<td>Construites et testées (22 tests dans le navigateur), en ligne</td>
+<td>Construites et testées (24 tests dans le navigateur), en ligne</td>
 </tr>
 <tr>
 <td>Déploiement de test</td>
@@ -1528,8 +1540,8 @@
 <td>Programme écrit et testé en local. Non déployé, pas encore dans l&#39;application web</td>
 </tr>
 <tr>
-<td>Vendre un jeton sur un autre réseau (pont)</td>
-<td>Prévu. Non construit</td>
+<td>Vendre sur un réseau et recevoir sur un autre (pont)</td>
+<td>Construit et testé avec des substituts des contrats de Circle. Pas encore exécuté sur le pont réel de Circle</td>
 </tr>
 </tbody></table></div>
 <p>Déploiement de test sur Sepolia :</p>
@@ -1730,6 +1742,7 @@
 <li><strong>Сети.</strong> Контракты работают в любой сети EVM: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain и других. Монета существует в той сети, где её запустили.</li>
 <li><strong>Резервная валюта.</strong> Каждое развёртывание площадки оценивает и обеспечивает свои монеты одним токеном: долларовым стейблкоином (USDT или USDC) или другим стандартным токеном, например токенизированной акцией. С токенизированной акцией нижняя граница — это количество акций, поэтому её стоимость в долларах меняется вместе с акцией.</li>
 <li><strong>Оплата собственной валютой сети.</strong> Там, где подключён маршрутизатор обмена, покупатели могут платить и получать выплаты в ETH или BNB. Платёж конвертируется на входе и на выходе; в резерве хранится только резервный токен.</li>
+<li><strong>Получение в другой сети.</strong> На площадке с резервом в USDC продавец может продать монету в её сети и получить доллары в другой сети. Перевод идёт через собственный мост USDC компании Circle (CCTP), и площадка ничего не удерживает по пути. Circle берёт свою комиссию из суммы. Это недоступно на площадке с резервом в USDT или в токенизированной акции, а также в BNB Chain и Robinhood Chain, которые мост Circle не обслуживает.</li>
 </ul>
 <h2>6. Риски</h2>
 <p>Прочитайте этот раздел, прежде чем использовать площадку с чем-либо ценным.</p>
@@ -1740,6 +1753,7 @@
 <li><strong>Риск премии.</strong> Нижняя граница защищает нижнюю цену. Деньги, уплаченные сверх неё, не защищены.</li>
 <li><strong>Риск резервного токена.</strong> Стейблкоин может потерять привязку, а его эмитент может заморозить адрес. Токенизированная акция следует за своей акцией и может ограничивать круг держателей. Контракты не могут защитить ни от чего из этого.</li>
 <li><strong>Риск обмена.</strong> Оплата собственной валютой сети зависит от маршрутизатора и его ликвидности и может стоить дороже, чем оплата резервным токеном.</li>
+<li><strong>Риск моста.</strong> Продажа с выплатой в другой сети зависит от того, доставит ли мост Circle доллары туда. Если Circle задерживается или останавливается, доставка ждёт. Контракты не могут ни ускорить её, ни отменить продажу.</li>
 <li><strong>Связанные кошельки.</strong> Лимит 2.5% считается по адресу.</li>
 <li><strong>Монеты, отправленные на рынок обычным переводом</strong>, а не через продажу, для отправителя потеряны.</li>
 <li><strong>Нижняя граница — это механизм.</strong> Это сумма, которую контракт заплатит за монету в резервном токене. Это не обещание прибыли и не страховка.</li>
@@ -1754,11 +1768,11 @@
 </thead>
 <tbody><tr>
 <td>Контракты EVM</td>
-<td>Построены и протестированы (35 тестов контрактов)</td>
+<td>Построены и протестированы (44 тестов контрактов)</td>
 </tr>
 <tr>
 <td>Веб-приложение и страница развёртывания</td>
-<td>Построены и протестированы (22 теста в браузере), работают</td>
+<td>Построены и протестированы (24 теста в браузере), работают</td>
 </tr>
 <tr>
 <td>Тестовое развёртывание</td>
@@ -1777,8 +1791,8 @@
 <td>Программа написана и протестирована локально. Не развёрнута, в веб-приложении её пока нет</td>
 </tr>
 <tr>
-<td>Продажа монеты в другой сети (мост)</td>
-<td>Запланировано. Не построено</td>
+<td>Продажа в одной сети с получением в другой (мост)</td>
+<td>Построено и протестировано с заменителями контрактов Circle. На действующем мосту Circle ещё не запускалось</td>
 </tr>
 </tbody></table></div>
 <p>Тестовое развёртывание в Sepolia:</p>
@@ -1979,6 +1993,7 @@
 <li><strong>Redes.</strong> Os contratos funcionam em qualquer rede EVM: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain e outras. Uma moeda vive na rede em que foi lançada.</li>
 <li><strong>Moeda de reserva.</strong> Cada implantação da plataforma precifica e cobre suas moedas em um único token: uma stablecoin em dólar (USDT ou USDC) ou outro token padrão, como uma ação tokenizada. Com uma ação tokenizada, o piso é um número de ações, então seu valor em dólares acompanha a ação.</li>
 <li><strong>Pagar com a moeda própria da rede.</strong> Onde houver um roteador de troca conectado, os compradores podem pagar e receber em ETH ou BNB. O pagamento é convertido na entrada e na saída; a reserva guarda apenas o token de reserva.</li>
+<li><strong>Receber em outra rede.</strong> Numa plataforma lastreada em USDC, quem vende pode vender na rede da moeda e receber os dólares em outra rede. A transferência passa pela ponte de USDC da própria Circle (CCTP), e a plataforma não guarda nada no caminho. A Circle cobra a própria taxa sobre o valor. Não está disponível numa plataforma lastreada em USDT ou em ação tokenizada, nem na BNB Chain e na Robinhood Chain, que a ponte da Circle não atende.</li>
 </ul>
 <h2>6. Riscos</h2>
 <p>Leia esta seção antes de usar a plataforma com qualquer coisa de valor.</p>
@@ -1989,6 +2004,7 @@
 <li><strong>Risco do prêmio.</strong> O piso protege o preço de piso. O dinheiro pago acima do piso não está protegido.</li>
 <li><strong>Risco do token de reserva.</strong> Uma stablecoin pode perder a paridade e seu emissor pode congelar um endereço. Uma ação tokenizada acompanha sua ação e pode restringir quem pode tê-la. Os contratos não conseguem defender contra nada disso.</li>
 <li><strong>Risco de troca.</strong> Pagar com a moeda própria da rede depende do roteador e da sua liquidez, e pode custar mais do que pagar com o token de reserva.</li>
+<li><strong>Risco da ponte.</strong> Uma venda paga em outra rede depende de a ponte da Circle entregar os dólares lá. Se a Circle atrasar ou parar, a entrega espera. Os contratos não conseguem acelerá-la nem desfazer a venda.</li>
 <li><strong>Carteiras vinculadas.</strong> O limite de 2.5% é por endereço.</li>
 <li><strong>Moedas enviadas ao mercado por transferência simples</strong>, em vez de uma venda, são perdidas por quem enviou.</li>
 <li><strong>O piso é um mecanismo.</strong> É o valor que o contrato pagará, no token de reserva, por uma moeda. Não é promessa de lucro e não é seguro.</li>
@@ -2003,11 +2019,11 @@
 </thead>
 <tbody><tr>
 <td>Contratos EVM</td>
-<td>Construídos e testados (35 testes de contratos)</td>
+<td>Construídos e testados (44 testes de contratos)</td>
 </tr>
 <tr>
 <td>Aplicação web e página de implantação</td>
-<td>Construídas e testadas (22 testes no navegador), no ar</td>
+<td>Construídas e testadas (24 testes no navegador), no ar</td>
 </tr>
 <tr>
 <td>Implantação de teste</td>
@@ -2026,8 +2042,8 @@
 <td>Programa escrito e testado localmente. Não implantado, ainda não está na aplicação web</td>
 </tr>
 <tr>
-<td>Vender uma moeda em outra rede (ponte)</td>
-<td>Planejado. Não construído</td>
+<td>Vender em uma rede e receber em outra (ponte)</td>
+<td>Construído e testado com substitutos dos contratos da Circle. Ainda não executado na ponte real da Circle</td>
 </tr>
 </tbody></table></div>
 <p>Implantação de teste na Sepolia:</p>
@@ -2228,6 +2244,7 @@
 <li><strong>Ağlar.</strong> Sözleşmeler herhangi bir EVM ağında çalışır: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain ve diğerleri. Bir coin, çıkarıldığı ağda yaşar.</li>
 <li><strong>Rezerv para birimi.</strong> Platformun her kurulumu, coinlerini tek bir token ile fiyatlar ve karşılar: dolar bazlı bir stablecoin (USDT veya USDC) ya da tokenleştirilmiş hisse gibi başka bir standart token. Tokenleştirilmiş hissede taban bir hisse adedidir; bu yüzden dolar değeri hisseyle birlikte hareket eder.</li>
 <li><strong>Ağın kendi para birimiyle ödeme.</strong> Bir takas yönlendiricisinin bağlı olduğu yerlerde alıcılar ETH veya BNB ile ödeyebilir ve ödeme alabilir. Ödeme girişte ve çıkışta dönüştürülür; rezervde yalnızca rezerv tokeni tutulur.</li>
+<li><strong>Başka bir ağda alma.</strong> USDC ile karşılanan bir platformda satıcı, coini kendi ağında satıp dolarları başka bir ağda alabilir. Transfer Circle&#39;ın kendi USDC köprüsünden (CCTP) geçer ve platform arada hiçbir şey tutmaz. Circle kendi ücretini tutardan alır. Bu özellik USDT veya tokenleştirilmiş hisseyle karşılanan platformlarda, ayrıca Circle köprüsünün hizmet vermediği BNB Chain ve Robinhood Chain üzerinde kullanılamaz.</li>
 </ul>
 <h2>6. Riskler</h2>
 <p>Platformu değeri olan herhangi bir şeyle kullanmadan önce bu bölümü okuyun.</p>
@@ -2238,6 +2255,7 @@
 <li><strong>Prim riski.</strong> Taban, taban fiyatı korur. Tabanın üstünde ödenen para korunmaz.</li>
 <li><strong>Rezerv tokeni riski.</strong> Bir stablecoin sabitini kaybedebilir ve onu çıkaran kurum bir adresi dondurabilir. Tokenleştirilmiş bir hisse kendi hissesini izler ve kimin tutabileceğini kısıtlayabilir. Sözleşmeler bunların hiçbirine karşı savunma yapamaz.</li>
 <li><strong>Takas riski.</strong> Ağın kendi para birimiyle ödeme, yönlendiriciye ve onun likiditesine bağlıdır ve rezerv tokeniyle ödemekten pahalı olabilir.</li>
+<li><strong>Köprü riski.</strong> Başka bir ağda ödenen bir satış, dolarların oraya ulaşması için Circle&#39;ın köprüsüne bağlıdır. Circle yavaşlarsa veya durursa teslimat bekler. Sözleşmeler bunu hızlandıramaz ve satışı geri alamaz.</li>
 <li><strong>Bağlantılı cüzdanlar.</strong> %2.5 sınırı adres başınadır.</li>
 <li><strong>Satış yerine düz transferle piyasaya gönderilen coinler</strong> gönderen için kaybolur.</li>
 <li><strong>Taban bir mekanizmadır.</strong> Sözleşmenin bir coin için rezerv tokeniyle ödeyeceği tutardır. Kâr vaadi değildir ve sigorta değildir.</li>
@@ -2252,11 +2270,11 @@
 </thead>
 <tbody><tr>
 <td>EVM sözleşmeleri</td>
-<td>Yazıldı ve test edildi (35 sözleşme testi)</td>
+<td>Yazıldı ve test edildi (44 sözleşme testi)</td>
 </tr>
 <tr>
 <td>Web uygulaması ve kurulum sayfası</td>
-<td>Yazıldı ve test edildi (22 tarayıcı testi), yayında</td>
+<td>Yazıldı ve test edildi (24 tarayıcı testi), yayında</td>
 </tr>
 <tr>
 <td>Test kurulumu</td>
@@ -2275,8 +2293,8 @@
 <td>Program yazıldı ve yerelde test edildi. Kurulmadı, henüz web uygulamasında yok</td>
 </tr>
 <tr>
-<td>Bir coini başka bir ağda satmak (köprü)</td>
-<td>Planlandı. Yazılmadı</td>
+<td>Bir ağda satıp başka bir ağda almak (köprü)</td>
+<td>Yazıldı ve Circle sözleşmelerinin yerine geçen test sözleşmeleriyle test edildi. Henüz Circle&#39;ın canlı köprüsünde çalıştırılmadı</td>
 </tr>
 </tbody></table></div>
 <p>Sepolia&#39;daki test kurulumu:</p>
@@ -2477,6 +2495,7 @@
 <li><strong>Jaringan.</strong> Kontrak berjalan di jaringan EVM mana pun: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain, dan lainnya. Sebuah koin berada di jaringan tempat koin itu diluncurkan.</li>
 <li><strong>Mata uang cadangan.</strong> Setiap pemasangan platform menghargai dan menjamin koin-koinnya dengan satu token: stablecoin dolar (USDT atau USDC), atau token standar lain seperti saham yang ditokenisasi. Dengan saham yang ditokenisasi, harga dasar berupa sejumlah saham, sehingga nilai dolarnya bergerak mengikuti saham itu.</li>
 <li><strong>Membayar dengan mata uang asli jaringan.</strong> Jika router pertukaran terhubung, pembeli dapat membayar dan dibayar dalam ETH atau BNB. Pembayaran dikonversi saat masuk dan keluar; cadangan hanya memegang token cadangan.</li>
+<li><strong>Menerima di jaringan lain.</strong> Pada platform yang dijamin dengan USDC, penjual dapat menjual di jaringan koin dan menerima dolarnya di jaringan lain. Transfer berjalan melalui jembatan USDC milik Circle sendiri (CCTP), dan platform tidak menahan apa pun di tengah jalan. Circle mengambil biayanya sendiri dari jumlah tersebut. Fitur ini tidak tersedia pada platform yang dijamin dengan USDT atau saham yang ditokenisasi, juga tidak di BNB Chain dan Robinhood Chain, yang tidak dilayani jembatan Circle.</li>
 </ul>
 <h2>6. Risiko</h2>
 <p>Baca bagian ini sebelum menggunakan platform dengan apa pun yang bernilai.</p>
@@ -2487,6 +2506,7 @@
 <li><strong>Risiko premi.</strong> Harga dasar melindungi harga dasar. Uang yang dibayarkan di atas harga dasar tidak dilindungi.</li>
 <li><strong>Risiko token cadangan.</strong> Stablecoin bisa kehilangan patokannya, dan penerbitnya bisa membekukan alamat. Saham yang ditokenisasi mengikuti sahamnya dan bisa membatasi siapa yang boleh memegangnya. Kontrak tidak bisa melindungi dari hal-hal ini.</li>
 <li><strong>Risiko pertukaran.</strong> Membayar dengan mata uang asli jaringan bergantung pada router dan likuiditasnya, dan bisa lebih mahal daripada membayar dengan token cadangan.</li>
+<li><strong>Risiko jembatan.</strong> Penjualan yang dibayarkan di jaringan lain bergantung pada jembatan Circle untuk mengirimkan dolarnya ke sana. Jika Circle lambat atau berhenti, pengiriman menunggu. Kontrak tidak bisa mempercepatnya atau membatalkan penjualan.</li>
 <li><strong>Dompet yang saling terkait.</strong> Batas 2.5% berlaku per alamat.</li>
 <li><strong>Koin yang dikirim ke pasar dengan transfer biasa</strong>, bukan melalui penjualan, hilang bagi pengirimnya.</li>
 <li><strong>Harga dasar adalah sebuah mekanisme.</strong> Itu adalah jumlah yang akan dibayar kontrak, dalam token cadangan, untuk satu koin. Itu bukan janji keuntungan dan bukan asuransi.</li>
@@ -2501,11 +2521,11 @@
 </thead>
 <tbody><tr>
 <td>Kontrak EVM</td>
-<td>Sudah dibangun dan diuji (35 pengujian kontrak)</td>
+<td>Sudah dibangun dan diuji (44 pengujian kontrak)</td>
 </tr>
 <tr>
 <td>Aplikasi web dan halaman pemasangan</td>
-<td>Sudah dibangun dan diuji (22 pengujian di peramban), sudah daring</td>
+<td>Sudah dibangun dan diuji (24 pengujian di peramban), sudah daring</td>
 </tr>
 <tr>
 <td>Pemasangan uji</td>
@@ -2524,8 +2544,8 @@
 <td>Program sudah ditulis dan diuji secara lokal. Belum dipasang, belum ada di aplikasi web</td>
 </tr>
 <tr>
-<td>Menjual koin di jaringan lain (jembatan)</td>
-<td>Direncanakan. Belum dibangun</td>
+<td>Menjual di satu jaringan dan menerima di jaringan lain (jembatan)</td>
+<td>Sudah dibangun dan diuji dengan pengganti kontrak Circle. Belum dijalankan di jembatan Circle yang sesungguhnya</td>
 </tr>
 </tbody></table></div>
 <p>Pemasangan uji di Sepolia:</p>

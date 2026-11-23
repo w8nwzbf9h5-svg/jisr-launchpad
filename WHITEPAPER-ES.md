@@ -103,6 +103,7 @@ El coste de este diseño: si se encuentra un error después del lanzamiento, nad
 - **Redes.** Los contratos funcionan en cualquier red EVM: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain y otras. Una moneda vive en la red en la que se lanzó.
 - **Moneda de reserva.** Cada despliegue de la plataforma valora y respalda sus monedas en un solo token: una stablecoin en dólares (USDT o USDC) u otro token estándar, como una acción tokenizada. Con una acción tokenizada, el mínimo es un número de acciones, así que su valor en dólares se mueve con la acción.
 - **Pagar con la moneda propia de la red.** Donde hay un enrutador de intercambio conectado, los compradores pueden pagar y cobrar en ETH o BNB. El pago se convierte al entrar y al salir; la reserva solo contiene el token de reserva.
+- **Recibir en otra red.** En una plataforma respaldada por USDC, quien vende puede vender en la red de la moneda y recibir los dólares en otra red. La transferencia pasa por el puente de USDC de la propia Circle (CCTP), y la plataforma no guarda nada por el camino. Circle cobra su propia comisión del importe. No está disponible en una plataforma respaldada por USDT o por una acción tokenizada, ni en BNB Chain y Robinhood Chain, a las que el puente de Circle no da servicio.
 
 ## 6. Riesgos
 
@@ -114,6 +115,7 @@ Lee esta sección antes de usar la plataforma con algo de valor.
 - **Riesgo de la prima.** El mínimo protege el precio mínimo. El dinero pagado por encima del mínimo no está protegido.
 - **Riesgo del token de reserva.** Una stablecoin puede perder su paridad y su emisor puede congelar una dirección. Una acción tokenizada sigue a su acción y puede restringir quién puede tenerla. Los contratos no pueden defender contra nada de esto.
 - **Riesgo de intercambio.** Pagar con la moneda propia de la red depende del enrutador y de su liquidez, y puede costar más que pagar con el token de reserva.
+- **Riesgo del puente.** Una venta que se paga en otra red depende de que el puente de Circle entregue allí los dólares. Si Circle se retrasa o se detiene, la entrega espera. Los contratos no pueden acelerarla ni deshacer la venta.
 - **Billeteras vinculadas.** El límite del 2.5% es por dirección.
 - **Las monedas enviadas al mercado por transferencia simple**, en lugar de mediante una venta, se pierden para quien las envía.
 - **El mínimo es un mecanismo.** Es el importe que el contrato pagará, en el token de reserva, por una moneda. No es una promesa de ganancia y no es un seguro.
@@ -122,13 +124,13 @@ Lee esta sección antes de usar la plataforma con algo de valor.
 
 | Parte | Estado |
 |---|---|
-| Contratos EVM | Construidos y probados (35 pruebas de contratos) |
-| Aplicación web y página de despliegue | Construidas y probadas (22 pruebas en navegador), en línea |
+| Contratos EVM | Construidos y probados (44 pruebas de contratos) |
+| Aplicación web y página de despliegue | Construidas y probadas (24 pruebas en navegador), en línea |
 | Despliegue de prueba | En línea en la red de pruebas Sepolia, con dinero de prueba sin valor |
 | Auditoría de seguridad independiente | No realizada |
 | Despliegue en redes reales | No realizado. Va después de la auditoría |
 | Solana | Programa escrito y probado localmente. No desplegado, aún no está en la aplicación web |
-| Vender una moneda en otra red (puente) | Planificado. No construido |
+| Vender en una red y recibir en otra (puente) | Construido y probado con sustitutos de los contratos de Circle. Aún no se ha ejecutado en el puente real de Circle |
 
 Despliegue de prueba en Sepolia:
 

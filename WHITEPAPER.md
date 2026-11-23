@@ -103,6 +103,7 @@ The cost of this design: if a bug is found after launch, nobody can pause or pat
 - **Networks.** The contracts work on any EVM network: Ethereum, BNB Chain, Base, Arbitrum, Optimism, Polygon, Avalanche, Robinhood Chain and others. A coin lives on the network it was launched on.
 - **Reserve currency.** Each launchpad deployment prices and backs its coins in one token: a dollar stablecoin (USDT or USDC), or another standard token such as a tokenized stock. With a stock token the floor is a number of shares, so its dollar value moves with the stock.
 - **Paying with the network's own currency.** Where a swap router is connected, buyers can pay and be paid in ETH or BNB. The payment is converted on the way in and out; the reserve holds only the reserve token.
+- **Receiving on another network.** On a launchpad backed by USDC, a seller can sell on the coin's network and receive the dollars on another network. The transfer goes through Circle's own USDC bridge (CCTP), and the launchpad holds nothing in between. Circle takes its own fee from the amount. This is not available on a launchpad backed by USDT or a stock token, or on BNB Chain and Robinhood Chain, which Circle's bridge does not serve.
 
 ## 6. Risks
 
@@ -114,6 +115,7 @@ Read this section before using the launchpad with anything of value.
 - **Premium risk.** The floor protects the floor price. Money paid above the floor is not protected.
 - **Reserve token risk.** A stablecoin can lose its peg, and its issuer can freeze an address. A stock token follows its stock and may restrict who can hold it. The contracts cannot defend against any of these.
 - **Swap risk.** Paying in the network's own currency depends on the router and its liquidity, and can cost more than paying in the reserve token.
+- **Bridge risk.** A sale paid out on another network depends on Circle's bridge to deliver the dollars there. If Circle is slow or stops, the delivery waits. The contracts cannot speed it up or reverse the sale.
 - **Linked wallets.** The 2.5% limit is per address.
 - **Coins sent to the market by plain transfer** instead of through a sale are lost to the sender.
 - **The floor is a mechanism.** It is the amount the contract will pay, in the reserve token, for a coin. It is not a promise of profit and it is not insurance.
@@ -122,13 +124,13 @@ Read this section before using the launchpad with anything of value.
 
 | Part | State |
 |---|---|
-| EVM contracts | Built and tested (35 contract tests) |
-| Web app and deploy page | Built and tested (22 browser tests), live |
+| EVM contracts | Built and tested (44 contract tests) |
+| Web app and deploy page | Built and tested (24 browser tests), live |
 | Test deployment | Live on the Sepolia test network, with test money that has no value |
 | Independent security audit | Not done |
 | Deployment on real networks | Not done. It follows the audit |
 | Solana | Program written and tested locally. Not deployed, not yet in the web app |
-| Selling a coin on a different network (bridge) | Planned. Not built |
+| Selling on one network and receiving on another (bridge) | Built and tested against stand-ins for Circle's contracts. Not yet run through Circle's live bridge |
 
 Test deployment on Sepolia:
 
