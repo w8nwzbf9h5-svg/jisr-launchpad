@@ -56,7 +56,13 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
 
     const text = (sel) => page.$eval(sel, (el) => el.textContent);
     const click = (sel) => page.$eval(sel, (el) => el.click());
-    const has = (sel, t) => page.waitForFunction((s, x) => { const el = document.querySelector(s); return el && !el.hidden && el.textContent.includes(x); }, { timeout: 60000 }, sel, t);
+    const has = async (sel, t) => {
+      try { await page.waitForFunction((s, x) => { const el = document.querySelector(s); return el && !el.hidden && el.textContent.includes(x); }, { timeout: 60000 }, sel, t); }
+      catch (e) {
+        const seen = await page.evaluate((s) => { const el = document.querySelector(s), to = document.querySelector("#toast"); return { there: el ? el.textContent.slice(0, 300) : null, toast: to ? (to.hidden ? "(hidden) " : "") + to.textContent : null }; }, sel);
+        throw new Error('waited for "' + t + '" in ' + sel + " but saw: " + JSON.stringify(seen) + " page errors: " + errors.join(" | "));
+      }
+    };
     const toast = (t) => has("#toast", t);
     const idle = () => page.waitForFunction(() => !document.body.classList.contains("busy"), { timeout: 60000 });
     const fill = async (sel, v) => { await page.focus(sel); await page.$eval(sel, (el) => { el.value = ""; }); await page.type(sel, v); };
