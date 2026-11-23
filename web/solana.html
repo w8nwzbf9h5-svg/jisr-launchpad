@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jisr Launchpad · Solana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=fa305785">
+<style>
+.card h2{font-size:18px;font-weight:700;margin:0 0 8px}
+.netlabel{border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <button class="brand" data-act="nav" data-v="board" aria-label="Jisr Launchpad on Solana, go to the board"><b>JISR</b><i></i><span>launchpad</span></button>
+    <nav aria-label="Main">
+      <button data-act="nav" data-v="board">Board</button>
+      <button data-act="nav" data-v="launch">Launch a coin</button>
+      <a href="./">Ethereum networks</a>
+      <a href="whitepaper.html">White paper</a>
+    </nav>
+    <div class="right">
+      <span class="netlabel">Solana</span>
+      <button class="wbtn" id="walletBtn" data-act="connect"><span class="dot"></span><span id="walletTxt">Connect Phantom</span></button>
+    </div>
+  </div>
+</header>
+<div class="strip"><div class="wrap" id="stripTxt"></div></div>
+
+<main class="wrap">
+
+<section id="v-setup"><div class="empty">Loading…</div></section>
+
+<section id="v-board" hidden>
+  <div class="hero">
+    <h1>Launch a coin with a floor that is <em>covered 100%.</em></h1>
+    <p>Every coin is sold at one fixed price, and the money stays in a reserve that nobody can withdraw. Any holder can sell back at the floor price at any time.</p>
+    <div class="cta"><button class="btn primary" data-act="nav" data-v="launch">Launch a coin</button><a class="btn" href="whitepaper.html">How it works</a></div>
+    <div class="spec">
+      <div><span class="label">Sale price</span><strong>Fixed, $100K market cap</strong><small>Same price for everyone. No early discount.</small></div>
+      <div><span class="label">Trading fee</span><strong>5% per trade</strong><small>Creator 1 · floor reserve 2 · launchpad 2</small></div>
+      <div><span class="label">Pay with</span><strong>Test dollars</strong><small id="specNet">On Solana</small></div>
+      <div><span class="label">Wallet limit</span><strong>2.5% of supply</strong><small>For every wallet, the creator included</small></div>
+    </div>
+  </div>
+  <div class="boardhead">
+    <h2>Coins on the board</h2>
+    <button class="btn" data-act="refresh">Refresh</button>
+  </div>
+  <div class="board">
+    <div class="cols label"><span></span><span>Coin</span><span>Market cap</span><span>Sale progress</span><span style="text-align:right">Status</span></div>
+    <div id="rows"><div class="empty">Loading coins…</div></div>
+  </div>
+</section>
+
+<section id="v-coin" hidden></section>
+
+<section id="v-launch" hidden>
+  <div class="page">
+    <h1>Launch a coin</h1>
+    <p>Every coin launches on the same terms, so buyers know what they are getting. You choose the name, the picture and the links. Launching sends one transaction from your wallet.</p>
+    <div class="lgrid">
+      <div class="form card">
+        <div class="field"><label for="lName">Coin name</label><input type="text" id="lName" maxlength="32" placeholder="Desert Rocket" autocomplete="off"></div>
+        <div class="field"><label for="lTicker">Ticker</label><input type="text" id="lTicker" maxlength="10" placeholder="DRKT" autocomplete="off" style="text-transform:uppercase;font-family:var(--mono)"></div>
+        <div class="field"><label for="lImg">Picture link, optional</label><input type="text" id="lImg" maxlength="120" placeholder="https://…/picture.png" autocomplete="off"></div>
+        <div class="field"><label for="lDesc">Description, optional</label><textarea id="lDesc" maxlength="160" placeholder="What is this coin about?"></textarea><div class="hint">Solana keeps a coin's description and links in 400 bytes in total, so keep them short.</div></div>
+        <div class="field"><label for="l-x">X (Twitter) link, optional</label><input type="text" id="l-x" maxlength="80" placeholder="https://x.com/yourcoin" autocomplete="off"></div>
+        <div class="field"><label for="l-telegram">Telegram link, optional</label><input type="text" id="l-telegram" maxlength="80" placeholder="https://t.me/yourcoin" autocomplete="off"></div>
+        <div class="field"><label for="l-website">Website, optional</label><input type="text" id="l-website" maxlength="80" placeholder="https://yourcoin.com" autocomplete="off"></div>
+        <div class="err" id="lErr" role="alert" hidden></div>
+        <button class="btn primary wide" type="button" data-act="launch">Launch the coin</button>
+        <div class="hint">You pay the network fee for one transaction. You receive no coins: you buy at the sale price like everyone else.</div>
+      </div>
+      <div class="card">
+        <span class="label">Launch terms, fixed for every coin</span>
+        <div class="kv"><span>Total supply</span><b class="num">1,000,000,000</b></div>
+        <div class="kv"><span>Sold in the sale</span><b class="num">800,000,000</b></div>
+        <div class="kv"><span>Graduation</span><b class="num">When the sale sells out</b></div>
+        <div class="kv"><span>Trading fee</span><b class="num">5%</b></div>
+        <div class="kv"><span>Your creator share</span><b class="num">1% of every trade</b></div>
+        <div class="kv"><span>To the floor reserve</span><b class="num">2%</b></div>
+        <div class="kv"><span>Launchpad share</span><b class="num">2%</b></div>
+        <div class="kv"><span>Most one wallet can hold</span><b class="num">2.5% of supply</b></div>
+        <div class="kv"><span>Who can withdraw the reserve</span><b class="num">Nobody</b></div>
+        <p class="hint" id="lTerms"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="foot"></footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="vendor/solana-web3.iife.min.js?v=ecfdbe55"></script>
+<script src="solana/config.js?v=adcef687"></script>
+<script src="solana/jisr-solana.js?v=537184ec"></script>
+<script src="solana/app.js?v=d8cb4276"></script>
+</body>
+</html>

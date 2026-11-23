@@ -501,7 +501,7 @@ pub enum JisrError {
     NotOutstanding,
     #[msg("One wallet can hold 2.5% of supply at most")]
     WalletLimit,
-    #[msg("Name must be 2 to 32 bytes, symbol 2 to 10, link up to 200")]
+    #[msg("Name must be 2 to 32 bytes, symbol 2 to 10, details up to 400")]
     BadName,
     #[msg("Only the admin can do this")]
     NotAdmin,
