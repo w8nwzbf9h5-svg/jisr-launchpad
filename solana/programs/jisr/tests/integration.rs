@@ -24,6 +24,8 @@ struct Env {
     payer: Keypair,
     stable_mint: Pubkey,
     config: Pubkey,
+    /// Counts transactions, so that two with the same instructions are still different transactions.
+    nonce: u64,
 }
 
 struct Coin {
@@ -40,7 +42,7 @@ impl Env {
         let (banks, payer, _) = pt.start().await;
         let stable = Keypair::new();
         let config = Pubkey::find_program_address(&[jisr::CONFIG_SEED], &jisr::ID).0;
-        let mut env = Env { banks, payer, stable_mint: stable.pubkey(), config };
+        let mut env = Env { banks, payer, stable_mint: stable.pubkey(), config, nonce: 0 };
         let rent = env.banks.get_rent().await.unwrap().minimum_balance(spl_token::state::Mint::LEN);
         let payer_pk = env.payer.pubkey();
         let ixs = vec![
@@ -53,6 +55,12 @@ impl Env {
 
     async fn send(&mut self, ixs: Vec<Instruction>, signers: &[&Keypair]) -> std::result::Result<(), BanksClientError> {
         let hash = self.banks.get_latest_blockhash().await.unwrap();
+        // The test bank answers a repeated transaction with the result of the first one. This test sends the
+        // same instruction before and after a change and expects different results, so every transaction
+        // carries a tiny self-transfer of a different amount to make it unique.
+        self.nonce += 1;
+        let mut ixs = ixs;
+        ixs.push(solana_sdk::system_instruction::transfer(&self.payer.pubkey(), &self.payer.pubkey(), self.nonce));
         let mut all: Vec<&Keypair> = vec![&self.payer];
         all.extend_from_slice(signers);
         let tx = Transaction::new_signed_with_payer(&ixs, Some(&self.payer.pubkey()), &all, hash);
