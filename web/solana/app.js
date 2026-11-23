@@ -55,7 +55,8 @@
     if ((e && e.code === 4001) || /user rejected|rejected the request|cancell?ed/i.test(t)) return "You cancelled the request in your wallet.";
     const custom = /"Custom":\s*(\d+)/.exec(t) || /custom program error: 0x([0-9a-f]+)/i.exec(t);
     if (custom) { const code = /0x/i.test(custom[0]) ? parseInt(custom[1], 16) : Number(custom[1]); if (PROGRAM_ERRORS[code]) return PROGRAM_ERRORS[code]; if (code === 1) return "Not enough balance for this trade."; }
-    if (/no record of a prior credit|insufficient lamports|insufficient funds for (fee|rent)|InsufficientFundsForFee|AccountNotFound/i.test(t)) return "Your wallet needs a little SOL on " + C.name + " for network fees.";
+    if (/may not be used to pay transaction fees|InvalidAccountForFee|no record of a prior credit|insufficient lamports|insufficient funds for (fee|rent)|InsufficientFundsForFee|AccountNotFound/i.test(t))
+      return "Your wallet has no SOL on " + C.name + " to pay the network fee." + (helperKey() ? " Press “Get SOL for fees” in the bar at the top, then try again." : " Get some from faucet.solana.com, then try again.");
     if (/blockhash not found|block height exceeded|expired/i.test(t)) return "The request took too long and expired. Try again.";
     if (/failed to fetch|networkerror|429|too many requests/i.test(t)) return "The Solana network did not answer. Try again in a moment.";
     return t.length > 180 ? t.slice(0, 180) + "…" : t || "Something went wrong.";
@@ -136,7 +137,9 @@
     $("#walletTxt").textContent = S.wallet ? short(S.wallet.toBase58()) + (S.cfg ? " · " + fUsd(S.stable) : "") : "Connect Phantom";
     const faucet = S.cfg && S.isTestDollar ? ' <button class="linkbtn" data-act="faucet">Get 10,000 test dollars</button>' : "";
     $("#stripTxt").innerHTML = "<b>" + esc(C.name) + ".</b> Test network. Coins and money here have no value." + faucet +
-      (S.wallet && S.sol < 10000000n ? ' Your wallet has almost no SOL for network fees: <a class="linkbtn" href="https://faucet.solana.com" target="_blank" rel="noopener">get devnet SOL</a>.' : "");
+      (S.wallet && S.sol < LOW_SOL ? " Your wallet has almost no SOL for network fees: " + (helperKey()
+        ? '<button class="linkbtn" data-act="solFaucet">Get SOL for fees</button>.'
+        : '<a class="linkbtn" href="https://faucet.solana.com" target="_blank" rel="noopener">get devnet SOL</a>.') : "");
     for (const v of ["board", "coin", "launch", "setup"]) $("#v-" + v).hidden = v !== shown();
     document.querySelectorAll("nav [data-act=nav]").forEach((b) => b.setAttribute("aria-current", b.dataset.v === S.view ? "page" : "false"));
     if (shown() === "setup") renderSetup();
@@ -299,6 +302,36 @@
     toast(creator ? "The creator was paid." : "The launchpad was paid.");
   });
 
+  /* A little SOL for network fees, from what is left at the public devnet deployer address. The transfer is
+     signed and paid by that public key, so a wallet with nothing at all can receive it. Test networks only. */
+  const LOW_SOL = 10000000n, HELP_LAMPORTS = 200000000; // below 0.01 SOL is "almost none"; the gift is 0.2 SOL
+  function helperKey() {
+    const h = C.feeHelperSeed;
+    if (!/^[0-9a-f]{64}$/.test(h || "")) return null;
+    try { return web3.Keypair.fromSeed(Uint8Array.from(h.match(/../g).map((b) => parseInt(b, 16)))); } catch (_) { return null; }
+  }
+  async function doSolFaucet() {
+    const kp = helperKey();
+    if (!kp || S.busy) return;
+    if (!S.wallet) { await connect(); if (!S.wallet) return; }
+    S.busy = true; document.body.classList.add("busy");
+    try {
+      toast("Sending a little SOL to your wallet…", 60000);
+      if (BigInt(await S.conn.getBalance(S.wallet)) >= LOW_SOL) { toast("Your wallet already has SOL for fees."); return; }
+      if ((await S.conn.getBalance(kp.publicKey)) < HELP_LAMPORTS + 10000000) { toast("The shared devnet SOL is used up. Get some for your wallet at faucet.solana.com (choose devnet).", 9000); return; }
+      const t = new web3.Transaction().add(web3.SystemProgram.transfer({ fromPubkey: kp.publicKey, toPubkey: S.wallet, lamports: HELP_LAMPORTS }));
+      t.feePayer = kp.publicKey;
+      const bh = await S.conn.getLatestBlockhash();
+      t.recentBlockhash = bh.blockhash;
+      t.sign(kp);
+      const sig = await S.conn.sendRawTransaction(t.serialize());
+      const res = await S.conn.confirmTransaction({ signature: sig, blockhash: bh.blockhash, lastValidBlockHeight: bh.lastValidBlockHeight }, "confirmed");
+      if (res.value.err) throw new Error(JSON.stringify(res.value.err));
+      toast("0.2 SOL added to your wallet for network fees.");
+    } catch (e) { toast(explain(e), 8000); }
+    finally { S.busy = false; document.body.classList.remove("busy"); try { await refresh(); } catch (_) { /* shown on next load */ } }
+  }
+
   /* ---------- wiring ---------- */
   function go(view, cur) {
     S.view = view; S.cur = cur || null; S.m = cur ? S.markets.find((m) => m.coinMint.toBase58() === cur) || null : null; S.held = 0n;
@@ -325,6 +358,7 @@
     else if (a === "sell") doSell();
     else if (a === "launch") doLaunch();
     else if (a === "faucet") doFaucet();
+    else if (a === "solFaucet") doSolFaucet();
     else if (a === "mkStable") doMkStable();
     else if (a === "init") doInit();
     else if (a === "payCreator") doPay(true);

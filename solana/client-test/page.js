@@ -21,7 +21,10 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
 
 (async () => {
   for (let i = 0; ; i++) { try { await conn.getVersion(); break; } catch (e) { if (i > 60) throw new Error("the local Solana node did not start"); await new Promise((r) => setTimeout(r, 1000)); } }
-  const sig = await conn.requestAirdrop(wallet.publicKey, 20 * web3.LAMPORTS_PER_SOL);
+  // the visitor's wallet starts with nothing; only the public fee-helper address has SOL, as on devnet after a deployment
+  const helperSeed = "064291e20f163c014a27b8e346d730d9d73d4d8c55365839b7b563c6f602c19f";
+  const helper = web3.Keypair.fromSeed(Uint8Array.from(helperSeed.match(/../g).map((b) => parseInt(b, 16))));
+  const sig = await conn.requestAirdrop(helper.publicKey, 3 * web3.LAMPORTS_PER_SOL);
   const bh = await conn.getLatestBlockhash();
   await conn.confirmTransaction({ signature: sig, blockhash: bh.blockhash, lastValidBlockHeight: bh.lastValidBlockHeight }, "confirmed");
 
@@ -40,7 +43,7 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
     await page.setRequestInterception(true);
     page.on("request", (req) => {
       if (new URL(req.url()).pathname.endsWith("/solana/config.js")) {
-        return req.respond({ status: 200, contentType: "application/javascript", body: "window.JISR_SOLANA = " + JSON.stringify({ name: "Local Solana node", rpcUrl: RPC, explorer: "https://explorer.solana.com", clusterParam: "?cluster=custom", programId: programId.toBase58() }) + ";" });
+        return req.respond({ status: 200, contentType: "application/javascript", body: "window.JISR_SOLANA = " + JSON.stringify({ name: "Local Solana node", rpcUrl: RPC, explorer: "https://explorer.solana.com", clusterParam: "?cluster=custom", programId: programId.toBase58(), feeHelperSeed: helperSeed }) + ";" });
       }
       req.continue();
     });
@@ -63,6 +66,13 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
     await has("#v-setup", "One-time setup");
     await click("[data-act=connect]");
     await has("#walletTxt", "…");
+    // with no SOL the wallet cannot pay a fee: the page says so plainly and offers a little SOL
+    assert.equal(await conn.getBalance(wallet.publicKey), 0);
+    await click("[data-act=mkStable]"); await toast("Your wallet has no SOL"); await idle();
+    await has("#stripTxt", "Get SOL for fees");
+    await click("[data-act=solFaucet]"); await toast("0.2 SOL added to your wallet"); await idle();
+    assert.equal(await conn.getBalance(wallet.publicKey), 200000000);
+    assert.equal(await page.$("[data-act=solFaucet]"), null, "the offer goes away once the wallet can pay fees");
     assert.equal(await page.$eval("[data-act=init]", (el) => el.disabled), true, "the launchpad cannot start before its currency exists");
     await click("[data-act=mkStable]"); await toast("The test dollar exists now"); await idle();
     await has("#v-setup", "Ready");
@@ -70,7 +80,7 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
     await has("#rows", "No coins yet");
     const cfg = await J.getConfig(conn, programId);
     assert.deepEqual([cfg.admin.toBase58(), cfg.platformWallet.toBase58(), cfg.stableMint.toBase58()], [wallet.publicKey.toBase58(), wallet.publicKey.toBase58(), J.TEST_DOLLAR.mintKey().publicKey.toBase58()]);
-    step("setup from the page: test dollar created, launchpad started with the connected wallet as admin");
+    step("setup from the page: an empty wallet gets fee money, the test dollar is created, the launchpad starts with that wallet as admin");
 
     // 2. test dollars
     await click("[data-act=faucet]"); await toast("10,000 test dollars"); await idle();
