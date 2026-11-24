@@ -31,7 +31,7 @@ use anchor_spl::token::spl_token::instruction::AuthorityType;
 use anchor_spl::token::{self, Mint, MintTo, SetAuthority, Token, TokenAccount, Transfer};
 use jisr_math::{MathError, COIN_DECIMALS, MAX_WALLET, TOTAL_SUPPLY};
 
-declare_id!("7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU");
+declare_id!("5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8");
 
 pub const CONFIG_SEED: &[u8] = b"config";
 pub const COIN_SEED: &[u8] = b"coin";

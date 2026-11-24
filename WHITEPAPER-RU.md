@@ -135,7 +135,7 @@ Jisr убирает дешёвые ранние монеты и кладёт п�
 Тестовое развёртывание в Sepolia:
 
 - Фабрика площадки: `0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647`
-- Solana devnet: `7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU`
+- Solana devnet: `5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8`
 - Сайт: https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
 - Код: https://github.com/w8nwzbf9h5-svg/jisr-launchpad
 

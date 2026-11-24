@@ -135,7 +135,7 @@ Baca bagian ini sebelum menggunakan platform dengan apa pun yang bernilai.
 Pemasangan uji di Sepolia:
 
 - Pabrik platform: `0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647`
-- Solana devnet: `7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU`
+- Solana devnet: `5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8`
 - Situs: https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
 - Kode: https://github.com/w8nwzbf9h5-svg/jisr-launchpad
 

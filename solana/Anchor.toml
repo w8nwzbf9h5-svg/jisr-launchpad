@@ -6,10 +6,10 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-jisr = "7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU"
+jisr = "5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8"
 
 [programs.devnet]
-jisr = "7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU"
+jisr = "5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8"
 
 [provider]
 cluster = "localnet"

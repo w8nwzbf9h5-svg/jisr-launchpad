@@ -125,8 +125,8 @@ Fix: the account is now accepted if it already exists (`init_if_needed`); its mi
 are still checked, so it can only be the market's own account. Anything it already holds can only
 become floor reserve through `reinforce`.
 Tests: Rust `a_vault_made_in_advance_cannot_block_a_launch`; client test step 7.
-The devnet deployment (`7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU`) is the earlier build. It was
-deployed as final and still has this fault. It holds test money only.
+The first devnet deployment (`7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU`) is the earlier build. It was
+deployed as final and still has this fault. It holds test money only and the site no longer points at it.
 
 ### Handled by procedure, not by code
 
@@ -203,7 +203,7 @@ program is attached to each run.
 | Network | Address |
 |---|---|
 | Sepolia (Ethereum test network) | factory `0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647` |
-| Solana devnet | program `7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU` (final; earlier build, see S1) |
+| Solana devnet | program `5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8` (final; the current build, with the fix for S1 and wallet metadata) |
 
 ## 9. Questions we would like a reviewer to answer
 

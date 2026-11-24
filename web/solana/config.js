@@ -13,9 +13,9 @@
   const networks = {
     devnet: {
       name: "Solana devnet", rpcUrl: "https://api.devnet.solana.com", explorer: "https://explorer.solana.com", clusterParam: "?cluster=devnet",
-      programId: "7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU", test: true,
-      // This first devnet build wrote no wallet metadata for coins. Remove the next line when devnet moves to the current build.
-      metadata: false,
+      programId: "5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8", test: true,
+      // No metadata service is set up for devnet, so wallets show a test coin's name and ticker without a picture.
+      metadataBase: "",
       // Devnet only: the public deployer key left over from the deployment. The page uses it to hand a
       // little SOL for network fees to a wallet that has none. It guards nothing of value.
       feeHelperSeed: "064291e20f163c014a27b8e346d730d9d73d4d8c55365839b7b563c6f602c19f"

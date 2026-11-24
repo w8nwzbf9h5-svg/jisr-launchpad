@@ -71,7 +71,7 @@ On test networks the reserve currency is a test dollar that anyone can mint from
 
 ## Deploying to devnet
 
-**Deployed:** `7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU` on devnet, as final (Solana Explorer shows it as executable and not upgradeable). The site's Solana page points at it.
+**Deployed:** `5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8` on devnet, as final (Solana Explorer shows it as executable and not upgradeable). The site's Solana page points at it.
 
 To deploy another copy:
 

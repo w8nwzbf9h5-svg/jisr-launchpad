@@ -135,7 +135,7 @@ Platformu değeri olan herhangi bir şeyle kullanmadan önce bu bölümü okuyun
 Sepolia'daki test kurulumu:
 
 - Platform fabrikası: `0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647`
-- Solana devnet: `7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU`
+- Solana devnet: `5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8`
 - Site: https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
 - Kod: https://github.com/w8nwzbf9h5-svg/jisr-launchpad
 

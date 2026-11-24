@@ -5,7 +5,7 @@ A launchpad for meme coins where every coin is sold at one fixed price and has a
 - **White paper:** [English](WHITEPAPER.md) · [العربية](WHITEPAPER-AR.md) · [中文](WHITEPAPER-ZH.md) · [Español](WHITEPAPER-ES.md) · [हिन्दी](WHITEPAPER-HI.md) · [Français](WHITEPAPER-FR.md) · [Русский](WHITEPAPER-RU.md) · [Português](WHITEPAPER-PT.md) · [Türkçe](WHITEPAPER-TR.md) · [Bahasa Indonesia](WHITEPAPER-ID.md) · [on the site](https://w8nwzbf9h5-svg.github.io/jisr-launchpad/whitepaper.html). English is the reference text.
 - **Site:** https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
 - **Test deployment:** Sepolia test network, factory `0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647`. Test money only, no value.
-- **Solana test deployment:** devnet, program `7cu1YmBA3D1asv1fUijaoZ5FqodZrW9JhbWdPCXGGSkU`, deployed as final. [Solana page](https://w8nwzbf9h5-svg.github.io/jisr-launchpad/solana.html). Test money only, no value.
+- **Solana test deployment:** devnet, program `5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8`, deployed as final. [Solana page](https://w8nwzbf9h5-svg.github.io/jisr-launchpad/solana.html). Test money only, no value.
 - **For a security reviewer:** [AUDIT.md](AUDIT.md). **Before real money:** [GO-LIVE.md](GO-LIVE.md).
 
 Status: tested locally end to end and deployed on two test networks. **Not audited and not deployed on any real network.** Do not put real money in before an independent security audit.
