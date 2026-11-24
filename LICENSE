@@ -1,0 +1,32 @@
+Jisr Launchpad
+Copyright (c) 2026 Jisr Launchpad and its owner. All rights reserved.
+
+This repository and everything in it is proprietary: the smart contracts, the Solana program, the
+web pages, the scripts, the tests, the documents, the figures, the designs and the translations
+(together, "the Material").
+
+No licence is granted. You may read the Material in order to review it, to verify what is deployed,
+and to use the launchpad through its own pages. You may not, without the prior written permission
+of the copyright holder:
+
+  - copy, reproduce or republish the Material, in whole or in part;
+  - modify it or create works derived from it;
+  - deploy it, or anything derived from it, to any network;
+  - use it to operate, or to help others operate, a product or a service;
+  - sell, license or distribute it.
+
+Publishing the Material where it can be read, including in a public repository or on a public
+blockchain, does not grant any of these rights.
+
+Third-party components keep their own licences and are not covered by this notice. They include
+OpenZeppelin Contracts, ethers, @solana/web3.js, Anchor, the SPL programs, marked, Hardhat and the
+fonts loaded by the pages.
+
+Earlier versions of some files in this repository carried an MIT licence identifier. From the commit
+that added this file onward, the Material is offered only under the terms above.
+
+THE MATERIAL IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. IN NO EVENT
+SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE
+MATERIAL OR FROM ITS USE.
+
+To ask for permission, contact the owner of the repository.

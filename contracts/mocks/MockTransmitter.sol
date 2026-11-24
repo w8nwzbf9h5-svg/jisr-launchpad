@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: UNLICENSED
+// Copyright (c) 2026 Jisr Launchpad. All rights reserved. See the LICENSE file.
 pragma solidity 0.8.26;
 
 /// Test stand-in for Circle's MessageTransmitterV2 on the destination network.

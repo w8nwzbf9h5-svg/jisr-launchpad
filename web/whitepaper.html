@@ -36,15 +36,75 @@
 .ptop a.brand{text-decoration:none}
 .ptop .acts{display:flex;gap:8px;align-items:center}
 .ptop .acts a,.ptop .acts select{border:1px solid var(--line);background:var(--raise);color:var(--ink);border-radius:10px;padding:8px 12px;font-size:13.5px;font-weight:600;text-decoration:none;cursor:pointer}
+
+.fig{--f-floor:#c98500;--f-plat:#3987e5;--f-crea:#199e70;--f-you:#aeb7c9;margin:22px 0 26px;padding:16px 16px 14px;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.fig figcaption{font-weight:700;font-size:16px;line-height:1.35;margin-bottom:14px}
+.fig .fig-n{color:var(--muted);font-weight:600;margin-inline-end:6px}
+.fig p.fig-note{font-size:14px;line-height:1.6;color:var(--muted);margin:12px 0 0}
+.fig p.fig-axis{font-size:12.5px;line-height:1.4;color:var(--muted);margin:0 0 4px}
+.fig p.fig-axis.x{text-align:center;margin:4px 0 0}
+.fig .sw{display:inline-block;flex:none;width:12px;height:12px;border-radius:3px}
+.fig .sw-line{height:3px;width:18px;border-radius:2px}
+.fig .sw-floor{background:var(--f-floor)}
+.fig .sw-extra{background:repeating-linear-gradient(135deg,var(--f-floor) 0 3px,#6d4a05 3px 6px)}
+.fig .sw-plat{background:var(--f-plat)}
+.fig .sw-crea{background:var(--f-crea)}
+.fig .sw-you{background:var(--f-you)}
+.fig-steps{list-style:none;counter-reset:step;margin:0;padding:0;display:grid;gap:10px;grid-template-columns:minmax(0,1fr)}
+.fig-steps li{counter-increment:step;position:relative;margin:0;padding:12px 12px 12px;padding-inline-start:46px;background:var(--raise);border:1px solid var(--line);border-radius:10px}
+.fig-steps li::before{content:counter(step);position:absolute;inset-inline-start:12px;top:12px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:600 13px var(--mono);background:var(--bg);border:1px solid var(--line);color:var(--ink)}
+.fig-steps b{display:block;font-size:15px;margin-bottom:2px}
+.fig-steps span{display:block;font-size:14px;line-height:1.5;color:var(--muted)}
+@media (min-width:720px){.fig-steps{grid-template-columns:repeat(4,minmax(0,1fr))}.fig-steps li{padding:44px 12px 12px}.fig-steps li::before{top:12px}}
+.fig p.fig-any{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.5;margin:12px 0 0;padding:10px 12px;border-radius:10px;background:var(--floor-soft)}
+.fig p.fig-any .sw{margin-top:5px}
+.fig-bar+.fig-bar{margin-top:18px}
+.fig-bar-t{font-weight:600;font-size:14.5px;margin-bottom:8px}
+.segs{display:flex;gap:2px;height:28px}
+.segs .seg{min-width:3px;height:100%}
+.segs .seg:first-child{border-start-start-radius:4px;border-end-start-radius:4px}
+.segs .seg:last-child{border-start-end-radius:4px;border-end-end-radius:4px}
+.fig-key{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
+.fig-key li{display:flex;gap:9px;align-items:center;margin:0;font-size:14px;line-height:1.4}
+.fig-key li span{flex:1;min-width:0}
+.fig-key li b{font-weight:600;direction:ltr}
+.fig-key.inline{margin:0 0 12px}
+@media (min-width:560px){.fig-key.inline{display:flex;flex-wrap:wrap;gap:6px 22px}.fig-key.inline li span{flex:none}}
+.fig-chart{position:relative}
+.fig-chart svg{display:block;width:100%;height:auto;overflow:visible}
+.fig-chart .grid{stroke:var(--line);stroke-width:1}
+.fig-chart .tick{font:12px var(--mono);fill:var(--muted)}
+.fig-chart .val{font:600 13px var(--mono);fill:var(--ink)}
+.fig-chart .ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.fig-chart .ln-floor{stroke:var(--f-floor)}
+.fig-chart .ln-plat{stroke:var(--f-plat)}
+.fig-chart .wash-floor{fill:var(--f-floor);opacity:.1}
+.fig-chart .ring{fill:var(--surface)}
+.fig-chart .dot-floor{fill:var(--f-floor)}
+.fig-chart .dot-plat{fill:var(--f-plat)}
+.fig-chart .cross{stroke:var(--muted);stroke-width:1}
+/* The drawing is 640 units wide and shrinks with the screen. On a phone one unit is about half a pixel,
+   so text and strokes are drawn larger there to stay readable. */
+@media (max-width:620px){.fig-chart .tick{font-size:21px}.fig-chart .val{font-size:22px}.fig-chart .ln{stroke-width:3.6}.fig-chart .ring{r:10px}.fig-chart .dot-floor,.fig-chart .dot-plat{r:7px}.fig-chart .grid,.fig-chart .cross{stroke-width:1.6}}
+.fig-zone{position:absolute;top:9%;text-align:center;font-size:12.5px;line-height:1.3;color:var(--muted);pointer-events:none;padding:0 4px}
+.fig-zone.b{top:36%;text-align:right;padding-right:8px}
+.fig-chart .band{fill:var(--ink);opacity:.045}
+.fig-tip{position:absolute;top:6px;z-index:2;pointer-events:none;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12.5px;line-height:1.5;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.fig-tip b{font:600 12.5px var(--mono)}
+.fig-tip .sw{width:9px;height:9px;margin-inline-end:6px;vertical-align:baseline}
+.fig-tbl{margin-top:10px}
+.fig-tbl summary{cursor:pointer;font-size:13.5px;font-weight:600;color:var(--muted)}
+.fig-tbl td{direction:ltr}
+@media print{.fig,.fig-steps li,.fig p.fig-any{background:#fff;border-color:#999}.fig-tip,.fig-chart .cross{display:none}}
 @media print{body{background:#fff;color:#000}.top{display:none}.paper .tw,.paper blockquote,.paper code,.paper th{background:#fff;border-color:#999}.paper a{color:#000}}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="wrap ptop">
-    <a class="brand" href="./" aria-label="Jisr Launchpad, back to the launchpad"><b>JISR</b><i></i><span>launchpad</span></a>
+    <a class="brand" href="./" aria-label="Jisr Launchpad, home"><b>JISR</b><i></i><span>launchpad</span></a>
     <div class="acts">
-      <a href="./" id="backLink">Open the launchpad</a>
+      <a href="app.html" id="backLink">Open the launchpad</a>
       <select id="langSel" aria-label="Language"><option value="en">English</option><option value="ar">العربية</option><option value="zh">中文</option><option value="es">Español</option><option value="hi">हिन्दी</option><option value="fr">Français</option><option value="ru">Русский</option><option value="pt">Português</option><option value="tr">Türkçe</option><option value="id">Bahasa Indonesia</option></select>
     </div>
   </div>
@@ -95,6 +155,10 @@
 <td>None</td>
 </tr>
 </tbody></table></div>
+
+<figure class="fig"><figcaption><span class="fig-n">Figure 1</span> The life of a coin</figcaption>
+<ol class="fig-steps"><li><b>Launch</b><span>The creator pays the network fee and receives no coins.</span></li><li><b>Sale</b><span>800M coins at one fixed price. The value of every coin sold goes into the reserve.</span></li><li><b>Graduation</b><span>The sale sells out. The reserve holds about $81,684 for those 800M coins.</span></li><li><b>After graduation</b><span>The last 200M coins sell above the floor, and fees from trading keep raising the floor.</span></li></ol>
+<p class="fig-any"><i class="sw sw-floor"></i>At any time, a holder can sell back to the reserve at the floor price, less the 5% fee.</p></figure>
 <h3>2.1 One price for everyone</h3>
 <p>The first 800 million coins are sold at the same price to everybody, the creator included. There is no cheap early round, so nobody holds coins that cost less than yours.</p>
 <h3>2.2 The covered floor</h3>
@@ -133,12 +197,32 @@
 </tr>
 </tbody></table></div>
 <p>A buy followed by a sale at the floor costs 9.75% in fees. That is the most a floor-price buyer can lose to the mechanism itself. The risks in section 6 are separate.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Figure 2</span> Where $1,000 goes</figcaption>
+<div class="fig-bar"><div class="fig-bar-t">You buy with $1,000</div>
+<div class="segs" dir="ltr" role="img" aria-label="You buy with $1,000: Floor reserve: pays for your coins if you sell $950, Stays in the reserve (2%) $20, Launchpad (2%) $20, Creator (1%) $10"><i class="seg sw-floor" style="flex:950 0 0" title="Floor reserve: pays for your coins if you sell: $950"></i><i class="seg sw-extra" style="flex:20 0 0" title="Stays in the reserve (2%): $20"></i><i class="seg sw-plat" style="flex:20 0 0" title="Launchpad (2%): $20"></i><i class="seg sw-crea" style="flex:10 0 0" title="Creator (1%): $10"></i></div>
+<ul class="fig-key"><li><i class="sw sw-floor"></i><span>Floor reserve: pays for your coins if you sell</span><b class="num">$950</b></li><li><i class="sw sw-extra"></i><span>Stays in the reserve (2%)</span><b class="num">$20</b></li><li><i class="sw sw-plat"></i><span>Launchpad (2%)</span><b class="num">$20</b></li><li><i class="sw sw-crea"></i><span>Creator (1%)</span><b class="num">$10</b></li></ul></div>
+<div class="fig-bar"><div class="fig-bar-t">You sell the same coins back</div>
+<div class="segs" dir="ltr" role="img" aria-label="You sell the same coins back: You receive $902.50, Stays in the reserve (2%) $19, Launchpad (2%) $19, Creator (1%) $9.50"><i class="seg sw-you" style="flex:902.5 0 0" title="You receive: $902.50"></i><i class="seg sw-extra" style="flex:19 0 0" title="Stays in the reserve (2%): $19"></i><i class="seg sw-plat" style="flex:19 0 0" title="Launchpad (2%): $19"></i><i class="seg sw-crea" style="flex:9.5 0 0" title="Creator (1%): $9.50"></i></div>
+<ul class="fig-key"><li><i class="sw sw-you"></i><span>You receive</span><b class="num">$902.50</b></li><li><i class="sw sw-extra"></i><span>Stays in the reserve (2%)</span><b class="num">$19</b></li><li><i class="sw sw-plat"></i><span>Launchpad (2%)</span><b class="num">$19</b></li><li><i class="sw sw-crea"></i><span>Creator (1%)</span><b class="num">$9.50</b></li></ul></div>
+<p class="fig-note">After the buy the reserve holds $970 for coins it can buy back for $950.</p></figure>
 <h3>2.3 Graduation and the rising floor</h3>
 <p>When all 800 million sale coins have been sold, the coin has <strong>graduated</strong>. From then on, the 2% of every trade that stays in the reserve makes the reserve larger than it needs to be, and the floor price is raised to match:</p>
 <blockquote>
 <p>floor price = floor reserve ÷ the larger of (coins in circulation, 800,000,000)</p>
 </blockquote>
 <p>The floor price is never lowered. At graduation the reserve holds about $81,684 for a $100,000 coin, so the floor starts about 2.1% above the sale price and climbs with trading volume.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Figure 3</span> The floor after graduation</figcaption>
+<p class="fig-axis">Floor price, as a multiple of the sale price</p>
+<div class="fig-chart" dir="ltr" data-fig="floor" data-name="The floor after graduation">
+<svg viewBox="0 0 640 300" role="img" aria-label="The floor after graduation. 2% of every trade stays in the reserve, and the floor is raised to match. It is never lowered. Shown for 800M coins in circulation."><line class="grid" x1="46" x2="610" y1="270" y2="270"/><text class="tick" x="38" y="274" text-anchor="end">1.00×</text><line class="grid" x1="46" x2="610" y1="212.3" y2="212.3"/><text class="tick" x="38" y="216.3" text-anchor="end">1.25×</text><line class="grid" x1="46" x2="610" y1="154.5" y2="154.5"/><text class="tick" x="38" y="158.5" text-anchor="end">1.50×</text><line class="grid" x1="46" x2="610" y1="96.8" y2="96.8"/><text class="tick" x="38" y="100.8" text-anchor="end">1.75×</text><line class="grid" x1="46" x2="610" y1="39.1" y2="39.1"/><text class="tick" x="38" y="43.1" text-anchor="end">2.00×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="187" y="291" text-anchor="middle">1</text><text class="tick" x="328" y="291" text-anchor="middle">2</text><text class="tick" x="469" y="291" text-anchor="middle">3</text><text class="tick" x="610" y="291" text-anchor="middle">4</text>
+<path class="wash-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2 L610 270 L46 270 Z"/><path class="ln ln-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2"/><circle class="ring" cx="610" cy="34.2" r="6"/><circle class="dot-floor" cx="610" cy="34.2" r="4"/>
+<text class="val" x="600" y="24.200000000000003" text-anchor="end">2.02×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg><div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">Money traded after graduation, in millions of dollars</p>
+<p class="fig-note">2% of every trade stays in the reserve, and the floor is raised to match. It is never lowered. Shown for 800M coins in circulation.</p>
+<details class="fig-tbl"><summary>Numbers</summary><div class="tw"><table><thead><tr><th>Money traded after graduation, in millions of dollars</th><th>Floor price, as a multiple of the sale price</th></tr></thead><tbody><tr><td class="num">$0M</td><td class="num">1.02×</td></tr><tr><td class="num">$1M</td><td class="num">1.27×</td></tr><tr><td class="num">$2M</td><td class="num">1.52×</td></tr><tr><td class="num">$3M</td><td class="num">1.77×</td></tr><tr><td class="num">$4M</td><td class="num">2.02×</td></tr></tbody></table></div></details></figure>
 <h3>2.4 Above the floor</h3>
 <p>The last 200 million coins cost the floor price plus a premium that grows as they sell out. The premium is held in a separate <strong>premium reserve</strong> and is paid back when coins are sold along the same line.</p>
 <div class="tw"><table>
@@ -171,6 +255,24 @@
 </tr>
 </tbody></table></div>
 <p>The floor covers the floor price only. A buyer who pays a premium above the floor can lose that premium if others sell first.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Figure 4</span> The price of the next coin</figcaption>
+<ul class="fig-key inline"><li><i class="sw sw-line sw-plat"></i><span>Price to buy the next coin</span></li><li><i class="sw sw-line sw-floor"></i><span>Floor price</span></li></ul>
+<p class="fig-axis">Price, as a multiple of the sale price</p>
+<div class="fig-chart" dir="ltr" data-fig="price" data-a="Price to buy the next coin" data-b="Floor price">
+<svg viewBox="0 0 640 300" role="img" aria-label="The price of the next coin. The curve continues to 990M coins, where the price reaches 400 times the sale price."><line class="grid" x1="46" x2="610" y1="254.1" y2="254.1"/><text class="tick" x="38" y="258.1" text-anchor="end">1×</text><line class="grid" x1="46" x2="610" y1="206.5" y2="206.5"/><text class="tick" x="38" y="210.5" text-anchor="end">4×</text><line class="grid" x1="46" x2="610" y1="143" y2="143"/><text class="tick" x="38" y="147" text-anchor="end">8×</text><line class="grid" x1="46" x2="610" y1="79.5" y2="79.5"/><text class="tick" x="38" y="83.5" text-anchor="end">12×</text><line class="grid" x1="46" x2="610" y1="16" y2="16"/><text class="tick" x="38" y="20" text-anchor="end">16×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="164.7" y="291" text-anchor="middle">200</text><text class="tick" x="283.5" y="291" text-anchor="middle">400</text><text class="tick" x="402.2" y="291" text-anchor="middle">600</text><text class="tick" x="520.9" y="291" text-anchor="middle">800</text><text class="tick" x="610" y="291" text-anchor="middle">950</text>
+<rect class="band" x="520.9" y="16" width="89.1" height="254"/>
+<line class="grid" x1="520.9" x2="520.9" y1="16" y2="270"/>
+<path class="ln ln-floor" d="M520.9 254.1 L610 254.1"/><path class="ln ln-plat" d="M46 254.1 L520.9 254.1 L522.1 253.8 L523.3 253.5 L524.5 253.1 L525.7 252.8 L526.9 252.4 L528.1 252 L529.3 251.6 L530.4 251.2 L531.6 250.8 L532.8 250.4 L534 250 L535.2 249.5 L536.4 249 L537.6 248.5 L538.8 248 L539.9 247.5 L541.1 247 L542.3 246.4 L543.5 245.8 L544.7 245.2 L545.9 244.6 L547.1 243.9 L548.3 243.2 L549.4 242.5 L550.6 241.8 L551.8 241 L553 240.2 L554.2 239.4 L555.4 238.5 L556.6 237.6 L557.8 236.7 L558.9 235.7 L560.1 234.6 L561.3 233.6 L562.5 232.4 L563.7 231.2 L564.9 230 L566.1 228.7 L567.3 227.3 L568.4 225.9 L569.6 224.4 L570.8 222.8 L572 221.1 L573.2 219.4 L574.4 217.5 L575.6 215.6 L576.8 213.5 L577.9 211.3 L579.1 209 L580.3 206.5 L581.5 203.9 L582.7 201.1 L583.9 198.1 L585.1 195 L586.3 191.6 L587.4 188 L588.6 184.1 L589.8 180 L591 175.6 L592.2 170.8 L593.4 165.6 L594.6 160.1 L595.8 154 L596.9 147.5 L598.1 140.4 L599.3 132.7 L600.5 124.2 L601.7 115 L602.9 104.8 L604.1 93.6 L605.3 81.2 L606.4 67.5 L607.6 52.2 L608.8 35.2 L610 16"/>
+<circle class="ring" cx="610" cy="254.1" r="6"/><circle class="dot-floor" cx="610" cy="254.1" r="4"/><circle class="ring" cx="610" cy="16" r="6"/><circle class="dot-plat" cx="610" cy="16" r="4"/>
+<text class="val" x="600" y="20" text-anchor="end">16×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg>
+<div class="fig-zone" style="left:7.2%;width:74.2%"><span dir="auto">Sale: one price</span></div>
+<div class="fig-zone b" style="right:18.6%;width:38%"><span dir="auto">Above the floor</span></div>
+<div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">Coins sold, in millions</p>
+<p class="fig-note">The curve continues to 990M coins, where the price reaches 400 times the sale price.</p>
+<details class="fig-tbl"><summary>Numbers</summary><div class="tw"><table><thead><tr><th>Coins sold, in millions</th><th>Price to buy the next coin</th><th>Floor price</th></tr></thead><tbody><tr><td class="num">0M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">800M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">850M</td><td class="num">1.78×</td><td class="num">1×</td></tr><tr><td class="num">900M</td><td class="num">4×</td><td class="num">1×</td></tr><tr><td class="num">950M</td><td class="num">16×</td><td class="num">1×</td></tr><tr><td class="num">990M</td><td class="num">400×</td><td class="num">1×</td></tr></tbody></table></div></details></figure>
 <h3>2.5 Where the 5% goes</h3>
 <div class="tw"><table>
 <thead>
@@ -267,7 +369,7 @@
 </tr>
 <tr>
 <td>Web app and deploy page</td>
-<td>Built and tested (24 browser tests), live</td>
+<td>Built and tested (25 browser tests), live</td>
 </tr>
 <tr>
 <td>Test deployment</td>
@@ -346,6 +448,10 @@
 <td>لا شيء</td>
 </tr>
 </tbody></table></div>
+
+<figure class="fig"><figcaption><span class="fig-n">الشكل 1</span> حياة العملة</figcaption>
+<ol class="fig-steps"><li><b>الإطلاق</b><span>المطوّر يدفع رسوم الشبكة ولا يحصل على أي عملات.</span></li><li><b>البيع</b><span>800 مليون عملة بسعر واحد ثابت. قيمة كل عملة تُباع تدخل الاحتياطي.</span></li><li><b>التخرّج</b><span>يكتمل بيع الحصة. الاحتياطي يحمل نحو 81,684$ مقابل تلك الـ800 مليون عملة.</span></li><li><b>بعد التخرّج</b><span>آخر 200 مليون عملة تُباع فوق الأرضية، ورسوم التداول ترفع الأرضية باستمرار.</span></li></ol>
+<p class="fig-any"><i class="sw sw-floor"></i>في أي وقت يستطيع الحامل أن يبيع للاحتياطي بسعر الأرضية، ناقص رسم 5%.</p></figure>
 <h3>2.1 سعر واحد للجميع</h3>
 <p>أول 800 مليون عملة تُباع بالسعر نفسه لكل الناس، والمطوّر منهم. لا توجد جولة مبكرة رخيصة، فلا أحد يحمل عملات كلّفته أقل مما كلّفتك.</p>
 <h3>2.2 الأرضية المغطاة</h3>
@@ -384,12 +490,32 @@
 </tr>
 </tbody></table></div>
 <p>الشراء ثم البيع بسعر الأرضية يكلّف 9.75% رسوماً. هذا أقصى ما يخسره مشتري سعر الأرضية بسبب الآلية نفسها. المخاطر في القسم 6 أمر آخر.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">الشكل 2</span> أين تذهب 1,000$</figcaption>
+<div class="fig-bar"><div class="fig-bar-t">تشتري بـ1,000$</div>
+<div class="segs" dir="ltr" role="img" aria-label="تشتري بـ1,000$: احتياطي الأرضية: يدفع ثمن عملاتك إذا بعت $950, يبقى في الاحتياطي (2%) $20, المنصة (2%) $20, المطوّر (1%) $10"><i class="seg sw-floor" style="flex:950 0 0" title="احتياطي الأرضية: يدفع ثمن عملاتك إذا بعت: $950"></i><i class="seg sw-extra" style="flex:20 0 0" title="يبقى في الاحتياطي (2%): $20"></i><i class="seg sw-plat" style="flex:20 0 0" title="المنصة (2%): $20"></i><i class="seg sw-crea" style="flex:10 0 0" title="المطوّر (1%): $10"></i></div>
+<ul class="fig-key"><li><i class="sw sw-floor"></i><span>احتياطي الأرضية: يدفع ثمن عملاتك إذا بعت</span><b class="num">$950</b></li><li><i class="sw sw-extra"></i><span>يبقى في الاحتياطي (2%)</span><b class="num">$20</b></li><li><i class="sw sw-plat"></i><span>المنصة (2%)</span><b class="num">$20</b></li><li><i class="sw sw-crea"></i><span>المطوّر (1%)</span><b class="num">$10</b></li></ul></div>
+<div class="fig-bar"><div class="fig-bar-t">تبيع العملات نفسها</div>
+<div class="segs" dir="ltr" role="img" aria-label="تبيع العملات نفسها: تستلم $902.50, يبقى في الاحتياطي (2%) $19, المنصة (2%) $19, المطوّر (1%) $9.50"><i class="seg sw-you" style="flex:902.5 0 0" title="تستلم: $902.50"></i><i class="seg sw-extra" style="flex:19 0 0" title="يبقى في الاحتياطي (2%): $19"></i><i class="seg sw-plat" style="flex:19 0 0" title="المنصة (2%): $19"></i><i class="seg sw-crea" style="flex:9.5 0 0" title="المطوّر (1%): $9.50"></i></div>
+<ul class="fig-key"><li><i class="sw sw-you"></i><span>تستلم</span><b class="num">$902.50</b></li><li><i class="sw sw-extra"></i><span>يبقى في الاحتياطي (2%)</span><b class="num">$19</b></li><li><i class="sw sw-plat"></i><span>المنصة (2%)</span><b class="num">$19</b></li><li><i class="sw sw-crea"></i><span>المطوّر (1%)</span><b class="num">$9.50</b></li></ul></div>
+<p class="fig-note">بعد الشراء يحمل الاحتياطي 970$ مقابل عملات يستطيع إعادة شرائها بـ950$.</p></figure>
 <h3>2.3 التخرّج والأرضية الصاعدة</h3>
 <p>عند بيع كل عملات البيع الـ800 مليون تكون العملة قد <strong>تخرّجت</strong>. بعدها، نسبة 2% التي تبقى في الاحتياطي من كل صفقة تجعله أكبر من حاجته، فيُرفع سعر الأرضية ليطابقه:</p>
 <blockquote>
 <p>سعر الأرضية = احتياطي الأرضية ÷ الأكبر من (العملات المتداولة، 800,000,000)</p>
 </blockquote>
 <p>سعر الأرضية لا ينخفض أبداً. عند التخرّج يحمل الاحتياطي نحو 81,684 دولاراً لعملة قيمتها 100,000 دولار، فتبدأ الأرضية أعلى من سعر البيع بنحو 2.1% وتصعد مع حجم التداول.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">الشكل 3</span> الأرضية بعد التخرّج</figcaption>
+<p class="fig-axis">سعر الأرضية، كمضاعف لسعر البيع</p>
+<div class="fig-chart" dir="ltr" data-fig="floor" data-name="الأرضية بعد التخرّج">
+<svg viewBox="0 0 640 300" role="img" aria-label="الأرضية بعد التخرّج. 2% من كل صفقة تبقى في الاحتياطي، وتُرفع الأرضية بما يطابقها، ولا تُخفَّض أبداً. الرسم لحالة 800 مليون عملة متداولة."><line class="grid" x1="46" x2="610" y1="270" y2="270"/><text class="tick" x="38" y="274" text-anchor="end">1.00×</text><line class="grid" x1="46" x2="610" y1="212.3" y2="212.3"/><text class="tick" x="38" y="216.3" text-anchor="end">1.25×</text><line class="grid" x1="46" x2="610" y1="154.5" y2="154.5"/><text class="tick" x="38" y="158.5" text-anchor="end">1.50×</text><line class="grid" x1="46" x2="610" y1="96.8" y2="96.8"/><text class="tick" x="38" y="100.8" text-anchor="end">1.75×</text><line class="grid" x1="46" x2="610" y1="39.1" y2="39.1"/><text class="tick" x="38" y="43.1" text-anchor="end">2.00×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="187" y="291" text-anchor="middle">1</text><text class="tick" x="328" y="291" text-anchor="middle">2</text><text class="tick" x="469" y="291" text-anchor="middle">3</text><text class="tick" x="610" y="291" text-anchor="middle">4</text>
+<path class="wash-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2 L610 270 L46 270 Z"/><path class="ln ln-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2"/><circle class="ring" cx="610" cy="34.2" r="6"/><circle class="dot-floor" cx="610" cy="34.2" r="4"/>
+<text class="val" x="600" y="24.200000000000003" text-anchor="end">2.02×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg><div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">حجم التداول بعد التخرّج، بملايين الدولارات</p>
+<p class="fig-note">2% من كل صفقة تبقى في الاحتياطي، وتُرفع الأرضية بما يطابقها، ولا تُخفَّض أبداً. الرسم لحالة 800 مليون عملة متداولة.</p>
+<details class="fig-tbl"><summary>الأرقام</summary><div class="tw"><table><thead><tr><th>حجم التداول بعد التخرّج، بملايين الدولارات</th><th>سعر الأرضية، كمضاعف لسعر البيع</th></tr></thead><tbody><tr><td class="num">$0M</td><td class="num">1.02×</td></tr><tr><td class="num">$1M</td><td class="num">1.27×</td></tr><tr><td class="num">$2M</td><td class="num">1.52×</td></tr><tr><td class="num">$3M</td><td class="num">1.77×</td></tr><tr><td class="num">$4M</td><td class="num">2.02×</td></tr></tbody></table></div></details></figure>
 <h3>2.4 فوق الأرضية</h3>
 <p>آخر 200 مليون عملة تكلّف سعر الأرضية مضافاً إليه علاوة تكبر كلما بيع منها أكثر. العلاوة تُحفظ في <strong>احتياطي علاوة</strong> منفصل، وتُردّ عند بيع العملات على الخط نفسه.</p>
 <div class="tw"><table>
@@ -422,6 +548,24 @@
 </tr>
 </tbody></table></div>
 <p>الأرضية تغطي سعر الأرضية فقط. من يدفع علاوة فوق الأرضية قد يخسر تلك العلاوة إذا باع غيره قبله.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">الشكل 4</span> سعر العملة التالية</figcaption>
+<ul class="fig-key inline"><li><i class="sw sw-line sw-plat"></i><span>سعر شراء العملة التالية</span></li><li><i class="sw sw-line sw-floor"></i><span>سعر الأرضية</span></li></ul>
+<p class="fig-axis">السعر، كمضاعف لسعر البيع</p>
+<div class="fig-chart" dir="ltr" data-fig="price" data-a="سعر شراء العملة التالية" data-b="سعر الأرضية">
+<svg viewBox="0 0 640 300" role="img" aria-label="سعر العملة التالية. يستمر المنحنى حتى 990 مليون عملة، حيث يبلغ السعر 400 ضعف سعر البيع."><line class="grid" x1="46" x2="610" y1="254.1" y2="254.1"/><text class="tick" x="38" y="258.1" text-anchor="end">1×</text><line class="grid" x1="46" x2="610" y1="206.5" y2="206.5"/><text class="tick" x="38" y="210.5" text-anchor="end">4×</text><line class="grid" x1="46" x2="610" y1="143" y2="143"/><text class="tick" x="38" y="147" text-anchor="end">8×</text><line class="grid" x1="46" x2="610" y1="79.5" y2="79.5"/><text class="tick" x="38" y="83.5" text-anchor="end">12×</text><line class="grid" x1="46" x2="610" y1="16" y2="16"/><text class="tick" x="38" y="20" text-anchor="end">16×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="164.7" y="291" text-anchor="middle">200</text><text class="tick" x="283.5" y="291" text-anchor="middle">400</text><text class="tick" x="402.2" y="291" text-anchor="middle">600</text><text class="tick" x="520.9" y="291" text-anchor="middle">800</text><text class="tick" x="610" y="291" text-anchor="middle">950</text>
+<rect class="band" x="520.9" y="16" width="89.1" height="254"/>
+<line class="grid" x1="520.9" x2="520.9" y1="16" y2="270"/>
+<path class="ln ln-floor" d="M520.9 254.1 L610 254.1"/><path class="ln ln-plat" d="M46 254.1 L520.9 254.1 L522.1 253.8 L523.3 253.5 L524.5 253.1 L525.7 252.8 L526.9 252.4 L528.1 252 L529.3 251.6 L530.4 251.2 L531.6 250.8 L532.8 250.4 L534 250 L535.2 249.5 L536.4 249 L537.6 248.5 L538.8 248 L539.9 247.5 L541.1 247 L542.3 246.4 L543.5 245.8 L544.7 245.2 L545.9 244.6 L547.1 243.9 L548.3 243.2 L549.4 242.5 L550.6 241.8 L551.8 241 L553 240.2 L554.2 239.4 L555.4 238.5 L556.6 237.6 L557.8 236.7 L558.9 235.7 L560.1 234.6 L561.3 233.6 L562.5 232.4 L563.7 231.2 L564.9 230 L566.1 228.7 L567.3 227.3 L568.4 225.9 L569.6 224.4 L570.8 222.8 L572 221.1 L573.2 219.4 L574.4 217.5 L575.6 215.6 L576.8 213.5 L577.9 211.3 L579.1 209 L580.3 206.5 L581.5 203.9 L582.7 201.1 L583.9 198.1 L585.1 195 L586.3 191.6 L587.4 188 L588.6 184.1 L589.8 180 L591 175.6 L592.2 170.8 L593.4 165.6 L594.6 160.1 L595.8 154 L596.9 147.5 L598.1 140.4 L599.3 132.7 L600.5 124.2 L601.7 115 L602.9 104.8 L604.1 93.6 L605.3 81.2 L606.4 67.5 L607.6 52.2 L608.8 35.2 L610 16"/>
+<circle class="ring" cx="610" cy="254.1" r="6"/><circle class="dot-floor" cx="610" cy="254.1" r="4"/><circle class="ring" cx="610" cy="16" r="6"/><circle class="dot-plat" cx="610" cy="16" r="4"/>
+<text class="val" x="600" y="20" text-anchor="end">16×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg>
+<div class="fig-zone" style="left:7.2%;width:74.2%"><span dir="auto">البيع: سعر واحد</span></div>
+<div class="fig-zone b" style="right:18.6%;width:38%"><span dir="auto">فوق الأرضية</span></div>
+<div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">العملات المباعة، بالملايين</p>
+<p class="fig-note">يستمر المنحنى حتى 990 مليون عملة، حيث يبلغ السعر 400 ضعف سعر البيع.</p>
+<details class="fig-tbl"><summary>الأرقام</summary><div class="tw"><table><thead><tr><th>العملات المباعة، بالملايين</th><th>سعر شراء العملة التالية</th><th>سعر الأرضية</th></tr></thead><tbody><tr><td class="num">0M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">800M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">850M</td><td class="num">1.78×</td><td class="num">1×</td></tr><tr><td class="num">900M</td><td class="num">4×</td><td class="num">1×</td></tr><tr><td class="num">950M</td><td class="num">16×</td><td class="num">1×</td></tr><tr><td class="num">990M</td><td class="num">400×</td><td class="num">1×</td></tr></tbody></table></div></details></figure>
 <h3>2.5 أين تذهب الـ5%</h3>
 <div class="tw"><table>
 <thead>
@@ -518,7 +662,7 @@
 </tr>
 <tr>
 <td>الموقع وصفحة النشر</td>
-<td>مبنيان ومختبران (24 اختباراً في المتصفح)، ويعملان</td>
+<td>مبنيان ومختبران (25 اختباراً في المتصفح)، ويعملان</td>
 </tr>
 <tr>
 <td>النشر التجريبي</td>
@@ -598,6 +742,10 @@
 <td>无</td>
 </tr>
 </tbody></table></div>
+
+<figure class="fig"><figcaption><span class="fig-n">图 1</span> 一枚代币的生命周期</figcaption>
+<ol class="fig-steps"><li><b>发行</b><span>创建者支付网络费用，不获得任何代币。</span></li><li><b>发售</b><span>8 亿枚代币以同一固定价格出售。每售出一枚，其价值都进入储备。</span></li><li><b>毕业</b><span>发售部分售罄。储备为这 8 亿枚代币持有约 81,684 美元。</span></li><li><b>毕业之后</b><span>最后 2 亿枚在底价之上出售，交易费用不断抬高底价。</span></li></ol>
+<p class="fig-any"><i class="sw sw-floor"></i>持有者可随时按底价卖回给储备，扣除 5% 的费用。</p></figure>
 <h3>2.1 所有人同一个价格</h3>
 <p>前 8 亿枚代币以同样的价格卖给所有人，包括创建者。没有低价的早期轮次，所以没有人持有成本比你更低的代币。</p>
 <h3>2.2 全额覆盖的底价</h3>
@@ -636,12 +784,32 @@
 </tr>
 </tbody></table></div>
 <p>按底价买入再卖出，手续费合计 9.75%。这是按底价买入的人因机制本身可能损失的最大比例。第 6 节中的风险另当别论。</p>
+
+<figure class="fig"><figcaption><span class="fig-n">图 2</span> 1,000 美元的去向</figcaption>
+<div class="fig-bar"><div class="fig-bar-t">你用 1,000 美元买入</div>
+<div class="segs" dir="ltr" role="img" aria-label="你用 1,000 美元买入: 底价储备：你卖出时用它支付 $950, 留在储备中（2%） $20, 平台（2%） $20, 创建者（1%） $10"><i class="seg sw-floor" style="flex:950 0 0" title="底价储备：你卖出时用它支付: $950"></i><i class="seg sw-extra" style="flex:20 0 0" title="留在储备中（2%）: $20"></i><i class="seg sw-plat" style="flex:20 0 0" title="平台（2%）: $20"></i><i class="seg sw-crea" style="flex:10 0 0" title="创建者（1%）: $10"></i></div>
+<ul class="fig-key"><li><i class="sw sw-floor"></i><span>底价储备：你卖出时用它支付</span><b class="num">$950</b></li><li><i class="sw sw-extra"></i><span>留在储备中（2%）</span><b class="num">$20</b></li><li><i class="sw sw-plat"></i><span>平台（2%）</span><b class="num">$20</b></li><li><i class="sw sw-crea"></i><span>创建者（1%）</span><b class="num">$10</b></li></ul></div>
+<div class="fig-bar"><div class="fig-bar-t">你把同样的代币卖回</div>
+<div class="segs" dir="ltr" role="img" aria-label="你把同样的代币卖回: 你收到 $902.50, 留在储备中（2%） $19, 平台（2%） $19, 创建者（1%） $9.50"><i class="seg sw-you" style="flex:902.5 0 0" title="你收到: $902.50"></i><i class="seg sw-extra" style="flex:19 0 0" title="留在储备中（2%）: $19"></i><i class="seg sw-plat" style="flex:19 0 0" title="平台（2%）: $19"></i><i class="seg sw-crea" style="flex:9.5 0 0" title="创建者（1%）: $9.50"></i></div>
+<ul class="fig-key"><li><i class="sw sw-you"></i><span>你收到</span><b class="num">$902.50</b></li><li><i class="sw sw-extra"></i><span>留在储备中（2%）</span><b class="num">$19</b></li><li><i class="sw sw-plat"></i><span>平台（2%）</span><b class="num">$19</b></li><li><i class="sw sw-crea"></i><span>创建者（1%）</span><b class="num">$9.50</b></li></ul></div>
+<p class="fig-note">买入后，储备持有 970 美元，而买回这些代币只需 950 美元。</p></figure>
 <h3>2.3 毕业与上升的底价</h3>
 <p>当 8 亿枚发售代币全部售出后，该代币即为<strong>毕业</strong>。此后，每笔交易中留在储备里的 2% 会使储备超过所需金额，底价随之上调：</p>
 <blockquote>
 <p>底价 = 底价储备 ÷（流通代币数量 与 800,000,000 两者中的较大值）</p>
 </blockquote>
 <p>底价永不下调。毕业时，一个市值 $100,000 的代币的储备约为 $81,684，所以底价一开始就比发售价高约 2.1%，并随交易量继续上升。</p>
+
+<figure class="fig"><figcaption><span class="fig-n">图 3</span> 毕业后的底价</figcaption>
+<p class="fig-axis">底价，相对于发售价的倍数</p>
+<div class="fig-chart" dir="ltr" data-fig="floor" data-name="毕业后的底价">
+<svg viewBox="0 0 640 300" role="img" aria-label="毕业后的底价. 每笔交易的 2% 留在储备中，底价随之上调，且永不下调。图中按 8 亿枚流通代币计算。"><line class="grid" x1="46" x2="610" y1="270" y2="270"/><text class="tick" x="38" y="274" text-anchor="end">1.00×</text><line class="grid" x1="46" x2="610" y1="212.3" y2="212.3"/><text class="tick" x="38" y="216.3" text-anchor="end">1.25×</text><line class="grid" x1="46" x2="610" y1="154.5" y2="154.5"/><text class="tick" x="38" y="158.5" text-anchor="end">1.50×</text><line class="grid" x1="46" x2="610" y1="96.8" y2="96.8"/><text class="tick" x="38" y="100.8" text-anchor="end">1.75×</text><line class="grid" x1="46" x2="610" y1="39.1" y2="39.1"/><text class="tick" x="38" y="43.1" text-anchor="end">2.00×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="187" y="291" text-anchor="middle">1</text><text class="tick" x="328" y="291" text-anchor="middle">2</text><text class="tick" x="469" y="291" text-anchor="middle">3</text><text class="tick" x="610" y="291" text-anchor="middle">4</text>
+<path class="wash-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2 L610 270 L46 270 Z"/><path class="ln ln-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2"/><circle class="ring" cx="610" cy="34.2" r="6"/><circle class="dot-floor" cx="610" cy="34.2" r="4"/>
+<text class="val" x="600" y="24.200000000000003" text-anchor="end">2.02×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg><div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">毕业后的交易额（百万美元）</p>
+<p class="fig-note">每笔交易的 2% 留在储备中，底价随之上调，且永不下调。图中按 8 亿枚流通代币计算。</p>
+<details class="fig-tbl"><summary>数据</summary><div class="tw"><table><thead><tr><th>毕业后的交易额（百万美元）</th><th>底价，相对于发售价的倍数</th></tr></thead><tbody><tr><td class="num">$0M</td><td class="num">1.02×</td></tr><tr><td class="num">$1M</td><td class="num">1.27×</td></tr><tr><td class="num">$2M</td><td class="num">1.52×</td></tr><tr><td class="num">$3M</td><td class="num">1.77×</td></tr><tr><td class="num">$4M</td><td class="num">2.02×</td></tr></tbody></table></div></details></figure>
 <h3>2.4 底价之上</h3>
 <p>最后 2 亿枚代币的价格是底价加上一份溢价，溢价随着这部分代币售出而增长。溢价存放在单独的<strong>溢价储备</strong>中，当代币沿同一条线卖回时返还。</p>
 <div class="tw"><table>
@@ -674,6 +842,24 @@
 </tr>
 </tbody></table></div>
 <p>底价只覆盖底价本身。在底价之上支付了溢价的买家，如果其他人先卖出，可能损失这部分溢价。</p>
+
+<figure class="fig"><figcaption><span class="fig-n">图 4</span> 下一枚代币的价格</figcaption>
+<ul class="fig-key inline"><li><i class="sw sw-line sw-plat"></i><span>买入下一枚代币的价格</span></li><li><i class="sw sw-line sw-floor"></i><span>底价</span></li></ul>
+<p class="fig-axis">价格，相对于发售价的倍数</p>
+<div class="fig-chart" dir="ltr" data-fig="price" data-a="买入下一枚代币的价格" data-b="底价">
+<svg viewBox="0 0 640 300" role="img" aria-label="下一枚代币的价格. 曲线一直延伸到 9.9 亿枚，届时价格达到发售价的 400 倍。"><line class="grid" x1="46" x2="610" y1="254.1" y2="254.1"/><text class="tick" x="38" y="258.1" text-anchor="end">1×</text><line class="grid" x1="46" x2="610" y1="206.5" y2="206.5"/><text class="tick" x="38" y="210.5" text-anchor="end">4×</text><line class="grid" x1="46" x2="610" y1="143" y2="143"/><text class="tick" x="38" y="147" text-anchor="end">8×</text><line class="grid" x1="46" x2="610" y1="79.5" y2="79.5"/><text class="tick" x="38" y="83.5" text-anchor="end">12×</text><line class="grid" x1="46" x2="610" y1="16" y2="16"/><text class="tick" x="38" y="20" text-anchor="end">16×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="164.7" y="291" text-anchor="middle">200</text><text class="tick" x="283.5" y="291" text-anchor="middle">400</text><text class="tick" x="402.2" y="291" text-anchor="middle">600</text><text class="tick" x="520.9" y="291" text-anchor="middle">800</text><text class="tick" x="610" y="291" text-anchor="middle">950</text>
+<rect class="band" x="520.9" y="16" width="89.1" height="254"/>
+<line class="grid" x1="520.9" x2="520.9" y1="16" y2="270"/>
+<path class="ln ln-floor" d="M520.9 254.1 L610 254.1"/><path class="ln ln-plat" d="M46 254.1 L520.9 254.1 L522.1 253.8 L523.3 253.5 L524.5 253.1 L525.7 252.8 L526.9 252.4 L528.1 252 L529.3 251.6 L530.4 251.2 L531.6 250.8 L532.8 250.4 L534 250 L535.2 249.5 L536.4 249 L537.6 248.5 L538.8 248 L539.9 247.5 L541.1 247 L542.3 246.4 L543.5 245.8 L544.7 245.2 L545.9 244.6 L547.1 243.9 L548.3 243.2 L549.4 242.5 L550.6 241.8 L551.8 241 L553 240.2 L554.2 239.4 L555.4 238.5 L556.6 237.6 L557.8 236.7 L558.9 235.7 L560.1 234.6 L561.3 233.6 L562.5 232.4 L563.7 231.2 L564.9 230 L566.1 228.7 L567.3 227.3 L568.4 225.9 L569.6 224.4 L570.8 222.8 L572 221.1 L573.2 219.4 L574.4 217.5 L575.6 215.6 L576.8 213.5 L577.9 211.3 L579.1 209 L580.3 206.5 L581.5 203.9 L582.7 201.1 L583.9 198.1 L585.1 195 L586.3 191.6 L587.4 188 L588.6 184.1 L589.8 180 L591 175.6 L592.2 170.8 L593.4 165.6 L594.6 160.1 L595.8 154 L596.9 147.5 L598.1 140.4 L599.3 132.7 L600.5 124.2 L601.7 115 L602.9 104.8 L604.1 93.6 L605.3 81.2 L606.4 67.5 L607.6 52.2 L608.8 35.2 L610 16"/>
+<circle class="ring" cx="610" cy="254.1" r="6"/><circle class="dot-floor" cx="610" cy="254.1" r="4"/><circle class="ring" cx="610" cy="16" r="6"/><circle class="dot-plat" cx="610" cy="16" r="4"/>
+<text class="val" x="600" y="20" text-anchor="end">16×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg>
+<div class="fig-zone" style="left:7.2%;width:74.2%"><span dir="auto">发售：同一价格</span></div>
+<div class="fig-zone b" style="right:18.6%;width:38%"><span dir="auto">底价之上</span></div>
+<div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">已售出的代币（百万枚）</p>
+<p class="fig-note">曲线一直延伸到 9.9 亿枚，届时价格达到发售价的 400 倍。</p>
+<details class="fig-tbl"><summary>数据</summary><div class="tw"><table><thead><tr><th>已售出的代币（百万枚）</th><th>买入下一枚代币的价格</th><th>底价</th></tr></thead><tbody><tr><td class="num">0M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">800M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">850M</td><td class="num">1.78×</td><td class="num">1×</td></tr><tr><td class="num">900M</td><td class="num">4×</td><td class="num">1×</td></tr><tr><td class="num">950M</td><td class="num">16×</td><td class="num">1×</td></tr><tr><td class="num">990M</td><td class="num">400×</td><td class="num">1×</td></tr></tbody></table></div></details></figure>
 <h3>2.5 5% 的去向</h3>
 <div class="tw"><table>
 <thead>
@@ -770,7 +956,7 @@
 </tr>
 <tr>
 <td>网页应用和部署页面</td>
-<td>已建成并通过测试（24 项浏览器测试），已上线</td>
+<td>已建成并通过测试（25 项浏览器测试），已上线</td>
 </tr>
 <tr>
 <td>测试部署</td>
@@ -850,6 +1036,10 @@
 <td>Ninguna</td>
 </tr>
 </tbody></table></div>
+
+<figure class="fig"><figcaption><span class="fig-n">Figura 1</span> La vida de una moneda</figcaption>
+<ol class="fig-steps"><li><b>Lanzamiento</b><span>El creador paga la comisión de la red y no recibe monedas.</span></li><li><b>Venta</b><span>800 M de monedas a un único precio fijo. El valor de cada moneda vendida entra en la reserva.</span></li><li><b>Graduación</b><span>La venta se agota. La reserva guarda unos 81.684 $ por esos 800 M de monedas.</span></li><li><b>Tras la graduación</b><span>Los últimos 200 M se venden por encima del mínimo, y las comisiones de las operaciones siguen subiendo el mínimo.</span></li></ol>
+<p class="fig-any"><i class="sw sw-floor"></i>En cualquier momento, un titular puede vender a la reserva al precio mínimo, menos la comisión del 5%.</p></figure>
 <h3>2.1 Un solo precio para todos</h3>
 <p>Las primeras 800 millones de monedas se venden al mismo precio a todo el mundo, incluido el creador. No hay ronda inicial barata, así que nadie tiene monedas que le hayan costado menos que a ti.</p>
 <h3>2.2 El mínimo cubierto</h3>
@@ -888,12 +1078,32 @@
 </tr>
 </tbody></table></div>
 <p>Comprar y luego vender al precio mínimo cuesta un 9.75% en comisiones. Eso es lo máximo que un comprador al precio mínimo puede perder por el mecanismo en sí. Los riesgos de la sección 6 son aparte.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Figura 2</span> A dónde van 1.000 $</figcaption>
+<div class="fig-bar"><div class="fig-bar-t">Compras con 1.000 $</div>
+<div class="segs" dir="ltr" role="img" aria-label="Compras con 1.000 $: Reserva del mínimo: paga tus monedas si vendes $950, Se queda en la reserva (2%) $20, Plataforma (2%) $20, Creador (1%) $10"><i class="seg sw-floor" style="flex:950 0 0" title="Reserva del mínimo: paga tus monedas si vendes: $950"></i><i class="seg sw-extra" style="flex:20 0 0" title="Se queda en la reserva (2%): $20"></i><i class="seg sw-plat" style="flex:20 0 0" title="Plataforma (2%): $20"></i><i class="seg sw-crea" style="flex:10 0 0" title="Creador (1%): $10"></i></div>
+<ul class="fig-key"><li><i class="sw sw-floor"></i><span>Reserva del mínimo: paga tus monedas si vendes</span><b class="num">$950</b></li><li><i class="sw sw-extra"></i><span>Se queda en la reserva (2%)</span><b class="num">$20</b></li><li><i class="sw sw-plat"></i><span>Plataforma (2%)</span><b class="num">$20</b></li><li><i class="sw sw-crea"></i><span>Creador (1%)</span><b class="num">$10</b></li></ul></div>
+<div class="fig-bar"><div class="fig-bar-t">Vendes esas mismas monedas</div>
+<div class="segs" dir="ltr" role="img" aria-label="Vendes esas mismas monedas: Recibes $902.50, Se queda en la reserva (2%) $19, Plataforma (2%) $19, Creador (1%) $9.50"><i class="seg sw-you" style="flex:902.5 0 0" title="Recibes: $902.50"></i><i class="seg sw-extra" style="flex:19 0 0" title="Se queda en la reserva (2%): $19"></i><i class="seg sw-plat" style="flex:19 0 0" title="Plataforma (2%): $19"></i><i class="seg sw-crea" style="flex:9.5 0 0" title="Creador (1%): $9.50"></i></div>
+<ul class="fig-key"><li><i class="sw sw-you"></i><span>Recibes</span><b class="num">$902.50</b></li><li><i class="sw sw-extra"></i><span>Se queda en la reserva (2%)</span><b class="num">$19</b></li><li><i class="sw sw-plat"></i><span>Plataforma (2%)</span><b class="num">$19</b></li><li><i class="sw sw-crea"></i><span>Creador (1%)</span><b class="num">$9.50</b></li></ul></div>
+<p class="fig-note">Tras la compra, la reserva guarda 970 $ por monedas que puede recomprar por 950 $.</p></figure>
 <h3>2.3 Graduación y mínimo ascendente</h3>
 <p>Cuando se han vendido las 800 millones de monedas de la venta, la moneda se ha <strong>graduado</strong>. A partir de ahí, el 2% de cada operación que se queda en la reserva la hace mayor de lo necesario, y el precio mínimo se sube para igualarla:</p>
 <blockquote>
 <p>precio mínimo = reserva del mínimo ÷ el mayor entre (monedas en circulación, 800,000,000)</p>
 </blockquote>
 <p>El precio mínimo nunca baja. En la graduación la reserva tiene unos $81,684 para una moneda de $100,000, así que el mínimo empieza alrededor de un 2.1% por encima del precio de venta y sube con el volumen de operaciones.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Figura 3</span> El mínimo tras la graduación</figcaption>
+<p class="fig-axis">Precio mínimo, como múltiplo del precio de venta</p>
+<div class="fig-chart" dir="ltr" data-fig="floor" data-name="El mínimo tras la graduación">
+<svg viewBox="0 0 640 300" role="img" aria-label="El mínimo tras la graduación. El 2% de cada operación se queda en la reserva y el mínimo sube en consecuencia. Nunca baja. Calculado para 800 M de monedas en circulación."><line class="grid" x1="46" x2="610" y1="270" y2="270"/><text class="tick" x="38" y="274" text-anchor="end">1.00×</text><line class="grid" x1="46" x2="610" y1="212.3" y2="212.3"/><text class="tick" x="38" y="216.3" text-anchor="end">1.25×</text><line class="grid" x1="46" x2="610" y1="154.5" y2="154.5"/><text class="tick" x="38" y="158.5" text-anchor="end">1.50×</text><line class="grid" x1="46" x2="610" y1="96.8" y2="96.8"/><text class="tick" x="38" y="100.8" text-anchor="end">1.75×</text><line class="grid" x1="46" x2="610" y1="39.1" y2="39.1"/><text class="tick" x="38" y="43.1" text-anchor="end">2.00×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="187" y="291" text-anchor="middle">1</text><text class="tick" x="328" y="291" text-anchor="middle">2</text><text class="tick" x="469" y="291" text-anchor="middle">3</text><text class="tick" x="610" y="291" text-anchor="middle">4</text>
+<path class="wash-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2 L610 270 L46 270 Z"/><path class="ln ln-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2"/><circle class="ring" cx="610" cy="34.2" r="6"/><circle class="dot-floor" cx="610" cy="34.2" r="4"/>
+<text class="val" x="600" y="24.200000000000003" text-anchor="end">2.02×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg><div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">Dinero negociado tras la graduación, en millones de dólares</p>
+<p class="fig-note">El 2% de cada operación se queda en la reserva y el mínimo sube en consecuencia. Nunca baja. Calculado para 800 M de monedas en circulación.</p>
+<details class="fig-tbl"><summary>Cifras</summary><div class="tw"><table><thead><tr><th>Dinero negociado tras la graduación, en millones de dólares</th><th>Precio mínimo, como múltiplo del precio de venta</th></tr></thead><tbody><tr><td class="num">$0M</td><td class="num">1.02×</td></tr><tr><td class="num">$1M</td><td class="num">1.27×</td></tr><tr><td class="num">$2M</td><td class="num">1.52×</td></tr><tr><td class="num">$3M</td><td class="num">1.77×</td></tr><tr><td class="num">$4M</td><td class="num">2.02×</td></tr></tbody></table></div></details></figure>
 <h3>2.4 Por encima del mínimo</h3>
 <p>Las últimas 200 millones de monedas cuestan el precio mínimo más una prima que crece a medida que se agotan. La prima se guarda en una <strong>reserva de primas</strong> separada y se devuelve cuando las monedas se venden recorriendo la misma línea.</p>
 <div class="tw"><table>
@@ -926,6 +1136,24 @@
 </tr>
 </tbody></table></div>
 <p>El mínimo cubre solo el precio mínimo. Quien paga una prima por encima del mínimo puede perder esa prima si otros venden antes.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Figura 4</span> El precio de la siguiente moneda</figcaption>
+<ul class="fig-key inline"><li><i class="sw sw-line sw-plat"></i><span>Precio de compra de la siguiente moneda</span></li><li><i class="sw sw-line sw-floor"></i><span>Precio mínimo</span></li></ul>
+<p class="fig-axis">Precio, como múltiplo del precio de venta</p>
+<div class="fig-chart" dir="ltr" data-fig="price" data-a="Precio de compra de la siguiente moneda" data-b="Precio mínimo">
+<svg viewBox="0 0 640 300" role="img" aria-label="El precio de la siguiente moneda. La curva continúa hasta 990 M de monedas, donde el precio alcanza 400 veces el precio de venta."><line class="grid" x1="46" x2="610" y1="254.1" y2="254.1"/><text class="tick" x="38" y="258.1" text-anchor="end">1×</text><line class="grid" x1="46" x2="610" y1="206.5" y2="206.5"/><text class="tick" x="38" y="210.5" text-anchor="end">4×</text><line class="grid" x1="46" x2="610" y1="143" y2="143"/><text class="tick" x="38" y="147" text-anchor="end">8×</text><line class="grid" x1="46" x2="610" y1="79.5" y2="79.5"/><text class="tick" x="38" y="83.5" text-anchor="end">12×</text><line class="grid" x1="46" x2="610" y1="16" y2="16"/><text class="tick" x="38" y="20" text-anchor="end">16×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="164.7" y="291" text-anchor="middle">200</text><text class="tick" x="283.5" y="291" text-anchor="middle">400</text><text class="tick" x="402.2" y="291" text-anchor="middle">600</text><text class="tick" x="520.9" y="291" text-anchor="middle">800</text><text class="tick" x="610" y="291" text-anchor="middle">950</text>
+<rect class="band" x="520.9" y="16" width="89.1" height="254"/>
+<line class="grid" x1="520.9" x2="520.9" y1="16" y2="270"/>
+<path class="ln ln-floor" d="M520.9 254.1 L610 254.1"/><path class="ln ln-plat" d="M46 254.1 L520.9 254.1 L522.1 253.8 L523.3 253.5 L524.5 253.1 L525.7 252.8 L526.9 252.4 L528.1 252 L529.3 251.6 L530.4 251.2 L531.6 250.8 L532.8 250.4 L534 250 L535.2 249.5 L536.4 249 L537.6 248.5 L538.8 248 L539.9 247.5 L541.1 247 L542.3 246.4 L543.5 245.8 L544.7 245.2 L545.9 244.6 L547.1 243.9 L548.3 243.2 L549.4 242.5 L550.6 241.8 L551.8 241 L553 240.2 L554.2 239.4 L555.4 238.5 L556.6 237.6 L557.8 236.7 L558.9 235.7 L560.1 234.6 L561.3 233.6 L562.5 232.4 L563.7 231.2 L564.9 230 L566.1 228.7 L567.3 227.3 L568.4 225.9 L569.6 224.4 L570.8 222.8 L572 221.1 L573.2 219.4 L574.4 217.5 L575.6 215.6 L576.8 213.5 L577.9 211.3 L579.1 209 L580.3 206.5 L581.5 203.9 L582.7 201.1 L583.9 198.1 L585.1 195 L586.3 191.6 L587.4 188 L588.6 184.1 L589.8 180 L591 175.6 L592.2 170.8 L593.4 165.6 L594.6 160.1 L595.8 154 L596.9 147.5 L598.1 140.4 L599.3 132.7 L600.5 124.2 L601.7 115 L602.9 104.8 L604.1 93.6 L605.3 81.2 L606.4 67.5 L607.6 52.2 L608.8 35.2 L610 16"/>
+<circle class="ring" cx="610" cy="254.1" r="6"/><circle class="dot-floor" cx="610" cy="254.1" r="4"/><circle class="ring" cx="610" cy="16" r="6"/><circle class="dot-plat" cx="610" cy="16" r="4"/>
+<text class="val" x="600" y="20" text-anchor="end">16×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg>
+<div class="fig-zone" style="left:7.2%;width:74.2%"><span dir="auto">Venta: un solo precio</span></div>
+<div class="fig-zone b" style="right:18.6%;width:38%"><span dir="auto">Por encima del mínimo</span></div>
+<div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">Monedas vendidas, en millones</p>
+<p class="fig-note">La curva continúa hasta 990 M de monedas, donde el precio alcanza 400 veces el precio de venta.</p>
+<details class="fig-tbl"><summary>Cifras</summary><div class="tw"><table><thead><tr><th>Monedas vendidas, en millones</th><th>Precio de compra de la siguiente moneda</th><th>Precio mínimo</th></tr></thead><tbody><tr><td class="num">0M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">800M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">850M</td><td class="num">1.78×</td><td class="num">1×</td></tr><tr><td class="num">900M</td><td class="num">4×</td><td class="num">1×</td></tr><tr><td class="num">950M</td><td class="num">16×</td><td class="num">1×</td></tr><tr><td class="num">990M</td><td class="num">400×</td><td class="num">1×</td></tr></tbody></table></div></details></figure>
 <h3>2.5 A dónde va el 5%</h3>
 <div class="tw"><table>
 <thead>
@@ -1022,7 +1250,7 @@
 </tr>
 <tr>
 <td>Aplicación web y página de despliegue</td>
-<td>Construidas y probadas (24 pruebas en navegador), en línea</td>
+<td>Construidas y probadas (25 pruebas en navegador), en línea</td>
 </tr>
 <tr>
 <td>Despliegue de prueba</td>
@@ -1102,6 +1330,10 @@
 <td>कोई नहीं</td>
 </tr>
 </tbody></table></div>
+
+<figure class="fig"><figcaption><span class="fig-n">चित्र 1</span> एक कॉइन का जीवन</figcaption>
+<ol class="fig-steps"><li><b>लॉन्च</b><span>बनाने वाला नेटवर्क शुल्क देता है और उसे कोई कॉइन नहीं मिलता।</span></li><li><b>बिक्री</b><span>80 करोड़ कॉइन एक ही तय कीमत पर। बिके हर कॉइन का मूल्य रिज़र्व में जाता है।</span></li><li><b>ग्रेजुएशन</b><span>बिक्री पूरी हो जाती है। उन 80 करोड़ कॉइन के लिए रिज़र्व में लगभग $81,684 होते हैं।</span></li><li><b>ग्रेजुएशन के बाद</b><span>आख़िरी 20 करोड़ कॉइन फ़्लोर से ऊपर बिकते हैं, और ट्रेडिंग की फ़ीस फ़्लोर को बढ़ाती रहती है।</span></li></ol>
+<p class="fig-any"><i class="sw sw-floor"></i>धारक किसी भी समय फ़्लोर कीमत पर, 5% फ़ीस घटाकर, रिज़र्व को वापस बेच सकता है।</p></figure>
 <h3>2.1 सबके लिए एक कीमत</h3>
 <p>पहले 80 करोड़ कॉइन सबको एक ही कीमत पर बेचे जाते हैं, बनाने वाले को भी। कोई सस्ता शुरुआती दौर नहीं है, इसलिए किसी के पास आपसे कम लागत वाले कॉइन नहीं होते।</p>
 <h3>2.2 पूरी तरह कवर किया गया फ़्लोर</h3>
@@ -1140,12 +1372,32 @@
 </tr>
 </tbody></table></div>
 <p>फ़्लोर कीमत पर ख़रीदकर फिर बेचने में कुल 9.75% शुल्क लगता है। फ़्लोर कीमत पर ख़रीदने वाला सिर्फ़ इस व्यवस्था की वजह से अधिकतम इतना ही खो सकता है। खंड 6 के जोखिम अलग हैं।</p>
+
+<figure class="fig"><figcaption><span class="fig-n">चित्र 2</span> $1,000 कहाँ जाता है</figcaption>
+<div class="fig-bar"><div class="fig-bar-t">आप $1,000 से ख़रीदते हैं</div>
+<div class="segs" dir="ltr" role="img" aria-label="आप $1,000 से ख़रीदते हैं: फ़्लोर रिज़र्व: बेचने पर आपके कॉइन का भुगतान यहीं से $950, रिज़र्व में रहता है (2%) $20, प्लेटफ़ॉर्म (2%) $20, बनाने वाला (1%) $10"><i class="seg sw-floor" style="flex:950 0 0" title="फ़्लोर रिज़र्व: बेचने पर आपके कॉइन का भुगतान यहीं से: $950"></i><i class="seg sw-extra" style="flex:20 0 0" title="रिज़र्व में रहता है (2%): $20"></i><i class="seg sw-plat" style="flex:20 0 0" title="प्लेटफ़ॉर्म (2%): $20"></i><i class="seg sw-crea" style="flex:10 0 0" title="बनाने वाला (1%): $10"></i></div>
+<ul class="fig-key"><li><i class="sw sw-floor"></i><span>फ़्लोर रिज़र्व: बेचने पर आपके कॉइन का भुगतान यहीं से</span><b class="num">$950</b></li><li><i class="sw sw-extra"></i><span>रिज़र्व में रहता है (2%)</span><b class="num">$20</b></li><li><i class="sw sw-plat"></i><span>प्लेटफ़ॉर्म (2%)</span><b class="num">$20</b></li><li><i class="sw sw-crea"></i><span>बनाने वाला (1%)</span><b class="num">$10</b></li></ul></div>
+<div class="fig-bar"><div class="fig-bar-t">आप वही कॉइन वापस बेचते हैं</div>
+<div class="segs" dir="ltr" role="img" aria-label="आप वही कॉइन वापस बेचते हैं: आपको मिलता है $902.50, रिज़र्व में रहता है (2%) $19, प्लेटफ़ॉर्म (2%) $19, बनाने वाला (1%) $9.50"><i class="seg sw-you" style="flex:902.5 0 0" title="आपको मिलता है: $902.50"></i><i class="seg sw-extra" style="flex:19 0 0" title="रिज़र्व में रहता है (2%): $19"></i><i class="seg sw-plat" style="flex:19 0 0" title="प्लेटफ़ॉर्म (2%): $19"></i><i class="seg sw-crea" style="flex:9.5 0 0" title="बनाने वाला (1%): $9.50"></i></div>
+<ul class="fig-key"><li><i class="sw sw-you"></i><span>आपको मिलता है</span><b class="num">$902.50</b></li><li><i class="sw sw-extra"></i><span>रिज़र्व में रहता है (2%)</span><b class="num">$19</b></li><li><i class="sw sw-plat"></i><span>प्लेटफ़ॉर्म (2%)</span><b class="num">$19</b></li><li><i class="sw sw-crea"></i><span>बनाने वाला (1%)</span><b class="num">$9.50</b></li></ul></div>
+<p class="fig-note">ख़रीद के बाद रिज़र्व में $970 होते हैं, जबकि वे कॉइन $950 में वापस ख़रीदे जा सकते हैं।</p></figure>
 <h3>2.3 ग्रेजुएशन और बढ़ता फ़्लोर</h3>
 <p>जब बिक्री के सभी 80 करोड़ कॉइन बिक जाते हैं, तो कॉइन <strong>ग्रेजुएट</strong> हो जाता है। इसके बाद हर ट्रेड का जो 2% रिज़र्व में रह जाता है, वह रिज़र्व को ज़रूरत से बड़ा कर देता है, और फ़्लोर कीमत उसी के हिसाब से बढ़ा दी जाती है:</p>
 <blockquote>
 <p>फ़्लोर कीमत = फ़्लोर रिज़र्व ÷ (चलन में कॉइन और 800,000,000 में से जो बड़ा हो)</p>
 </blockquote>
 <p>फ़्लोर कीमत कभी घटाई नहीं जाती। ग्रेजुएशन के समय $100,000 के कॉइन के लिए रिज़र्व में लगभग $81,684 होते हैं, इसलिए फ़्लोर बिक्री कीमत से लगभग 2.1% ऊपर शुरू होता है और ट्रेडिंग वॉल्यूम के साथ बढ़ता है।</p>
+
+<figure class="fig"><figcaption><span class="fig-n">चित्र 3</span> ग्रेजुएशन के बाद फ़्लोर</figcaption>
+<p class="fig-axis">फ़्लोर कीमत, बिक्री कीमत के गुणज में</p>
+<div class="fig-chart" dir="ltr" data-fig="floor" data-name="ग्रेजुएशन के बाद फ़्लोर">
+<svg viewBox="0 0 640 300" role="img" aria-label="ग्रेजुएशन के बाद फ़्लोर. हर ट्रेड का 2% रिज़र्व में रहता है और फ़्लोर उसी के अनुसार बढ़ाया जाता है। इसे कभी घटाया नहीं जाता। चित्र 80 करोड़ चलन में मौजूद कॉइन के लिए है।"><line class="grid" x1="46" x2="610" y1="270" y2="270"/><text class="tick" x="38" y="274" text-anchor="end">1.00×</text><line class="grid" x1="46" x2="610" y1="212.3" y2="212.3"/><text class="tick" x="38" y="216.3" text-anchor="end">1.25×</text><line class="grid" x1="46" x2="610" y1="154.5" y2="154.5"/><text class="tick" x="38" y="158.5" text-anchor="end">1.50×</text><line class="grid" x1="46" x2="610" y1="96.8" y2="96.8"/><text class="tick" x="38" y="100.8" text-anchor="end">1.75×</text><line class="grid" x1="46" x2="610" y1="39.1" y2="39.1"/><text class="tick" x="38" y="43.1" text-anchor="end">2.00×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="187" y="291" text-anchor="middle">1</text><text class="tick" x="328" y="291" text-anchor="middle">2</text><text class="tick" x="469" y="291" text-anchor="middle">3</text><text class="tick" x="610" y="291" text-anchor="middle">4</text>
+<path class="wash-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2 L610 270 L46 270 Z"/><path class="ln ln-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2"/><circle class="ring" cx="610" cy="34.2" r="6"/><circle class="dot-floor" cx="610" cy="34.2" r="4"/>
+<text class="val" x="600" y="24.200000000000003" text-anchor="end">2.02×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg><div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">ग्रेजुएशन के बाद हुआ कारोबार, दस लाख डॉलर में</p>
+<p class="fig-note">हर ट्रेड का 2% रिज़र्व में रहता है और फ़्लोर उसी के अनुसार बढ़ाया जाता है। इसे कभी घटाया नहीं जाता। चित्र 80 करोड़ चलन में मौजूद कॉइन के लिए है।</p>
+<details class="fig-tbl"><summary>आँकड़े</summary><div class="tw"><table><thead><tr><th>ग्रेजुएशन के बाद हुआ कारोबार, दस लाख डॉलर में</th><th>फ़्लोर कीमत, बिक्री कीमत के गुणज में</th></tr></thead><tbody><tr><td class="num">$0M</td><td class="num">1.02×</td></tr><tr><td class="num">$1M</td><td class="num">1.27×</td></tr><tr><td class="num">$2M</td><td class="num">1.52×</td></tr><tr><td class="num">$3M</td><td class="num">1.77×</td></tr><tr><td class="num">$4M</td><td class="num">2.02×</td></tr></tbody></table></div></details></figure>
 <h3>2.4 फ़्लोर से ऊपर</h3>
 <p>आख़िरी 20 करोड़ कॉइन की कीमत फ़्लोर कीमत और एक प्रीमियम का जोड़ होती है, और यह प्रीमियम इन कॉइन के बिकने के साथ बढ़ता जाता है। प्रीमियम एक अलग <strong>प्रीमियम रिज़र्व</strong> में रखा जाता है और जब कॉइन उसी रेखा पर वापस बेचे जाते हैं तो लौटा दिया जाता है।</p>
 <div class="tw"><table>
@@ -1178,6 +1430,24 @@
 </tr>
 </tbody></table></div>
 <p>फ़्लोर सिर्फ़ फ़्लोर कीमत को कवर करता है। जो ख़रीदार फ़्लोर से ऊपर प्रीमियम चुकाता है, वह वह प्रीमियम खो सकता है अगर दूसरे लोग उससे पहले बेच दें।</p>
+
+<figure class="fig"><figcaption><span class="fig-n">चित्र 4</span> अगले कॉइन की कीमत</figcaption>
+<ul class="fig-key inline"><li><i class="sw sw-line sw-plat"></i><span>अगला कॉइन ख़रीदने की कीमत</span></li><li><i class="sw sw-line sw-floor"></i><span>फ़्लोर कीमत</span></li></ul>
+<p class="fig-axis">कीमत, बिक्री कीमत के गुणज में</p>
+<div class="fig-chart" dir="ltr" data-fig="price" data-a="अगला कॉइन ख़रीदने की कीमत" data-b="फ़्लोर कीमत">
+<svg viewBox="0 0 640 300" role="img" aria-label="अगले कॉइन की कीमत. वक्र 99 करोड़ कॉइन तक चलता है, जहाँ कीमत बिक्री कीमत की 400 गुना हो जाती है।"><line class="grid" x1="46" x2="610" y1="254.1" y2="254.1"/><text class="tick" x="38" y="258.1" text-anchor="end">1×</text><line class="grid" x1="46" x2="610" y1="206.5" y2="206.5"/><text class="tick" x="38" y="210.5" text-anchor="end">4×</text><line class="grid" x1="46" x2="610" y1="143" y2="143"/><text class="tick" x="38" y="147" text-anchor="end">8×</text><line class="grid" x1="46" x2="610" y1="79.5" y2="79.5"/><text class="tick" x="38" y="83.5" text-anchor="end">12×</text><line class="grid" x1="46" x2="610" y1="16" y2="16"/><text class="tick" x="38" y="20" text-anchor="end">16×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="164.7" y="291" text-anchor="middle">200</text><text class="tick" x="283.5" y="291" text-anchor="middle">400</text><text class="tick" x="402.2" y="291" text-anchor="middle">600</text><text class="tick" x="520.9" y="291" text-anchor="middle">800</text><text class="tick" x="610" y="291" text-anchor="middle">950</text>
+<rect class="band" x="520.9" y="16" width="89.1" height="254"/>
+<line class="grid" x1="520.9" x2="520.9" y1="16" y2="270"/>
+<path class="ln ln-floor" d="M520.9 254.1 L610 254.1"/><path class="ln ln-plat" d="M46 254.1 L520.9 254.1 L522.1 253.8 L523.3 253.5 L524.5 253.1 L525.7 252.8 L526.9 252.4 L528.1 252 L529.3 251.6 L530.4 251.2 L531.6 250.8 L532.8 250.4 L534 250 L535.2 249.5 L536.4 249 L537.6 248.5 L538.8 248 L539.9 247.5 L541.1 247 L542.3 246.4 L543.5 245.8 L544.7 245.2 L545.9 244.6 L547.1 243.9 L548.3 243.2 L549.4 242.5 L550.6 241.8 L551.8 241 L553 240.2 L554.2 239.4 L555.4 238.5 L556.6 237.6 L557.8 236.7 L558.9 235.7 L560.1 234.6 L561.3 233.6 L562.5 232.4 L563.7 231.2 L564.9 230 L566.1 228.7 L567.3 227.3 L568.4 225.9 L569.6 224.4 L570.8 222.8 L572 221.1 L573.2 219.4 L574.4 217.5 L575.6 215.6 L576.8 213.5 L577.9 211.3 L579.1 209 L580.3 206.5 L581.5 203.9 L582.7 201.1 L583.9 198.1 L585.1 195 L586.3 191.6 L587.4 188 L588.6 184.1 L589.8 180 L591 175.6 L592.2 170.8 L593.4 165.6 L594.6 160.1 L595.8 154 L596.9 147.5 L598.1 140.4 L599.3 132.7 L600.5 124.2 L601.7 115 L602.9 104.8 L604.1 93.6 L605.3 81.2 L606.4 67.5 L607.6 52.2 L608.8 35.2 L610 16"/>
+<circle class="ring" cx="610" cy="254.1" r="6"/><circle class="dot-floor" cx="610" cy="254.1" r="4"/><circle class="ring" cx="610" cy="16" r="6"/><circle class="dot-plat" cx="610" cy="16" r="4"/>
+<text class="val" x="600" y="20" text-anchor="end">16×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg>
+<div class="fig-zone" style="left:7.2%;width:74.2%"><span dir="auto">बिक्री: एक ही कीमत</span></div>
+<div class="fig-zone b" style="right:18.6%;width:38%"><span dir="auto">फ़्लोर से ऊपर</span></div>
+<div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">बिके कॉइन, दस लाख में</p>
+<p class="fig-note">वक्र 99 करोड़ कॉइन तक चलता है, जहाँ कीमत बिक्री कीमत की 400 गुना हो जाती है।</p>
+<details class="fig-tbl"><summary>आँकड़े</summary><div class="tw"><table><thead><tr><th>बिके कॉइन, दस लाख में</th><th>अगला कॉइन ख़रीदने की कीमत</th><th>फ़्लोर कीमत</th></tr></thead><tbody><tr><td class="num">0M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">800M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">850M</td><td class="num">1.78×</td><td class="num">1×</td></tr><tr><td class="num">900M</td><td class="num">4×</td><td class="num">1×</td></tr><tr><td class="num">950M</td><td class="num">16×</td><td class="num">1×</td></tr><tr><td class="num">990M</td><td class="num">400×</td><td class="num">1×</td></tr></tbody></table></div></details></figure>
 <h3>2.5 5% कहाँ जाता है</h3>
 <div class="tw"><table>
 <thead>
@@ -1274,7 +1544,7 @@
 </tr>
 <tr>
 <td>वेब ऐप और डिप्लॉय पेज</td>
-<td>बन चुके हैं और टेस्ट हो चुके हैं (24 ब्राउज़र टेस्ट), लाइव हैं</td>
+<td>बन चुके हैं और टेस्ट हो चुके हैं (25 ब्राउज़र टेस्ट), लाइव हैं</td>
 </tr>
 <tr>
 <td>टेस्ट डिप्लॉयमेंट</td>
@@ -1354,6 +1624,10 @@
 <td>Aucun</td>
 </tr>
 </tbody></table></div>
+
+<figure class="fig"><figcaption><span class="fig-n">Figure 1</span> La vie d'un jeton</figcaption>
+<ol class="fig-steps"><li><b>Lancement</b><span>Le créateur paie les frais de réseau et ne reçoit aucun jeton.</span></li><li><b>Vente</b><span>800 M de jetons à un prix fixe unique. La valeur de chaque jeton vendu entre dans la réserve.</span></li><li><b>Graduation</b><span>La vente est épuisée. La réserve détient environ 81 684 $ pour ces 800 M de jetons.</span></li><li><b>Après la graduation</b><span>Les 200 derniers millions se vendent au-dessus du plancher, et les frais des échanges continuent de relever le plancher.</span></li></ol>
+<p class="fig-any"><i class="sw sw-floor"></i>À tout moment, un détenteur peut revendre à la réserve au prix plancher, moins les frais de 5 %.</p></figure>
 <h3>2.1 Un seul prix pour tous</h3>
 <p>Les 800 premiers millions de jetons sont vendus au même prix à tout le monde, créateur compris. Il n&#39;y a pas de tour initial à bas prix : personne ne détient de jetons qui lui ont coûté moins cher que les vôtres.</p>
 <h3>2.2 Le plancher couvert</h3>
@@ -1392,12 +1666,32 @@
 </tr>
 </tbody></table></div>
 <p>Un achat suivi d&#39;une vente au prix plancher coûte 9.75 % de frais. C&#39;est le maximum qu&#39;un acheteur au prix plancher peut perdre du fait du mécanisme lui-même. Les risques de la section 6 sont distincts.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Figure 2</span> Où vont 1 000 $</figcaption>
+<div class="fig-bar"><div class="fig-bar-t">Vous achetez pour 1 000 $</div>
+<div class="segs" dir="ltr" role="img" aria-label="Vous achetez pour 1 000 $: Réserve du plancher : paie vos jetons si vous vendez $950, Reste dans la réserve (2 %) $20, Plateforme (2 %) $20, Créateur (1 %) $10"><i class="seg sw-floor" style="flex:950 0 0" title="Réserve du plancher : paie vos jetons si vous vendez: $950"></i><i class="seg sw-extra" style="flex:20 0 0" title="Reste dans la réserve (2 %): $20"></i><i class="seg sw-plat" style="flex:20 0 0" title="Plateforme (2 %): $20"></i><i class="seg sw-crea" style="flex:10 0 0" title="Créateur (1 %): $10"></i></div>
+<ul class="fig-key"><li><i class="sw sw-floor"></i><span>Réserve du plancher : paie vos jetons si vous vendez</span><b class="num">$950</b></li><li><i class="sw sw-extra"></i><span>Reste dans la réserve (2 %)</span><b class="num">$20</b></li><li><i class="sw sw-plat"></i><span>Plateforme (2 %)</span><b class="num">$20</b></li><li><i class="sw sw-crea"></i><span>Créateur (1 %)</span><b class="num">$10</b></li></ul></div>
+<div class="fig-bar"><div class="fig-bar-t">Vous revendez ces mêmes jetons</div>
+<div class="segs" dir="ltr" role="img" aria-label="Vous revendez ces mêmes jetons: Vous recevez $902.50, Reste dans la réserve (2 %) $19, Plateforme (2 %) $19, Créateur (1 %) $9.50"><i class="seg sw-you" style="flex:902.5 0 0" title="Vous recevez: $902.50"></i><i class="seg sw-extra" style="flex:19 0 0" title="Reste dans la réserve (2 %): $19"></i><i class="seg sw-plat" style="flex:19 0 0" title="Plateforme (2 %): $19"></i><i class="seg sw-crea" style="flex:9.5 0 0" title="Créateur (1 %): $9.50"></i></div>
+<ul class="fig-key"><li><i class="sw sw-you"></i><span>Vous recevez</span><b class="num">$902.50</b></li><li><i class="sw sw-extra"></i><span>Reste dans la réserve (2 %)</span><b class="num">$19</b></li><li><i class="sw sw-plat"></i><span>Plateforme (2 %)</span><b class="num">$19</b></li><li><i class="sw sw-crea"></i><span>Créateur (1 %)</span><b class="num">$9.50</b></li></ul></div>
+<p class="fig-note">Après l'achat, la réserve détient 970 $ pour des jetons qu'elle peut racheter 950 $.</p></figure>
 <h3>2.3 Graduation et plancher croissant</h3>
 <p>Quand les 800 millions de jetons de la vente sont vendus, le jeton est <strong>gradué</strong>. À partir de là, les 2 % de chaque transaction qui restent dans la réserve la rendent plus grande que nécessaire, et le prix plancher est relevé en conséquence :</p>
 <blockquote>
 <p>prix plancher = réserve du plancher ÷ le plus grand de (jetons en circulation, 800,000,000)</p>
 </blockquote>
 <p>Le prix plancher ne baisse jamais. À la graduation, la réserve contient environ $81,684 pour un jeton à $100,000 : le plancher démarre donc environ 2.1 % au-dessus du prix de vente et monte avec le volume des échanges.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Figure 3</span> Le plancher après la graduation</figcaption>
+<p class="fig-axis">Prix plancher, en multiple du prix de vente</p>
+<div class="fig-chart" dir="ltr" data-fig="floor" data-name="Le plancher après la graduation">
+<svg viewBox="0 0 640 300" role="img" aria-label="Le plancher après la graduation. 2 % de chaque échange restent dans la réserve, et le plancher est relevé en conséquence. Il n'est jamais abaissé. Calculé pour 800 M de jetons en circulation."><line class="grid" x1="46" x2="610" y1="270" y2="270"/><text class="tick" x="38" y="274" text-anchor="end">1.00×</text><line class="grid" x1="46" x2="610" y1="212.3" y2="212.3"/><text class="tick" x="38" y="216.3" text-anchor="end">1.25×</text><line class="grid" x1="46" x2="610" y1="154.5" y2="154.5"/><text class="tick" x="38" y="158.5" text-anchor="end">1.50×</text><line class="grid" x1="46" x2="610" y1="96.8" y2="96.8"/><text class="tick" x="38" y="100.8" text-anchor="end">1.75×</text><line class="grid" x1="46" x2="610" y1="39.1" y2="39.1"/><text class="tick" x="38" y="43.1" text-anchor="end">2.00×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="187" y="291" text-anchor="middle">1</text><text class="tick" x="328" y="291" text-anchor="middle">2</text><text class="tick" x="469" y="291" text-anchor="middle">3</text><text class="tick" x="610" y="291" text-anchor="middle">4</text>
+<path class="wash-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2 L610 270 L46 270 Z"/><path class="ln ln-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2"/><circle class="ring" cx="610" cy="34.2" r="6"/><circle class="dot-floor" cx="610" cy="34.2" r="4"/>
+<text class="val" x="600" y="24.200000000000003" text-anchor="end">2.02×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg><div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">Montant échangé après la graduation, en millions de dollars</p>
+<p class="fig-note">2 % de chaque échange restent dans la réserve, et le plancher est relevé en conséquence. Il n'est jamais abaissé. Calculé pour 800 M de jetons en circulation.</p>
+<details class="fig-tbl"><summary>Chiffres</summary><div class="tw"><table><thead><tr><th>Montant échangé après la graduation, en millions de dollars</th><th>Prix plancher, en multiple du prix de vente</th></tr></thead><tbody><tr><td class="num">$0M</td><td class="num">1.02×</td></tr><tr><td class="num">$1M</td><td class="num">1.27×</td></tr><tr><td class="num">$2M</td><td class="num">1.52×</td></tr><tr><td class="num">$3M</td><td class="num">1.77×</td></tr><tr><td class="num">$4M</td><td class="num">2.02×</td></tr></tbody></table></div></details></figure>
 <h3>2.4 Au-dessus du plancher</h3>
 <p>Les 200 derniers millions de jetons coûtent le prix plancher plus une prime qui augmente à mesure qu&#39;ils s&#39;épuisent. La prime est conservée dans une <strong>réserve de primes</strong> distincte et elle est restituée quand les jetons sont revendus le long de la même ligne.</p>
 <div class="tw"><table>
@@ -1430,6 +1724,24 @@
 </tr>
 </tbody></table></div>
 <p>Le plancher ne couvre que le prix plancher. Un acheteur qui paie une prime au-dessus du plancher peut perdre cette prime si d&#39;autres vendent avant lui.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Figure 4</span> Le prix du jeton suivant</figcaption>
+<ul class="fig-key inline"><li><i class="sw sw-line sw-plat"></i><span>Prix d'achat du jeton suivant</span></li><li><i class="sw sw-line sw-floor"></i><span>Prix plancher</span></li></ul>
+<p class="fig-axis">Prix, en multiple du prix de vente</p>
+<div class="fig-chart" dir="ltr" data-fig="price" data-a="Prix d'achat du jeton suivant" data-b="Prix plancher">
+<svg viewBox="0 0 640 300" role="img" aria-label="Le prix du jeton suivant. La courbe se poursuit jusqu'à 990 M de jetons, où le prix atteint 400 fois le prix de vente."><line class="grid" x1="46" x2="610" y1="254.1" y2="254.1"/><text class="tick" x="38" y="258.1" text-anchor="end">1×</text><line class="grid" x1="46" x2="610" y1="206.5" y2="206.5"/><text class="tick" x="38" y="210.5" text-anchor="end">4×</text><line class="grid" x1="46" x2="610" y1="143" y2="143"/><text class="tick" x="38" y="147" text-anchor="end">8×</text><line class="grid" x1="46" x2="610" y1="79.5" y2="79.5"/><text class="tick" x="38" y="83.5" text-anchor="end">12×</text><line class="grid" x1="46" x2="610" y1="16" y2="16"/><text class="tick" x="38" y="20" text-anchor="end">16×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="164.7" y="291" text-anchor="middle">200</text><text class="tick" x="283.5" y="291" text-anchor="middle">400</text><text class="tick" x="402.2" y="291" text-anchor="middle">600</text><text class="tick" x="520.9" y="291" text-anchor="middle">800</text><text class="tick" x="610" y="291" text-anchor="middle">950</text>
+<rect class="band" x="520.9" y="16" width="89.1" height="254"/>
+<line class="grid" x1="520.9" x2="520.9" y1="16" y2="270"/>
+<path class="ln ln-floor" d="M520.9 254.1 L610 254.1"/><path class="ln ln-plat" d="M46 254.1 L520.9 254.1 L522.1 253.8 L523.3 253.5 L524.5 253.1 L525.7 252.8 L526.9 252.4 L528.1 252 L529.3 251.6 L530.4 251.2 L531.6 250.8 L532.8 250.4 L534 250 L535.2 249.5 L536.4 249 L537.6 248.5 L538.8 248 L539.9 247.5 L541.1 247 L542.3 246.4 L543.5 245.8 L544.7 245.2 L545.9 244.6 L547.1 243.9 L548.3 243.2 L549.4 242.5 L550.6 241.8 L551.8 241 L553 240.2 L554.2 239.4 L555.4 238.5 L556.6 237.6 L557.8 236.7 L558.9 235.7 L560.1 234.6 L561.3 233.6 L562.5 232.4 L563.7 231.2 L564.9 230 L566.1 228.7 L567.3 227.3 L568.4 225.9 L569.6 224.4 L570.8 222.8 L572 221.1 L573.2 219.4 L574.4 217.5 L575.6 215.6 L576.8 213.5 L577.9 211.3 L579.1 209 L580.3 206.5 L581.5 203.9 L582.7 201.1 L583.9 198.1 L585.1 195 L586.3 191.6 L587.4 188 L588.6 184.1 L589.8 180 L591 175.6 L592.2 170.8 L593.4 165.6 L594.6 160.1 L595.8 154 L596.9 147.5 L598.1 140.4 L599.3 132.7 L600.5 124.2 L601.7 115 L602.9 104.8 L604.1 93.6 L605.3 81.2 L606.4 67.5 L607.6 52.2 L608.8 35.2 L610 16"/>
+<circle class="ring" cx="610" cy="254.1" r="6"/><circle class="dot-floor" cx="610" cy="254.1" r="4"/><circle class="ring" cx="610" cy="16" r="6"/><circle class="dot-plat" cx="610" cy="16" r="4"/>
+<text class="val" x="600" y="20" text-anchor="end">16×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg>
+<div class="fig-zone" style="left:7.2%;width:74.2%"><span dir="auto">Vente : un seul prix</span></div>
+<div class="fig-zone b" style="right:18.6%;width:38%"><span dir="auto">Au-dessus du plancher</span></div>
+<div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">Jetons vendus, en millions</p>
+<p class="fig-note">La courbe se poursuit jusqu'à 990 M de jetons, où le prix atteint 400 fois le prix de vente.</p>
+<details class="fig-tbl"><summary>Chiffres</summary><div class="tw"><table><thead><tr><th>Jetons vendus, en millions</th><th>Prix d'achat du jeton suivant</th><th>Prix plancher</th></tr></thead><tbody><tr><td class="num">0M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">800M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">850M</td><td class="num">1.78×</td><td class="num">1×</td></tr><tr><td class="num">900M</td><td class="num">4×</td><td class="num">1×</td></tr><tr><td class="num">950M</td><td class="num">16×</td><td class="num">1×</td></tr><tr><td class="num">990M</td><td class="num">400×</td><td class="num">1×</td></tr></tbody></table></div></details></figure>
 <h3>2.5 Où vont les 5 %</h3>
 <div class="tw"><table>
 <thead>
@@ -1526,7 +1838,7 @@
 </tr>
 <tr>
 <td>Application web et page de déploiement</td>
-<td>Construites et testées (24 tests dans le navigateur), en ligne</td>
+<td>Construites et testées (25 tests dans le navigateur), en ligne</td>
 </tr>
 <tr>
 <td>Déploiement de test</td>
@@ -1606,6 +1918,10 @@
 <td>Нет</td>
 </tr>
 </tbody></table></div>
+
+<figure class="fig"><figcaption><span class="fig-n">Рисунок 1</span> Жизнь монеты</figcaption>
+<ol class="fig-steps"><li><b>Запуск</b><span>Создатель платит комиссию сети и не получает монет.</span></li><li><b>Продажа</b><span>800 млн монет по одной фиксированной цене. Стоимость каждой проданной монеты идёт в резерв.</span></li><li><b>Выпуск</b><span>Продажа завершена. В резерве около $81 684 под эти 800 млн монет.</span></li><li><b>После выпуска</b><span>Последние 200 млн монет продаются выше нижней границы, а комиссии с торговли продолжают её поднимать.</span></li></ol>
+<p class="fig-any"><i class="sw sw-floor"></i>В любой момент держатель может продать монеты резерву по цене нижней границы за вычетом комиссии 5%.</p></figure>
 <h3>2.1 Одна цена для всех</h3>
 <p>Первые 800 миллионов монет продаются по одной цене всем, включая создателя. Дешёвого раннего раунда нет, поэтому ни у кого нет монет, которые обошлись дешевле ваших.</p>
 <h3>2.2 Обеспеченная нижняя граница</h3>
@@ -1644,12 +1960,32 @@
 </tr>
 </tbody></table></div>
 <p>Покупка с последующей продажей по нижней цене стоит 9.75% комиссий. Это максимум, который покупатель по нижней цене может потерять из-за самого механизма. Риски из раздела 6 — отдельная тема.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Рисунок 2</span> Куда идут $1 000</figcaption>
+<div class="fig-bar"><div class="fig-bar-t">Вы покупаете на $1 000</div>
+<div class="segs" dir="ltr" role="img" aria-label="Вы покупаете на $1 000: Резерв нижней границы: из него оплачиваются ваши монеты при продаже $950, Остаётся в резерве (2%) $20, Площадка (2%) $20, Создатель (1%) $10"><i class="seg sw-floor" style="flex:950 0 0" title="Резерв нижней границы: из него оплачиваются ваши монеты при продаже: $950"></i><i class="seg sw-extra" style="flex:20 0 0" title="Остаётся в резерве (2%): $20"></i><i class="seg sw-plat" style="flex:20 0 0" title="Площадка (2%): $20"></i><i class="seg sw-crea" style="flex:10 0 0" title="Создатель (1%): $10"></i></div>
+<ul class="fig-key"><li><i class="sw sw-floor"></i><span>Резерв нижней границы: из него оплачиваются ваши монеты при продаже</span><b class="num">$950</b></li><li><i class="sw sw-extra"></i><span>Остаётся в резерве (2%)</span><b class="num">$20</b></li><li><i class="sw sw-plat"></i><span>Площадка (2%)</span><b class="num">$20</b></li><li><i class="sw sw-crea"></i><span>Создатель (1%)</span><b class="num">$10</b></li></ul></div>
+<div class="fig-bar"><div class="fig-bar-t">Вы продаёте те же монеты обратно</div>
+<div class="segs" dir="ltr" role="img" aria-label="Вы продаёте те же монеты обратно: Вы получаете $902.50, Остаётся в резерве (2%) $19, Площадка (2%) $19, Создатель (1%) $9.50"><i class="seg sw-you" style="flex:902.5 0 0" title="Вы получаете: $902.50"></i><i class="seg sw-extra" style="flex:19 0 0" title="Остаётся в резерве (2%): $19"></i><i class="seg sw-plat" style="flex:19 0 0" title="Площадка (2%): $19"></i><i class="seg sw-crea" style="flex:9.5 0 0" title="Создатель (1%): $9.50"></i></div>
+<ul class="fig-key"><li><i class="sw sw-you"></i><span>Вы получаете</span><b class="num">$902.50</b></li><li><i class="sw sw-extra"></i><span>Остаётся в резерве (2%)</span><b class="num">$19</b></li><li><i class="sw sw-plat"></i><span>Площадка (2%)</span><b class="num">$19</b></li><li><i class="sw sw-crea"></i><span>Создатель (1%)</span><b class="num">$9.50</b></li></ul></div>
+<p class="fig-note">После покупки в резерве $970 под монеты, которые он может выкупить за $950.</p></figure>
 <h3>2.3 Выпуск и растущая нижняя граница</h3>
 <p>Когда все 800 миллионов монет продажи проданы, монета считается <strong>выпущенной</strong> (graduated). С этого момента 2% с каждой сделки, которые остаются в резерве, делают его больше необходимого, и нижняя цена повышается соответственно:</p>
 <blockquote>
 <p>нижняя цена = резерв нижней границы ÷ большее из (монеты в обращении, 800,000,000)</p>
 </blockquote>
 <p>Нижняя цена никогда не снижается. В момент выпуска в резерве около $81,684 для монеты с капитализацией $100,000, поэтому нижняя граница начинается примерно на 2.1% выше цены продажи и растёт вместе с объёмом торгов.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Рисунок 3</span> Нижняя граница после выпуска</figcaption>
+<p class="fig-axis">Цена нижней границы, в долях цены продажи</p>
+<div class="fig-chart" dir="ltr" data-fig="floor" data-name="Нижняя граница после выпуска">
+<svg viewBox="0 0 640 300" role="img" aria-label="Нижняя граница после выпуска. 2% с каждой сделки остаются в резерве, и нижняя граница поднимается соответственно. Она никогда не снижается. Показано для 800 млн монет в обращении."><line class="grid" x1="46" x2="610" y1="270" y2="270"/><text class="tick" x="38" y="274" text-anchor="end">1.00×</text><line class="grid" x1="46" x2="610" y1="212.3" y2="212.3"/><text class="tick" x="38" y="216.3" text-anchor="end">1.25×</text><line class="grid" x1="46" x2="610" y1="154.5" y2="154.5"/><text class="tick" x="38" y="158.5" text-anchor="end">1.50×</text><line class="grid" x1="46" x2="610" y1="96.8" y2="96.8"/><text class="tick" x="38" y="100.8" text-anchor="end">1.75×</text><line class="grid" x1="46" x2="610" y1="39.1" y2="39.1"/><text class="tick" x="38" y="43.1" text-anchor="end">2.00×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="187" y="291" text-anchor="middle">1</text><text class="tick" x="328" y="291" text-anchor="middle">2</text><text class="tick" x="469" y="291" text-anchor="middle">3</text><text class="tick" x="610" y="291" text-anchor="middle">4</text>
+<path class="wash-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2 L610 270 L46 270 Z"/><path class="ln ln-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2"/><circle class="ring" cx="610" cy="34.2" r="6"/><circle class="dot-floor" cx="610" cy="34.2" r="4"/>
+<text class="val" x="600" y="24.200000000000003" text-anchor="end">2.02×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg><div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">Объём торгов после выпуска, млн долларов</p>
+<p class="fig-note">2% с каждой сделки остаются в резерве, и нижняя граница поднимается соответственно. Она никогда не снижается. Показано для 800 млн монет в обращении.</p>
+<details class="fig-tbl"><summary>Цифры</summary><div class="tw"><table><thead><tr><th>Объём торгов после выпуска, млн долларов</th><th>Цена нижней границы, в долях цены продажи</th></tr></thead><tbody><tr><td class="num">$0M</td><td class="num">1.02×</td></tr><tr><td class="num">$1M</td><td class="num">1.27×</td></tr><tr><td class="num">$2M</td><td class="num">1.52×</td></tr><tr><td class="num">$3M</td><td class="num">1.77×</td></tr><tr><td class="num">$4M</td><td class="num">2.02×</td></tr></tbody></table></div></details></figure>
 <h3>2.4 Выше нижней границы</h3>
 <p>Последние 200 миллионов монет стоят нижнюю цену плюс премию, которая растёт по мере их распродажи. Премия хранится в отдельном <strong>резерве премий</strong> и возвращается, когда монеты продаются обратно по той же линии.</p>
 <div class="tw"><table>
@@ -1682,6 +2018,24 @@
 </tr>
 </tbody></table></div>
 <p>Нижняя граница покрывает только нижнюю цену. Покупатель, заплативший премию сверх неё, может потерять эту премию, если другие продадут раньше.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Рисунок 4</span> Цена следующей монеты</figcaption>
+<ul class="fig-key inline"><li><i class="sw sw-line sw-plat"></i><span>Цена покупки следующей монеты</span></li><li><i class="sw sw-line sw-floor"></i><span>Цена нижней границы</span></li></ul>
+<p class="fig-axis">Цена, в долях цены продажи</p>
+<div class="fig-chart" dir="ltr" data-fig="price" data-a="Цена покупки следующей монеты" data-b="Цена нижней границы">
+<svg viewBox="0 0 640 300" role="img" aria-label="Цена следующей монеты. Кривая продолжается до 990 млн монет, где цена достигает 400-кратной цены продажи."><line class="grid" x1="46" x2="610" y1="254.1" y2="254.1"/><text class="tick" x="38" y="258.1" text-anchor="end">1×</text><line class="grid" x1="46" x2="610" y1="206.5" y2="206.5"/><text class="tick" x="38" y="210.5" text-anchor="end">4×</text><line class="grid" x1="46" x2="610" y1="143" y2="143"/><text class="tick" x="38" y="147" text-anchor="end">8×</text><line class="grid" x1="46" x2="610" y1="79.5" y2="79.5"/><text class="tick" x="38" y="83.5" text-anchor="end">12×</text><line class="grid" x1="46" x2="610" y1="16" y2="16"/><text class="tick" x="38" y="20" text-anchor="end">16×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="164.7" y="291" text-anchor="middle">200</text><text class="tick" x="283.5" y="291" text-anchor="middle">400</text><text class="tick" x="402.2" y="291" text-anchor="middle">600</text><text class="tick" x="520.9" y="291" text-anchor="middle">800</text><text class="tick" x="610" y="291" text-anchor="middle">950</text>
+<rect class="band" x="520.9" y="16" width="89.1" height="254"/>
+<line class="grid" x1="520.9" x2="520.9" y1="16" y2="270"/>
+<path class="ln ln-floor" d="M520.9 254.1 L610 254.1"/><path class="ln ln-plat" d="M46 254.1 L520.9 254.1 L522.1 253.8 L523.3 253.5 L524.5 253.1 L525.7 252.8 L526.9 252.4 L528.1 252 L529.3 251.6 L530.4 251.2 L531.6 250.8 L532.8 250.4 L534 250 L535.2 249.5 L536.4 249 L537.6 248.5 L538.8 248 L539.9 247.5 L541.1 247 L542.3 246.4 L543.5 245.8 L544.7 245.2 L545.9 244.6 L547.1 243.9 L548.3 243.2 L549.4 242.5 L550.6 241.8 L551.8 241 L553 240.2 L554.2 239.4 L555.4 238.5 L556.6 237.6 L557.8 236.7 L558.9 235.7 L560.1 234.6 L561.3 233.6 L562.5 232.4 L563.7 231.2 L564.9 230 L566.1 228.7 L567.3 227.3 L568.4 225.9 L569.6 224.4 L570.8 222.8 L572 221.1 L573.2 219.4 L574.4 217.5 L575.6 215.6 L576.8 213.5 L577.9 211.3 L579.1 209 L580.3 206.5 L581.5 203.9 L582.7 201.1 L583.9 198.1 L585.1 195 L586.3 191.6 L587.4 188 L588.6 184.1 L589.8 180 L591 175.6 L592.2 170.8 L593.4 165.6 L594.6 160.1 L595.8 154 L596.9 147.5 L598.1 140.4 L599.3 132.7 L600.5 124.2 L601.7 115 L602.9 104.8 L604.1 93.6 L605.3 81.2 L606.4 67.5 L607.6 52.2 L608.8 35.2 L610 16"/>
+<circle class="ring" cx="610" cy="254.1" r="6"/><circle class="dot-floor" cx="610" cy="254.1" r="4"/><circle class="ring" cx="610" cy="16" r="6"/><circle class="dot-plat" cx="610" cy="16" r="4"/>
+<text class="val" x="600" y="20" text-anchor="end">16×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg>
+<div class="fig-zone" style="left:7.2%;width:74.2%"><span dir="auto">Продажа: одна цена</span></div>
+<div class="fig-zone b" style="right:18.6%;width:38%"><span dir="auto">Выше нижней границы</span></div>
+<div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">Продано монет, млн</p>
+<p class="fig-note">Кривая продолжается до 990 млн монет, где цена достигает 400-кратной цены продажи.</p>
+<details class="fig-tbl"><summary>Цифры</summary><div class="tw"><table><thead><tr><th>Продано монет, млн</th><th>Цена покупки следующей монеты</th><th>Цена нижней границы</th></tr></thead><tbody><tr><td class="num">0M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">800M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">850M</td><td class="num">1.78×</td><td class="num">1×</td></tr><tr><td class="num">900M</td><td class="num">4×</td><td class="num">1×</td></tr><tr><td class="num">950M</td><td class="num">16×</td><td class="num">1×</td></tr><tr><td class="num">990M</td><td class="num">400×</td><td class="num">1×</td></tr></tbody></table></div></details></figure>
 <h3>2.5 Куда идут 5%</h3>
 <div class="tw"><table>
 <thead>
@@ -1778,7 +2132,7 @@
 </tr>
 <tr>
 <td>Веб-приложение и страница развёртывания</td>
-<td>Построены и протестированы (24 теста в браузере), работают</td>
+<td>Построены и протестированы (25 теста в браузере), работают</td>
 </tr>
 <tr>
 <td>Тестовое развёртывание</td>
@@ -1858,6 +2212,10 @@
 <td>Nenhuma</td>
 </tr>
 </tbody></table></div>
+
+<figure class="fig"><figcaption><span class="fig-n">Figura 1</span> A vida de uma moeda</figcaption>
+<ol class="fig-steps"><li><b>Lançamento</b><span>O criador paga a taxa da rede e não recebe moedas.</span></li><li><b>Venda</b><span>800 M de moedas a um único preço fixo. O valor de cada moeda vendida entra na reserva.</span></li><li><b>Graduação</b><span>A venda esgota. A reserva guarda cerca de US$ 81.684 por essas 800 M de moedas.</span></li><li><b>Após a graduação</b><span>As últimas 200 M são vendidas acima do piso, e as taxas das negociações continuam elevando o piso.</span></li></ol>
+<p class="fig-any"><i class="sw sw-floor"></i>A qualquer momento, um titular pode vender à reserva pelo preço do piso, menos a taxa de 5%.</p></figure>
 <h3>2.1 Um preço para todos</h3>
 <p>As primeiras 800 milhões de moedas são vendidas pelo mesmo preço para todo mundo, inclusive o criador. Não há rodada inicial barata, então ninguém tem moedas que custaram menos do que as suas.</p>
 <h3>2.2 O piso coberto</h3>
@@ -1896,12 +2254,32 @@
 </tr>
 </tbody></table></div>
 <p>Comprar e depois vender pelo preço de piso custa 9.75% em taxas. Isso é o máximo que um comprador ao preço de piso pode perder pelo mecanismo em si. Os riscos da seção 6 são à parte.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Figura 2</span> Para onde vão US$ 1.000</figcaption>
+<div class="fig-bar"><div class="fig-bar-t">Você compra com US$ 1.000</div>
+<div class="segs" dir="ltr" role="img" aria-label="Você compra com US$ 1.000: Reserva do piso: paga suas moedas se você vender $950, Fica na reserva (2%) $20, Plataforma (2%) $20, Criador (1%) $10"><i class="seg sw-floor" style="flex:950 0 0" title="Reserva do piso: paga suas moedas se você vender: $950"></i><i class="seg sw-extra" style="flex:20 0 0" title="Fica na reserva (2%): $20"></i><i class="seg sw-plat" style="flex:20 0 0" title="Plataforma (2%): $20"></i><i class="seg sw-crea" style="flex:10 0 0" title="Criador (1%): $10"></i></div>
+<ul class="fig-key"><li><i class="sw sw-floor"></i><span>Reserva do piso: paga suas moedas se você vender</span><b class="num">$950</b></li><li><i class="sw sw-extra"></i><span>Fica na reserva (2%)</span><b class="num">$20</b></li><li><i class="sw sw-plat"></i><span>Plataforma (2%)</span><b class="num">$20</b></li><li><i class="sw sw-crea"></i><span>Criador (1%)</span><b class="num">$10</b></li></ul></div>
+<div class="fig-bar"><div class="fig-bar-t">Você vende as mesmas moedas</div>
+<div class="segs" dir="ltr" role="img" aria-label="Você vende as mesmas moedas: Você recebe $902.50, Fica na reserva (2%) $19, Plataforma (2%) $19, Criador (1%) $9.50"><i class="seg sw-you" style="flex:902.5 0 0" title="Você recebe: $902.50"></i><i class="seg sw-extra" style="flex:19 0 0" title="Fica na reserva (2%): $19"></i><i class="seg sw-plat" style="flex:19 0 0" title="Plataforma (2%): $19"></i><i class="seg sw-crea" style="flex:9.5 0 0" title="Criador (1%): $9.50"></i></div>
+<ul class="fig-key"><li><i class="sw sw-you"></i><span>Você recebe</span><b class="num">$902.50</b></li><li><i class="sw sw-extra"></i><span>Fica na reserva (2%)</span><b class="num">$19</b></li><li><i class="sw sw-plat"></i><span>Plataforma (2%)</span><b class="num">$19</b></li><li><i class="sw sw-crea"></i><span>Criador (1%)</span><b class="num">$9.50</b></li></ul></div>
+<p class="fig-note">Depois da compra, a reserva guarda US$ 970 por moedas que pode recomprar por US$ 950.</p></figure>
 <h3>2.3 Graduação e piso crescente</h3>
 <p>Quando todas as 800 milhões de moedas da venda forem vendidas, a moeda está <strong>graduada</strong>. A partir daí, os 2% de cada negociação que ficam na reserva a tornam maior do que o necessário, e o preço de piso é elevado para acompanhar:</p>
 <blockquote>
 <p>preço de piso = reserva do piso ÷ o maior entre (moedas em circulação, 800,000,000)</p>
 </blockquote>
 <p>O preço de piso nunca é reduzido. Na graduação a reserva tem cerca de $81,684 para uma moeda de $100,000, então o piso começa cerca de 2.1% acima do preço de venda e sobe com o volume negociado.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Figura 3</span> O piso após a graduação</figcaption>
+<p class="fig-axis">Preço do piso, como múltiplo do preço de venda</p>
+<div class="fig-chart" dir="ltr" data-fig="floor" data-name="O piso após a graduação">
+<svg viewBox="0 0 640 300" role="img" aria-label="O piso após a graduação. 2% de cada negociação ficam na reserva, e o piso é elevado na mesma medida. Ele nunca é reduzido. Calculado para 800 M de moedas em circulação."><line class="grid" x1="46" x2="610" y1="270" y2="270"/><text class="tick" x="38" y="274" text-anchor="end">1.00×</text><line class="grid" x1="46" x2="610" y1="212.3" y2="212.3"/><text class="tick" x="38" y="216.3" text-anchor="end">1.25×</text><line class="grid" x1="46" x2="610" y1="154.5" y2="154.5"/><text class="tick" x="38" y="158.5" text-anchor="end">1.50×</text><line class="grid" x1="46" x2="610" y1="96.8" y2="96.8"/><text class="tick" x="38" y="100.8" text-anchor="end">1.75×</text><line class="grid" x1="46" x2="610" y1="39.1" y2="39.1"/><text class="tick" x="38" y="43.1" text-anchor="end">2.00×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="187" y="291" text-anchor="middle">1</text><text class="tick" x="328" y="291" text-anchor="middle">2</text><text class="tick" x="469" y="291" text-anchor="middle">3</text><text class="tick" x="610" y="291" text-anchor="middle">4</text>
+<path class="wash-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2 L610 270 L46 270 Z"/><path class="ln ln-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2"/><circle class="ring" cx="610" cy="34.2" r="6"/><circle class="dot-floor" cx="610" cy="34.2" r="4"/>
+<text class="val" x="600" y="24.200000000000003" text-anchor="end">2.02×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg><div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">Valor negociado após a graduação, em milhões de dólares</p>
+<p class="fig-note">2% de cada negociação ficam na reserva, e o piso é elevado na mesma medida. Ele nunca é reduzido. Calculado para 800 M de moedas em circulação.</p>
+<details class="fig-tbl"><summary>Números</summary><div class="tw"><table><thead><tr><th>Valor negociado após a graduação, em milhões de dólares</th><th>Preço do piso, como múltiplo do preço de venda</th></tr></thead><tbody><tr><td class="num">$0M</td><td class="num">1.02×</td></tr><tr><td class="num">$1M</td><td class="num">1.27×</td></tr><tr><td class="num">$2M</td><td class="num">1.52×</td></tr><tr><td class="num">$3M</td><td class="num">1.77×</td></tr><tr><td class="num">$4M</td><td class="num">2.02×</td></tr></tbody></table></div></details></figure>
 <h3>2.4 Acima do piso</h3>
 <p>As últimas 200 milhões de moedas custam o preço de piso mais um prêmio que cresce à medida que se esgotam. O prêmio fica numa <strong>reserva de prêmios</strong> separada e é devolvido quando as moedas são vendidas ao longo da mesma linha.</p>
 <div class="tw"><table>
@@ -1934,6 +2312,24 @@
 </tr>
 </tbody></table></div>
 <p>O piso cobre apenas o preço de piso. Quem paga um prêmio acima do piso pode perder esse prêmio se outros venderem antes.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Figura 4</span> O preço da próxima moeda</figcaption>
+<ul class="fig-key inline"><li><i class="sw sw-line sw-plat"></i><span>Preço de compra da próxima moeda</span></li><li><i class="sw sw-line sw-floor"></i><span>Preço do piso</span></li></ul>
+<p class="fig-axis">Preço, como múltiplo do preço de venda</p>
+<div class="fig-chart" dir="ltr" data-fig="price" data-a="Preço de compra da próxima moeda" data-b="Preço do piso">
+<svg viewBox="0 0 640 300" role="img" aria-label="O preço da próxima moeda. A curva continua até 990 M de moedas, onde o preço chega a 400 vezes o preço de venda."><line class="grid" x1="46" x2="610" y1="254.1" y2="254.1"/><text class="tick" x="38" y="258.1" text-anchor="end">1×</text><line class="grid" x1="46" x2="610" y1="206.5" y2="206.5"/><text class="tick" x="38" y="210.5" text-anchor="end">4×</text><line class="grid" x1="46" x2="610" y1="143" y2="143"/><text class="tick" x="38" y="147" text-anchor="end">8×</text><line class="grid" x1="46" x2="610" y1="79.5" y2="79.5"/><text class="tick" x="38" y="83.5" text-anchor="end">12×</text><line class="grid" x1="46" x2="610" y1="16" y2="16"/><text class="tick" x="38" y="20" text-anchor="end">16×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="164.7" y="291" text-anchor="middle">200</text><text class="tick" x="283.5" y="291" text-anchor="middle">400</text><text class="tick" x="402.2" y="291" text-anchor="middle">600</text><text class="tick" x="520.9" y="291" text-anchor="middle">800</text><text class="tick" x="610" y="291" text-anchor="middle">950</text>
+<rect class="band" x="520.9" y="16" width="89.1" height="254"/>
+<line class="grid" x1="520.9" x2="520.9" y1="16" y2="270"/>
+<path class="ln ln-floor" d="M520.9 254.1 L610 254.1"/><path class="ln ln-plat" d="M46 254.1 L520.9 254.1 L522.1 253.8 L523.3 253.5 L524.5 253.1 L525.7 252.8 L526.9 252.4 L528.1 252 L529.3 251.6 L530.4 251.2 L531.6 250.8 L532.8 250.4 L534 250 L535.2 249.5 L536.4 249 L537.6 248.5 L538.8 248 L539.9 247.5 L541.1 247 L542.3 246.4 L543.5 245.8 L544.7 245.2 L545.9 244.6 L547.1 243.9 L548.3 243.2 L549.4 242.5 L550.6 241.8 L551.8 241 L553 240.2 L554.2 239.4 L555.4 238.5 L556.6 237.6 L557.8 236.7 L558.9 235.7 L560.1 234.6 L561.3 233.6 L562.5 232.4 L563.7 231.2 L564.9 230 L566.1 228.7 L567.3 227.3 L568.4 225.9 L569.6 224.4 L570.8 222.8 L572 221.1 L573.2 219.4 L574.4 217.5 L575.6 215.6 L576.8 213.5 L577.9 211.3 L579.1 209 L580.3 206.5 L581.5 203.9 L582.7 201.1 L583.9 198.1 L585.1 195 L586.3 191.6 L587.4 188 L588.6 184.1 L589.8 180 L591 175.6 L592.2 170.8 L593.4 165.6 L594.6 160.1 L595.8 154 L596.9 147.5 L598.1 140.4 L599.3 132.7 L600.5 124.2 L601.7 115 L602.9 104.8 L604.1 93.6 L605.3 81.2 L606.4 67.5 L607.6 52.2 L608.8 35.2 L610 16"/>
+<circle class="ring" cx="610" cy="254.1" r="6"/><circle class="dot-floor" cx="610" cy="254.1" r="4"/><circle class="ring" cx="610" cy="16" r="6"/><circle class="dot-plat" cx="610" cy="16" r="4"/>
+<text class="val" x="600" y="20" text-anchor="end">16×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg>
+<div class="fig-zone" style="left:7.2%;width:74.2%"><span dir="auto">Venda: um só preço</span></div>
+<div class="fig-zone b" style="right:18.6%;width:38%"><span dir="auto">Acima do piso</span></div>
+<div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">Moedas vendidas, em milhões</p>
+<p class="fig-note">A curva continua até 990 M de moedas, onde o preço chega a 400 vezes o preço de venda.</p>
+<details class="fig-tbl"><summary>Números</summary><div class="tw"><table><thead><tr><th>Moedas vendidas, em milhões</th><th>Preço de compra da próxima moeda</th><th>Preço do piso</th></tr></thead><tbody><tr><td class="num">0M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">800M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">850M</td><td class="num">1.78×</td><td class="num">1×</td></tr><tr><td class="num">900M</td><td class="num">4×</td><td class="num">1×</td></tr><tr><td class="num">950M</td><td class="num">16×</td><td class="num">1×</td></tr><tr><td class="num">990M</td><td class="num">400×</td><td class="num">1×</td></tr></tbody></table></div></details></figure>
 <h3>2.5 Para onde vão os 5%</h3>
 <div class="tw"><table>
 <thead>
@@ -2030,7 +2426,7 @@
 </tr>
 <tr>
 <td>Aplicação web e página de implantação</td>
-<td>Construídas e testadas (24 testes no navegador), no ar</td>
+<td>Construídas e testadas (25 testes no navegador), no ar</td>
 </tr>
 <tr>
 <td>Implantação de teste</td>
@@ -2110,6 +2506,10 @@
 <td>Yok</td>
 </tr>
 </tbody></table></div>
+
+<figure class="fig"><figcaption><span class="fig-n">Şekil 1</span> Bir coinin yaşamı</figcaption>
+<ol class="fig-steps"><li><b>Çıkış</b><span>Oluşturan kişi ağ ücretini öder ve hiç coin almaz.</span></li><li><b>Satış</b><span>800 milyon coin tek bir sabit fiyattan. Satılan her coinin değeri rezerve girer.</span></li><li><b>Mezuniyet</b><span>Satış tükenir. Rezerv bu 800 milyon coin için yaklaşık 81.684 $ tutar.</span></li><li><b>Mezuniyetten sonra</b><span>Son 200 milyon coin tabanın üstünde satılır ve işlem ücretleri tabanı yükseltmeye devam eder.</span></li></ol>
+<p class="fig-any"><i class="sw sw-floor"></i>Coin sahibi istediği zaman, %5 ücret düşülerek, taban fiyattan rezerve geri satabilir.</p></figure>
 <h3>2.1 Herkese tek fiyat</h3>
 <p>İlk 800 milyon coin, oluşturan dahil herkese aynı fiyattan satılır. Ucuz bir erken tur yoktur; bu yüzden kimse sizinkinden daha ucuza gelmiş coin tutmaz.</p>
 <h3>2.2 Karşılığı olan taban</h3>
@@ -2148,12 +2548,32 @@
 </tr>
 </tbody></table></div>
 <p>Taban fiyattan alıp sonra satmak toplam %9.75 ücrete mal olur. Taban fiyattan alan birinin mekanizmanın kendisi yüzünden kaybedebileceği en fazla tutar budur. 6. bölümdeki riskler ayrıdır.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Şekil 2</span> 1.000 $ nereye gider</figcaption>
+<div class="fig-bar"><div class="fig-bar-t">1.000 $ ile alırsınız</div>
+<div class="segs" dir="ltr" role="img" aria-label="1.000 $ ile alırsınız: Taban rezervi: satarsanız coinlerinizin karşılığını öder $950, Rezervde kalır (%2) $20, Platform (%2) $20, Oluşturan (%1) $10"><i class="seg sw-floor" style="flex:950 0 0" title="Taban rezervi: satarsanız coinlerinizin karşılığını öder: $950"></i><i class="seg sw-extra" style="flex:20 0 0" title="Rezervde kalır (%2): $20"></i><i class="seg sw-plat" style="flex:20 0 0" title="Platform (%2): $20"></i><i class="seg sw-crea" style="flex:10 0 0" title="Oluşturan (%1): $10"></i></div>
+<ul class="fig-key"><li><i class="sw sw-floor"></i><span>Taban rezervi: satarsanız coinlerinizin karşılığını öder</span><b class="num">$950</b></li><li><i class="sw sw-extra"></i><span>Rezervde kalır (%2)</span><b class="num">$20</b></li><li><i class="sw sw-plat"></i><span>Platform (%2)</span><b class="num">$20</b></li><li><i class="sw sw-crea"></i><span>Oluşturan (%1)</span><b class="num">$10</b></li></ul></div>
+<div class="fig-bar"><div class="fig-bar-t">Aynı coinleri geri satarsınız</div>
+<div class="segs" dir="ltr" role="img" aria-label="Aynı coinleri geri satarsınız: Elinize geçen $902.50, Rezervde kalır (%2) $19, Platform (%2) $19, Oluşturan (%1) $9.50"><i class="seg sw-you" style="flex:902.5 0 0" title="Elinize geçen: $902.50"></i><i class="seg sw-extra" style="flex:19 0 0" title="Rezervde kalır (%2): $19"></i><i class="seg sw-plat" style="flex:19 0 0" title="Platform (%2): $19"></i><i class="seg sw-crea" style="flex:9.5 0 0" title="Oluşturan (%1): $9.50"></i></div>
+<ul class="fig-key"><li><i class="sw sw-you"></i><span>Elinize geçen</span><b class="num">$902.50</b></li><li><i class="sw sw-extra"></i><span>Rezervde kalır (%2)</span><b class="num">$19</b></li><li><i class="sw sw-plat"></i><span>Platform (%2)</span><b class="num">$19</b></li><li><i class="sw sw-crea"></i><span>Oluşturan (%1)</span><b class="num">$9.50</b></li></ul></div>
+<p class="fig-note">Alımdan sonra rezerv, 950 $'a geri alabileceği coinler için 970 $ tutar.</p></figure>
 <h3>2.3 Mezuniyet ve yükselen taban</h3>
 <p>Satıştaki 800 milyon coinin tamamı satıldığında coin <strong>mezun</strong> olmuş sayılır. Bundan sonra her işlemden rezervde kalan %2, rezervi gerekenden büyük hale getirir ve taban fiyat buna göre yükseltilir:</p>
 <blockquote>
 <p>taban fiyat = taban rezervi ÷ (dolaşımdaki coin sayısı ile 800,000,000&#39;dan büyük olanı)</p>
 </blockquote>
 <p>Taban fiyat hiçbir zaman düşürülmez. Mezuniyet anında $100,000 değerindeki bir coin için rezervde yaklaşık $81,684 bulunur; yani taban, satış fiyatının yaklaşık %2.1 üstünde başlar ve işlem hacmiyle birlikte yükselir.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Şekil 3</span> Mezuniyetten sonra taban</figcaption>
+<p class="fig-axis">Taban fiyat, satış fiyatının katı olarak</p>
+<div class="fig-chart" dir="ltr" data-fig="floor" data-name="Mezuniyetten sonra taban">
+<svg viewBox="0 0 640 300" role="img" aria-label="Mezuniyetten sonra taban. Her işlemin %2'si rezervde kalır ve taban buna göre yükseltilir. Asla düşürülmez. Dolaşımdaki 800 milyon coin için gösterilmiştir."><line class="grid" x1="46" x2="610" y1="270" y2="270"/><text class="tick" x="38" y="274" text-anchor="end">1.00×</text><line class="grid" x1="46" x2="610" y1="212.3" y2="212.3"/><text class="tick" x="38" y="216.3" text-anchor="end">1.25×</text><line class="grid" x1="46" x2="610" y1="154.5" y2="154.5"/><text class="tick" x="38" y="158.5" text-anchor="end">1.50×</text><line class="grid" x1="46" x2="610" y1="96.8" y2="96.8"/><text class="tick" x="38" y="100.8" text-anchor="end">1.75×</text><line class="grid" x1="46" x2="610" y1="39.1" y2="39.1"/><text class="tick" x="38" y="43.1" text-anchor="end">2.00×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="187" y="291" text-anchor="middle">1</text><text class="tick" x="328" y="291" text-anchor="middle">2</text><text class="tick" x="469" y="291" text-anchor="middle">3</text><text class="tick" x="610" y="291" text-anchor="middle">4</text>
+<path class="wash-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2 L610 270 L46 270 Z"/><path class="ln ln-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2"/><circle class="ring" cx="610" cy="34.2" r="6"/><circle class="dot-floor" cx="610" cy="34.2" r="4"/>
+<text class="val" x="600" y="24.200000000000003" text-anchor="end">2.02×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg><div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">Mezuniyetten sonraki işlem hacmi, milyon dolar</p>
+<p class="fig-note">Her işlemin %2'si rezervde kalır ve taban buna göre yükseltilir. Asla düşürülmez. Dolaşımdaki 800 milyon coin için gösterilmiştir.</p>
+<details class="fig-tbl"><summary>Rakamlar</summary><div class="tw"><table><thead><tr><th>Mezuniyetten sonraki işlem hacmi, milyon dolar</th><th>Taban fiyat, satış fiyatının katı olarak</th></tr></thead><tbody><tr><td class="num">$0M</td><td class="num">1.02×</td></tr><tr><td class="num">$1M</td><td class="num">1.27×</td></tr><tr><td class="num">$2M</td><td class="num">1.52×</td></tr><tr><td class="num">$3M</td><td class="num">1.77×</td></tr><tr><td class="num">$4M</td><td class="num">2.02×</td></tr></tbody></table></div></details></figure>
 <h3>2.4 Tabanın üstü</h3>
 <p>Son 200 milyon coin, taban fiyata ek olarak, bu coinler satıldıkça büyüyen bir prim karşılığında satılır. Prim ayrı bir <strong>prim rezervinde</strong> tutulur ve coinler aynı çizgi boyunca geri satıldığında iade edilir.</p>
 <div class="tw"><table>
@@ -2186,6 +2606,24 @@
 </tr>
 </tbody></table></div>
 <p>Taban yalnızca taban fiyatı karşılar. Tabanın üstünde prim ödeyen bir alıcı, başkaları ondan önce satarsa bu primi kaybedebilir.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Şekil 4</span> Bir sonraki coinin fiyatı</figcaption>
+<ul class="fig-key inline"><li><i class="sw sw-line sw-plat"></i><span>Bir sonraki coini alma fiyatı</span></li><li><i class="sw sw-line sw-floor"></i><span>Taban fiyat</span></li></ul>
+<p class="fig-axis">Fiyat, satış fiyatının katı olarak</p>
+<div class="fig-chart" dir="ltr" data-fig="price" data-a="Bir sonraki coini alma fiyatı" data-b="Taban fiyat">
+<svg viewBox="0 0 640 300" role="img" aria-label="Bir sonraki coinin fiyatı. Eğri 990 milyon coine kadar sürer; orada fiyat satış fiyatının 400 katına ulaşır."><line class="grid" x1="46" x2="610" y1="254.1" y2="254.1"/><text class="tick" x="38" y="258.1" text-anchor="end">1×</text><line class="grid" x1="46" x2="610" y1="206.5" y2="206.5"/><text class="tick" x="38" y="210.5" text-anchor="end">4×</text><line class="grid" x1="46" x2="610" y1="143" y2="143"/><text class="tick" x="38" y="147" text-anchor="end">8×</text><line class="grid" x1="46" x2="610" y1="79.5" y2="79.5"/><text class="tick" x="38" y="83.5" text-anchor="end">12×</text><line class="grid" x1="46" x2="610" y1="16" y2="16"/><text class="tick" x="38" y="20" text-anchor="end">16×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="164.7" y="291" text-anchor="middle">200</text><text class="tick" x="283.5" y="291" text-anchor="middle">400</text><text class="tick" x="402.2" y="291" text-anchor="middle">600</text><text class="tick" x="520.9" y="291" text-anchor="middle">800</text><text class="tick" x="610" y="291" text-anchor="middle">950</text>
+<rect class="band" x="520.9" y="16" width="89.1" height="254"/>
+<line class="grid" x1="520.9" x2="520.9" y1="16" y2="270"/>
+<path class="ln ln-floor" d="M520.9 254.1 L610 254.1"/><path class="ln ln-plat" d="M46 254.1 L520.9 254.1 L522.1 253.8 L523.3 253.5 L524.5 253.1 L525.7 252.8 L526.9 252.4 L528.1 252 L529.3 251.6 L530.4 251.2 L531.6 250.8 L532.8 250.4 L534 250 L535.2 249.5 L536.4 249 L537.6 248.5 L538.8 248 L539.9 247.5 L541.1 247 L542.3 246.4 L543.5 245.8 L544.7 245.2 L545.9 244.6 L547.1 243.9 L548.3 243.2 L549.4 242.5 L550.6 241.8 L551.8 241 L553 240.2 L554.2 239.4 L555.4 238.5 L556.6 237.6 L557.8 236.7 L558.9 235.7 L560.1 234.6 L561.3 233.6 L562.5 232.4 L563.7 231.2 L564.9 230 L566.1 228.7 L567.3 227.3 L568.4 225.9 L569.6 224.4 L570.8 222.8 L572 221.1 L573.2 219.4 L574.4 217.5 L575.6 215.6 L576.8 213.5 L577.9 211.3 L579.1 209 L580.3 206.5 L581.5 203.9 L582.7 201.1 L583.9 198.1 L585.1 195 L586.3 191.6 L587.4 188 L588.6 184.1 L589.8 180 L591 175.6 L592.2 170.8 L593.4 165.6 L594.6 160.1 L595.8 154 L596.9 147.5 L598.1 140.4 L599.3 132.7 L600.5 124.2 L601.7 115 L602.9 104.8 L604.1 93.6 L605.3 81.2 L606.4 67.5 L607.6 52.2 L608.8 35.2 L610 16"/>
+<circle class="ring" cx="610" cy="254.1" r="6"/><circle class="dot-floor" cx="610" cy="254.1" r="4"/><circle class="ring" cx="610" cy="16" r="6"/><circle class="dot-plat" cx="610" cy="16" r="4"/>
+<text class="val" x="600" y="20" text-anchor="end">16×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg>
+<div class="fig-zone" style="left:7.2%;width:74.2%"><span dir="auto">Satış: tek fiyat</span></div>
+<div class="fig-zone b" style="right:18.6%;width:38%"><span dir="auto">Tabanın üstü</span></div>
+<div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">Satılan coin, milyon</p>
+<p class="fig-note">Eğri 990 milyon coine kadar sürer; orada fiyat satış fiyatının 400 katına ulaşır.</p>
+<details class="fig-tbl"><summary>Rakamlar</summary><div class="tw"><table><thead><tr><th>Satılan coin, milyon</th><th>Bir sonraki coini alma fiyatı</th><th>Taban fiyat</th></tr></thead><tbody><tr><td class="num">0M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">800M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">850M</td><td class="num">1.78×</td><td class="num">1×</td></tr><tr><td class="num">900M</td><td class="num">4×</td><td class="num">1×</td></tr><tr><td class="num">950M</td><td class="num">16×</td><td class="num">1×</td></tr><tr><td class="num">990M</td><td class="num">400×</td><td class="num">1×</td></tr></tbody></table></div></details></figure>
 <h3>2.5 %5 nereye gider</h3>
 <div class="tw"><table>
 <thead>
@@ -2282,7 +2720,7 @@
 </tr>
 <tr>
 <td>Web uygulaması ve kurulum sayfası</td>
-<td>Yazıldı ve test edildi (24 tarayıcı testi), yayında</td>
+<td>Yazıldı ve test edildi (25 tarayıcı testi), yayında</td>
 </tr>
 <tr>
 <td>Test kurulumu</td>
@@ -2362,6 +2800,10 @@
 <td>Tidak ada</td>
 </tr>
 </tbody></table></div>
+
+<figure class="fig"><figcaption><span class="fig-n">Gambar 1</span> Perjalanan sebuah koin</figcaption>
+<ol class="fig-steps"><li><b>Peluncuran</b><span>Pembuat membayar biaya jaringan dan tidak menerima koin.</span></li><li><b>Penjualan</b><span>800 juta koin dengan satu harga tetap. Nilai setiap koin yang terjual masuk ke cadangan.</span></li><li><b>Kelulusan</b><span>Penjualan habis. Cadangan memegang sekitar $81.684 untuk 800 juta koin itu.</span></li><li><b>Setelah kelulusan</b><span>200 juta koin terakhir dijual di atas harga dasar, dan biaya perdagangan terus menaikkan harga dasar.</span></li></ol>
+<p class="fig-any"><i class="sw sw-floor"></i>Kapan saja, pemegang dapat menjual kembali ke cadangan pada harga dasar, dikurangi biaya 5%.</p></figure>
 <h3>2.1 Satu harga untuk semua</h3>
 <p>800 juta koin pertama dijual dengan harga yang sama kepada semua orang, termasuk pembuatnya. Tidak ada putaran awal yang murah, jadi tidak ada orang yang memegang koin dengan biaya lebih rendah daripada milik Anda.</p>
 <h3>2.2 Harga dasar yang dijamin</h3>
@@ -2400,12 +2842,32 @@
 </tr>
 </tbody></table></div>
 <p>Membeli lalu menjual pada harga dasar memakan biaya 9.75%. Itulah kerugian terbesar yang bisa dialami pembeli pada harga dasar akibat mekanisme itu sendiri. Risiko pada bagian 6 adalah hal terpisah.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Gambar 2</span> Ke mana $1.000 pergi</figcaption>
+<div class="fig-bar"><div class="fig-bar-t">Anda membeli dengan $1.000</div>
+<div class="segs" dir="ltr" role="img" aria-label="Anda membeli dengan $1.000: Cadangan harga dasar: membayar koin Anda jika Anda menjual $950, Tetap di cadangan (2%) $20, Platform (2%) $20, Pembuat (1%) $10"><i class="seg sw-floor" style="flex:950 0 0" title="Cadangan harga dasar: membayar koin Anda jika Anda menjual: $950"></i><i class="seg sw-extra" style="flex:20 0 0" title="Tetap di cadangan (2%): $20"></i><i class="seg sw-plat" style="flex:20 0 0" title="Platform (2%): $20"></i><i class="seg sw-crea" style="flex:10 0 0" title="Pembuat (1%): $10"></i></div>
+<ul class="fig-key"><li><i class="sw sw-floor"></i><span>Cadangan harga dasar: membayar koin Anda jika Anda menjual</span><b class="num">$950</b></li><li><i class="sw sw-extra"></i><span>Tetap di cadangan (2%)</span><b class="num">$20</b></li><li><i class="sw sw-plat"></i><span>Platform (2%)</span><b class="num">$20</b></li><li><i class="sw sw-crea"></i><span>Pembuat (1%)</span><b class="num">$10</b></li></ul></div>
+<div class="fig-bar"><div class="fig-bar-t">Anda menjual kembali koin yang sama</div>
+<div class="segs" dir="ltr" role="img" aria-label="Anda menjual kembali koin yang sama: Anda menerima $902.50, Tetap di cadangan (2%) $19, Platform (2%) $19, Pembuat (1%) $9.50"><i class="seg sw-you" style="flex:902.5 0 0" title="Anda menerima: $902.50"></i><i class="seg sw-extra" style="flex:19 0 0" title="Tetap di cadangan (2%): $19"></i><i class="seg sw-plat" style="flex:19 0 0" title="Platform (2%): $19"></i><i class="seg sw-crea" style="flex:9.5 0 0" title="Pembuat (1%): $9.50"></i></div>
+<ul class="fig-key"><li><i class="sw sw-you"></i><span>Anda menerima</span><b class="num">$902.50</b></li><li><i class="sw sw-extra"></i><span>Tetap di cadangan (2%)</span><b class="num">$19</b></li><li><i class="sw sw-plat"></i><span>Platform (2%)</span><b class="num">$19</b></li><li><i class="sw sw-crea"></i><span>Pembuat (1%)</span><b class="num">$9.50</b></li></ul></div>
+<p class="fig-note">Setelah pembelian, cadangan memegang $970 untuk koin yang dapat dibelinya kembali seharga $950.</p></figure>
 <h3>2.3 Kelulusan dan harga dasar yang naik</h3>
 <p>Ketika 800 juta koin penjualan sudah terjual semua, koin tersebut telah <strong>lulus</strong>. Sejak saat itu, 2% dari setiap transaksi yang tetap berada di cadangan membuat cadangan lebih besar daripada yang dibutuhkan, dan harga dasar dinaikkan agar sesuai:</p>
 <blockquote>
 <p>harga dasar = cadangan harga dasar ÷ yang lebih besar antara (koin beredar, 800,000,000)</p>
 </blockquote>
 <p>Harga dasar tidak pernah diturunkan. Saat kelulusan, cadangan berisi sekitar $81,684 untuk koin senilai $100,000, sehingga harga dasar dimulai sekitar 2.1% di atas harga jual dan naik seiring volume transaksi.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Gambar 3</span> Harga dasar setelah kelulusan</figcaption>
+<p class="fig-axis">Harga dasar, sebagai kelipatan harga jual</p>
+<div class="fig-chart" dir="ltr" data-fig="floor" data-name="Harga dasar setelah kelulusan">
+<svg viewBox="0 0 640 300" role="img" aria-label="Harga dasar setelah kelulusan. 2% dari setiap transaksi tetap di cadangan, dan harga dasar dinaikkan mengikutinya. Harga dasar tidak pernah diturunkan. Ditampilkan untuk 800 juta koin yang beredar."><line class="grid" x1="46" x2="610" y1="270" y2="270"/><text class="tick" x="38" y="274" text-anchor="end">1.00×</text><line class="grid" x1="46" x2="610" y1="212.3" y2="212.3"/><text class="tick" x="38" y="216.3" text-anchor="end">1.25×</text><line class="grid" x1="46" x2="610" y1="154.5" y2="154.5"/><text class="tick" x="38" y="158.5" text-anchor="end">1.50×</text><line class="grid" x1="46" x2="610" y1="96.8" y2="96.8"/><text class="tick" x="38" y="100.8" text-anchor="end">1.75×</text><line class="grid" x1="46" x2="610" y1="39.1" y2="39.1"/><text class="tick" x="38" y="43.1" text-anchor="end">2.00×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="187" y="291" text-anchor="middle">1</text><text class="tick" x="328" y="291" text-anchor="middle">2</text><text class="tick" x="469" y="291" text-anchor="middle">3</text><text class="tick" x="610" y="291" text-anchor="middle">4</text>
+<path class="wash-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2 L610 270 L46 270 Z"/><path class="ln ln-floor" d="M46 265.1 L187 207.4 L328 149.7 L469 92 L610 34.2"/><circle class="ring" cx="610" cy="34.2" r="6"/><circle class="dot-floor" cx="610" cy="34.2" r="4"/>
+<text class="val" x="600" y="24.200000000000003" text-anchor="end">2.02×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg><div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">Nilai perdagangan setelah kelulusan, dalam juta dolar</p>
+<p class="fig-note">2% dari setiap transaksi tetap di cadangan, dan harga dasar dinaikkan mengikutinya. Harga dasar tidak pernah diturunkan. Ditampilkan untuk 800 juta koin yang beredar.</p>
+<details class="fig-tbl"><summary>Angka</summary><div class="tw"><table><thead><tr><th>Nilai perdagangan setelah kelulusan, dalam juta dolar</th><th>Harga dasar, sebagai kelipatan harga jual</th></tr></thead><tbody><tr><td class="num">$0M</td><td class="num">1.02×</td></tr><tr><td class="num">$1M</td><td class="num">1.27×</td></tr><tr><td class="num">$2M</td><td class="num">1.52×</td></tr><tr><td class="num">$3M</td><td class="num">1.77×</td></tr><tr><td class="num">$4M</td><td class="num">2.02×</td></tr></tbody></table></div></details></figure>
 <h3>2.4 Di atas harga dasar</h3>
 <p>200 juta koin terakhir berharga sebesar harga dasar ditambah premi yang membesar seiring koin-koin itu terjual. Premi disimpan di <strong>cadangan premi</strong> yang terpisah dan dikembalikan ketika koin dijual kembali di sepanjang garis yang sama.</p>
 <div class="tw"><table>
@@ -2438,6 +2900,24 @@
 </tr>
 </tbody></table></div>
 <p>Harga dasar hanya menjamin harga dasar. Pembeli yang membayar premi di atas harga dasar bisa kehilangan premi itu jika orang lain menjual lebih dulu.</p>
+
+<figure class="fig"><figcaption><span class="fig-n">Gambar 4</span> Harga koin berikutnya</figcaption>
+<ul class="fig-key inline"><li><i class="sw sw-line sw-plat"></i><span>Harga beli koin berikutnya</span></li><li><i class="sw sw-line sw-floor"></i><span>Harga dasar</span></li></ul>
+<p class="fig-axis">Harga, sebagai kelipatan harga jual</p>
+<div class="fig-chart" dir="ltr" data-fig="price" data-a="Harga beli koin berikutnya" data-b="Harga dasar">
+<svg viewBox="0 0 640 300" role="img" aria-label="Harga koin berikutnya. Kurva berlanjut hingga 990 juta koin, saat harga mencapai 400 kali harga jual."><line class="grid" x1="46" x2="610" y1="254.1" y2="254.1"/><text class="tick" x="38" y="258.1" text-anchor="end">1×</text><line class="grid" x1="46" x2="610" y1="206.5" y2="206.5"/><text class="tick" x="38" y="210.5" text-anchor="end">4×</text><line class="grid" x1="46" x2="610" y1="143" y2="143"/><text class="tick" x="38" y="147" text-anchor="end">8×</text><line class="grid" x1="46" x2="610" y1="79.5" y2="79.5"/><text class="tick" x="38" y="83.5" text-anchor="end">12×</text><line class="grid" x1="46" x2="610" y1="16" y2="16"/><text class="tick" x="38" y="20" text-anchor="end">16×</text><text class="tick" x="46" y="291" text-anchor="middle">0</text><text class="tick" x="164.7" y="291" text-anchor="middle">200</text><text class="tick" x="283.5" y="291" text-anchor="middle">400</text><text class="tick" x="402.2" y="291" text-anchor="middle">600</text><text class="tick" x="520.9" y="291" text-anchor="middle">800</text><text class="tick" x="610" y="291" text-anchor="middle">950</text>
+<rect class="band" x="520.9" y="16" width="89.1" height="254"/>
+<line class="grid" x1="520.9" x2="520.9" y1="16" y2="270"/>
+<path class="ln ln-floor" d="M520.9 254.1 L610 254.1"/><path class="ln ln-plat" d="M46 254.1 L520.9 254.1 L522.1 253.8 L523.3 253.5 L524.5 253.1 L525.7 252.8 L526.9 252.4 L528.1 252 L529.3 251.6 L530.4 251.2 L531.6 250.8 L532.8 250.4 L534 250 L535.2 249.5 L536.4 249 L537.6 248.5 L538.8 248 L539.9 247.5 L541.1 247 L542.3 246.4 L543.5 245.8 L544.7 245.2 L545.9 244.6 L547.1 243.9 L548.3 243.2 L549.4 242.5 L550.6 241.8 L551.8 241 L553 240.2 L554.2 239.4 L555.4 238.5 L556.6 237.6 L557.8 236.7 L558.9 235.7 L560.1 234.6 L561.3 233.6 L562.5 232.4 L563.7 231.2 L564.9 230 L566.1 228.7 L567.3 227.3 L568.4 225.9 L569.6 224.4 L570.8 222.8 L572 221.1 L573.2 219.4 L574.4 217.5 L575.6 215.6 L576.8 213.5 L577.9 211.3 L579.1 209 L580.3 206.5 L581.5 203.9 L582.7 201.1 L583.9 198.1 L585.1 195 L586.3 191.6 L587.4 188 L588.6 184.1 L589.8 180 L591 175.6 L592.2 170.8 L593.4 165.6 L594.6 160.1 L595.8 154 L596.9 147.5 L598.1 140.4 L599.3 132.7 L600.5 124.2 L601.7 115 L602.9 104.8 L604.1 93.6 L605.3 81.2 L606.4 67.5 L607.6 52.2 L608.8 35.2 L610 16"/>
+<circle class="ring" cx="610" cy="254.1" r="6"/><circle class="dot-floor" cx="610" cy="254.1" r="4"/><circle class="ring" cx="610" cy="16" r="6"/><circle class="dot-plat" cx="610" cy="16" r="4"/>
+<text class="val" x="600" y="20" text-anchor="end">16×</text>
+<line class="cross" y1="16" y2="270" hidden/></svg>
+<div class="fig-zone" style="left:7.2%;width:74.2%"><span dir="auto">Penjualan: satu harga</span></div>
+<div class="fig-zone b" style="right:18.6%;width:38%"><span dir="auto">Di atas harga dasar</span></div>
+<div class="fig-tip" hidden></div></div>
+<p class="fig-axis x">Koin terjual, dalam juta</p>
+<p class="fig-note">Kurva berlanjut hingga 990 juta koin, saat harga mencapai 400 kali harga jual.</p>
+<details class="fig-tbl"><summary>Angka</summary><div class="tw"><table><thead><tr><th>Koin terjual, dalam juta</th><th>Harga beli koin berikutnya</th><th>Harga dasar</th></tr></thead><tbody><tr><td class="num">0M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">800M</td><td class="num">1×</td><td class="num">1×</td></tr><tr><td class="num">850M</td><td class="num">1.78×</td><td class="num">1×</td></tr><tr><td class="num">900M</td><td class="num">4×</td><td class="num">1×</td></tr><tr><td class="num">950M</td><td class="num">16×</td><td class="num">1×</td></tr><tr><td class="num">990M</td><td class="num">400×</td><td class="num">1×</td></tr></tbody></table></div></details></figure>
 <h3>2.5 Ke mana 5% itu pergi</h3>
 <div class="tw"><table>
 <thead>
@@ -2534,7 +3014,7 @@
 </tr>
 <tr>
 <td>Aplikasi web dan halaman pemasangan</td>
-<td>Sudah dibangun dan diuji (24 pengujian di peramban), sudah daring</td>
+<td>Sudah dibangun dan diuji (25 pengujian di peramban), sudah daring</td>
 </tr>
 <tr>
 <td>Pemasangan uji</td>
@@ -2587,6 +3067,36 @@
   var nav = String(navigator.language || "").slice(0, 2).toLowerCase();
   show(q && META[q[1]] ? q[1] : META[saved] ? saved : META[nav] ? nav : "en");
   sel.addEventListener("change", function () { show(sel.value); window.scrollTo(0, 0); });
+})();
+
+(function () {
+  var W = 640, L = 46, R = 30, G = 81684.2105263158;
+  var defs = {
+    floor: { max: 4, x: function (v) { return "$" + v.toFixed(1) + "M"; }, rows: function (v, el) { return [["sw-floor", el.getAttribute("data-name"), ((G + 20000 * v) / 80000).toFixed(2) + "\u00d7"]]; } },
+    price: { max: 950, x: function (v) { return Math.round(v) + "M"; }, rows: function (v, el) { var p = v <= 800 ? 1 : Math.pow(200 / (1000 - v), 2); return [["sw-plat", el.getAttribute("data-a"), p.toFixed(2) + "\u00d7"], ["sw-floor", el.getAttribute("data-b"), "1.00\u00d7"]]; } }
+  };
+  Array.prototype.forEach.call(document.querySelectorAll(".fig-chart[data-fig]"), function (el) {
+    var d = defs[el.getAttribute("data-fig")], svg = el.querySelector("svg"), cross = el.querySelector(".cross"), tip = el.querySelector(".fig-tip");
+    if (!d) return;
+    function move(ev) {
+      var box = svg.getBoundingClientRect(), sx = (ev.clientX - box.left) / box.width * W;
+      var v = Math.max(0, Math.min(d.max, (sx - L) / (W - L - R) * d.max)), cx = L + v / d.max * (W - L - R);
+      cross.setAttribute("x1", cx); cross.setAttribute("x2", cx); cross.removeAttribute("hidden");
+      tip.textContent = "";
+      var head = document.createElement("b"); head.textContent = d.x(v); tip.appendChild(head);
+      d.rows(v, el).forEach(function (r) {
+        var row = document.createElement("div"), sw = document.createElement("i"), val = document.createElement("b");
+        sw.className = "sw " + r[0]; val.textContent = " " + r[2];
+        row.appendChild(sw); row.appendChild(document.createTextNode(r[1])); row.appendChild(val); tip.appendChild(row);
+      });
+      tip.hidden = false;
+      var left = cx / W * box.width + 12;
+      if (left + tip.offsetWidth > box.width) left = cx / W * box.width - tip.offsetWidth - 12;
+      tip.style.left = Math.max(0, left) + "px";
+    }
+    function leave() { cross.setAttribute("hidden", ""); tip.hidden = true; }
+    el.addEventListener("pointermove", move); el.addEventListener("pointerdown", move); el.addEventListener("pointerleave", leave);
+  });
 })();
 </script>
 </body>

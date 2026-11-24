@@ -125,7 +125,7 @@ Baca bagian ini sebelum menggunakan platform dengan apa pun yang bernilai.
 | Bagian | Keadaan |
 |---|---|
 | Kontrak EVM | Sudah dibangun dan diuji (47 pengujian kontrak) |
-| Aplikasi web dan halaman pemasangan | Sudah dibangun dan diuji (24 pengujian di peramban), sudah daring |
+| Aplikasi web dan halaman pemasangan | Sudah dibangun dan diuji (25 pengujian di peramban), sudah daring |
 | Pemasangan uji | Daring di jaringan uji Sepolia, dengan uang uji yang tidak bernilai |
 | Audit keamanan independen | Belum dilakukan |
 | Pemasangan di jaringan sungguhan | Belum dilakukan. Menyusul setelah audit |

@@ -2,7 +2,7 @@
   "name": "jisr-launchpad",
   "version": "0.1.0",
   "private": true,
-  "license": "MIT",
+  "license": "UNLICENSED",
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",

@@ -125,7 +125,7 @@ Lisez cette section avant d'utiliser la plateforme avec quoi que ce soit de vale
 | Partie | État |
 |---|---|
 | Contrats EVM | Construits et testés (47 tests de contrats) |
-| Application web et page de déploiement | Construites et testées (24 tests dans le navigateur), en ligne |
+| Application web et page de déploiement | Construites et testées (25 tests dans le navigateur), en ligne |
 | Déploiement de test | En ligne sur le réseau de test Sepolia, avec de l'argent de test sans valeur |
 | Audit de sécurité indépendant | Non réalisé |
 | Déploiement sur des réseaux réels | Non réalisé. Il vient après l'audit |

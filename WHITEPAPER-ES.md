@@ -125,7 +125,7 @@ Lee esta sección antes de usar la plataforma con algo de valor.
 | Parte | Estado |
 |---|---|
 | Contratos EVM | Construidos y probados (47 pruebas de contratos) |
-| Aplicación web y página de despliegue | Construidas y probadas (24 pruebas en navegador), en línea |
+| Aplicación web y página de despliegue | Construidas y probadas (25 pruebas en navegador), en línea |
 | Despliegue de prueba | En línea en la red de pruebas Sepolia, con dinero de prueba sin valor |
 | Auditoría de seguridad independiente | No realizada |
 | Despliegue en redes reales | No realizado. Va después de la auditoría |

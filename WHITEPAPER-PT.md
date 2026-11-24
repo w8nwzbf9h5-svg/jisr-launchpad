@@ -125,7 +125,7 @@ Leia esta seção antes de usar a plataforma com qualquer coisa de valor.
 | Parte | Situação |
 |---|---|
 | Contratos EVM | Construídos e testados (47 testes de contratos) |
-| Aplicação web e página de implantação | Construídas e testadas (24 testes no navegador), no ar |
+| Aplicação web e página de implantação | Construídas e testadas (25 testes no navegador), no ar |
 | Implantação de teste | No ar na rede de testes Sepolia, com dinheiro de teste sem valor |
 | Auditoria de segurança independente | Não realizada |
 | Implantação em redes reais | Não realizada. Vem depois da auditoria |

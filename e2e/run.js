@@ -10,7 +10,7 @@ const puppeteer = require("puppeteer-core");
 const { ethers } = require("ethers");
 
 const ROOT = path.join(__dirname, "..");
-const RPC = "http://127.0.0.1:8545", WEB = "http://127.0.0.1:4173";
+const RPC = "http://127.0.0.1:8545", WEB = "http://127.0.0.1:4173", APP = WEB + "/app.html";
 const E18 = 10n ** 18n, M = 1_000_000n * E18;
 const DEPLOYMENTS = path.join(ROOT, "web", "deployments.js");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -96,13 +96,40 @@ function waitFor(child, text, ms) {
     const settle = async () => { await sleep(150); await idle(); await sleep(150); };
 
     // 1. The board loads from the chain without a wallet.
-    await page.goto(WEB, { waitUntil: "networkidle0" });
+    await page.goto(APP, { waitUntil: "networkidle0" });
     await page.waitForSelector("#rows .row");
     const board = await text("#rows");
     assert(board.includes("Camel Cash") && board.includes("Karak Chai"), "board should list the two demo coins");
     assert(board.includes("40% sold") && board.includes("Graduated"), "board should show sale progress and graduation: " + board);
     assert.equal(await text("#specPrice"), "Fixed, $100.0K market cap");
     step("board lists coins read from the chain");
+
+    // 1a. The home page: the model gives the launchpad's own numbers, old links still land in the launchpad.
+    {
+      const thrown = [], onErr = (e) => thrown.push(String(e));
+      page.on("pageerror", onErr);
+      await page.goto(WEB + "/", { waitUntil: "domcontentloaded" });
+      await page.waitForFunction(() => window.JISR_HOME && document.querySelector("#bOut").textContent.length > 0);
+      const setIn = (id, v) => page.evaluate((id, v) => { const e = document.querySelector(id); e.value = v; e.dispatchEvent(new Event("input", { bubbles: true })); }, id, v);
+      await setIn("#mSoldIn", 0); await setIn("#bAmt", "1000");
+      const buyLine = await text("#bOut");
+      assert(buyLine.includes("9.5M coins") && buyLine.includes("$902.50"), "the model: $1,000 buys 9.5M coins and they sell back for $902.50: " + buyLine);
+      assert.equal(await page.$eval("#mVol", (e) => e.disabled), true, "the floor cannot rise before the sale has sold out");
+      await setIn("#mSoldIn", 800);
+      assert.equal(await text("#rReserve"), "$81,684", "the reserve at graduation");
+      assert.equal(await page.$eval("#mVol", (e) => e.disabled), false);
+      await setIn("#mVol", 4000000);
+      assert.equal(await text("#rFloor"), "$0.000202", "after $4M of trading the floor has about doubled");
+      assert.equal(await text("#rCover"), "100.0%");
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true, "the home page fits a phone screen");
+      assert.deepEqual(thrown, [], "the home page threw errors: " + thrown.join(" | "));
+      page.off("pageerror", onErr);
+      await page.goto("about:blank");
+      await page.goto(WEB + "/#board", { waitUntil: "networkidle0" });
+      assert(page.url().endsWith("/app.html#board"), "an old link to the board lands in the launchpad: " + page.url());
+      await page.goto(APP, { waitUntil: "networkidle0" });
+      step("home page: the model matches the contracts, fits a phone, and old links still open the launchpad");
+    }
 
     // 1b. The white paper is linked from the site and reads in English and Arabic.
     assert.equal(await page.$eval("#nav-paper", (el) => el.getAttribute("href")), "whitepaper.html");
@@ -122,7 +149,9 @@ function waitFor(child, text, ms) {
     }
     await page.select("#langSel", "ar");
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true, "the paper fits a phone screen");
-    await page.goto(WEB, { waitUntil: "networkidle0" });
+    assert.equal(await page.$$eval("#paper-en figure.fig", (f) => f.length), 4, "the paper has its four figures");
+    assert.equal(await page.$$eval("figure.fig", (f) => f.length), 40, "in every language");
+    await page.goto(APP, { waitUntil: "networkidle0" });
     await page.waitForSelector("#rows .row");
     step("white paper: linked from the site, ten languages, fits a phone");
 
@@ -177,17 +206,17 @@ function waitFor(child, text, ms) {
     const evil = JSON.stringify({ description: '<img src=x onerror="window.__pwned=1"><script>window.__pwned=1</script>', image: "data:image/svg+xml;base64,PHN2ZyBvbmxvYWQ9IndpbmRvdy5fX3B3bmVkPTEiLz4=", x: "javascript:window.__pwned=1", telegram: "https://t.me.evil.example/x", website: "http://insecure.example" });
     await (await factory.connect(attacker).createCoin("<b id=inj>Evil</b><script>", "EVIL", evil)).wait();
     const evilCoin = await factory.coins(Number(await factory.coinCount()) - 1);
-    await page.goto(WEB + "/#coin-" + evilCoin, { waitUntil: "networkidle0" });
+    await page.goto(APP + "#coin-" + evilCoin, { waitUntil: "networkidle0" });
     await page.waitForFunction(() => { const h = document.querySelector("#v-coin h1"); return h && h.textContent.includes("Evil"); });
     assert.equal(await page.evaluate(() => window.__pwned), undefined, "hostile coin details must not run");
     assert.equal(await page.$("#v-coin h1 b"), null, "the name is shown as text, not as markup");
     assert.equal(await page.$("#cLinks"), null, "bad links are dropped");
     assert.equal(await page.$(".chead .ava img"), null, "an SVG picture is refused");
     assert((await text("#cDesc")).includes("<img src=x"), "the description is shown as plain text");
-    await page.goto(WEB + "/#board", { waitUntil: "networkidle0" });
+    await page.goto(APP + "#board", { waitUntil: "networkidle0" });
     await page.waitForSelector("#rows .row");
     assert.equal(await page.evaluate(() => window.__pwned), undefined);
-    await page.goto(WEB + "/#coin-" + coinAddr, { waitUntil: "networkidle0" });
+    await page.goto(APP + "#coin-" + coinAddr, { waitUntil: "networkidle0" });
     await page.waitForFunction(() => { const h = document.querySelector("#v-coin h1"); return h && h.textContent === "E2E Coin"; });
     await click("#walletBtn");
     await page.waitForFunction(() => document.querySelector("#walletTxt").textContent.includes("0x"));
@@ -258,7 +287,7 @@ function waitFor(child, text, ms) {
     step("the 2.5% wallet limit trims a large buy and blocks the next one");
 
     // 10. A graduated coin: buying above the floor, then selling back.
-    await page.goto(WEB + "/#coin-" + dep.coins[1], { waitUntil: "networkidle0" });
+    await page.goto(APP + "#coin-" + dep.coins[1], { waitUntil: "networkidle0" });
     await page.waitForFunction(() => { const h = document.querySelector("#v-coin h1"); return h && h.textContent === "Karak Chai"; });
     const kMarket = new ethers.Contract(await factory.marketOf(dep.coins[1]), art("CoinMarket"), provider);
     const kCoin = new ethers.Contract(dep.coins[1], art("Coin"), provider);
@@ -300,7 +329,7 @@ function waitFor(child, text, ms) {
     await click("[data-act=nav][data-v=board]");
     await page.waitForFunction(() => document.querySelector("#rows").textContent.includes("E2E Coin"));
     await page.screenshot({ path: path.join(__dirname, "board.png"), fullPage: true });
-    await page.goto(WEB + "/#coin-" + coinAddr, { waitUntil: "networkidle0" });
+    await page.goto(APP + "#coin-" + coinAddr, { waitUntil: "networkidle0" });
     await page.waitForFunction(() => { const h = document.querySelector("#v-coin h1"); return h && h.textContent === "E2E Coin"; });
     await sleep(500);
     await page.screenshot({ path: path.join(__dirname, "coin.png"), fullPage: true });
@@ -356,7 +385,7 @@ function waitFor(child, text, ms) {
     assert.equal(bothObj["31337"].factory, dep.factory);
     assert.deepEqual(bothObj["31337"].extraFactories, [realFactory]);
     fs.writeFileSync(DEPLOYMENTS, both);
-    await page.goto(WEB + "/#board", { waitUntil: "networkidle0" });
+    await page.goto(APP + "#board", { waitUntil: "networkidle0" });
     await page.waitForSelector("#rows .row");
     assert.equal(await page.$$eval("#netSel option", (o) => o.length), 2, "both factories are offered in the menu");
     assert((await text("#rows")).includes("Camel Cash"), "the first currency shows its own coins");
@@ -404,7 +433,7 @@ function waitFor(child, text, ms) {
     fs.writeFileSync(DEPLOYMENTS, await page.$eval("#aOut", (el) => el.value));
     const stockToken = new ethers.Contract(dep.stock, require(path.join(ROOT, "artifacts/contracts/mocks/MockStable.sol/MockStable.json")).abi, await provider.getSigner(accounts[0]));
     await (await stockToken.mint(account, 1000n * 10n ** 18n)).wait();
-    await page.goto(WEB + "/#board", { waitUntil: "networkidle0" });
+    await page.goto(APP + "#board", { waitUntil: "networkidle0" });
     await page.waitForFunction(() => document.querySelectorAll("#netSel option").length === 3);
     await page.select("#netSel", "31337:2");
     await page.waitForFunction(() => document.querySelector("#specPrice").textContent.includes("mTSLA"));
@@ -440,7 +469,7 @@ function waitFor(child, text, ms) {
     assert.equal(replaced["31337"].factory, realFactory2, "ticking replace makes the new factory the linked one");
     assert.equal(replaced["31337"].extraFactories, undefined);
     fs.writeFileSync(DEPLOYMENTS, snippet);
-    await page.goto(WEB + "/#board", { waitUntil: "networkidle0" });
+    await page.goto(APP + "#board", { waitUntil: "networkidle0" });
     await page.waitForFunction(() => document.querySelector("#rows").textContent.includes("No coins yet"));
     assert((await text("#foot")).includes(realFactory2), "the site now points at the new factory");
     await click("#walletBtn");
@@ -501,7 +530,7 @@ function waitFor(child, text, ms) {
     });
     const openLinkedCoin = async () => {
       await page.goto("about:blank"); // a full reload, so the page starts with no remembered fees
-      await page.goto(WEB + "/#board", { waitUntil: "networkidle0" });
+      await page.goto(APP + "#board", { waitUntil: "networkidle0" });
       await click("#walletBtn");
       await page.waitForFunction(() => document.querySelector("#walletTxt").textContent.includes("0x"));
       await click("#rows .row"); await page.waitForSelector("#goBtn"); await settle();

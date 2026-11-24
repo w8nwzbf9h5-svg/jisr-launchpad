@@ -4,10 +4,24 @@ const fs = require("fs");
 const path = require("path");
 const { marked } = require("marked");
 
+const FIG = require("./whitepaper-figures.js");
+
 const root = path.join(__dirname, "..");
-const html = (file) => marked.parse(fs.readFileSync(path.join(root, file), "utf8"), { gfm: true })
+const text = (file) => marked.parse(fs.readFileSync(path.join(root, file), "utf8"), { gfm: true })
   .replace(/<table>/g, '<div class="tw"><table>').replace(/<\/table>/g, "</table></div>")
   .replace(/<a href="http/g, '<a rel="noopener" href="http');
+
+// The four figures go at the end of the sections they illustrate. Every language has the same
+// section layout, so the places are counted in third-level headings:
+//   figure 1 (life of a coin)   before 2.1      figure 3 (rising floor)  before 2.4
+//   figure 2 (where $1,000 goes) before 2.3     figure 4 (price line)    before 2.5
+const PLACES = [0, 2, 3, 4];
+function html(file, lang) {
+  const parts = text(file).split(/(?=<h3)/), figs = FIG.figures(lang);
+  if (parts.length !== 7) throw new Error(file + ": expected 6 third-level headings, found " + (parts.length - 1));
+  PLACES.forEach((at, i) => { parts[at] += "\n" + figs[i] + "\n"; });
+  return parts.join("");
+}
 
 // English is the reference text. To add a language: add its Markdown file and one line here.
 const LANGS = [
@@ -22,7 +36,7 @@ const LANGS = [
   { code: "tr", file: "WHITEPAPER-TR.md", name: "Türkçe", title: "Jisr Launchpad: Teknik Doküman", back: "Platformu aç" },
   { code: "id", file: "WHITEPAPER-ID.md", name: "Bahasa Indonesia", title: "Jisr Launchpad: Buku Putih", back: "Buka platform" },
 ];
-const articles = LANGS.map((l) => `<article id="paper-${l.code}" lang="${l.code}"${l.rtl ? ' dir="rtl"' : ""}${l.code === "en" ? "" : " hidden"}>\n${html(l.file)}\n</article>`).join("\n");
+const articles = LANGS.map((l) => `<article id="paper-${l.code}" lang="${l.code}"${l.rtl ? ' dir="rtl"' : ""}${l.code === "en" ? "" : " hidden"}>\n${html(l.file, l.code)}\n</article>`).join("\n");
 const options = LANGS.map((l) => `<option value="${l.code}">${l.name}</option>`).join("");
 const meta = JSON.stringify(LANGS.reduce((m, l) => { m[l.code] = { title: l.title, back: l.back }; return m; }, {}));
 
@@ -64,15 +78,15 @@ const page = `<!DOCTYPE html>
 .ptop a.brand{text-decoration:none}
 .ptop .acts{display:flex;gap:8px;align-items:center}
 .ptop .acts a,.ptop .acts select{border:1px solid var(--line);background:var(--raise);color:var(--ink);border-radius:10px;padding:8px 12px;font-size:13.5px;font-weight:600;text-decoration:none;cursor:pointer}
-@media print{body{background:#fff;color:#000}.top{display:none}.paper .tw,.paper blockquote,.paper code,.paper th{background:#fff;border-color:#999}.paper a{color:#000}}
+${FIG.CSS}@media print{body{background:#fff;color:#000}.top{display:none}.paper .tw,.paper blockquote,.paper code,.paper th{background:#fff;border-color:#999}.paper a{color:#000}}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="wrap ptop">
-    <a class="brand" href="./" aria-label="Jisr Launchpad, back to the launchpad"><b>JISR</b><i></i><span>launchpad</span></a>
+    <a class="brand" href="./" aria-label="Jisr Launchpad, home"><b>JISR</b><i></i><span>launchpad</span></a>
     <div class="acts">
-      <a href="./" id="backLink">Open the launchpad</a>
+      <a href="app.html" id="backLink">Open the launchpad</a>
       <select id="langSel" aria-label="Language">${options}</select>
     </div>
   </div>
@@ -98,7 +112,7 @@ ${articles}
   show(q && META[q[1]] ? q[1] : META[saved] ? saved : META[nav] ? nav : "en");
   sel.addEventListener("change", function () { show(sel.value); window.scrollTo(0, 0); });
 })();
-</script>
+${FIG.JS}</script>
 </body>
 </html>
 `;

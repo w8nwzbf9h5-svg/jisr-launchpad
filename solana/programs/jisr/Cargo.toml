@@ -2,7 +2,8 @@
 name = "jisr"
 version = "0.1.0"
 edition = "2021"
-license = "MIT"
+license-file = "../../../LICENSE"
+publish = false
 description = "Jisr launchpad program for Solana: fixed-price sale, fully covered rising floor, no admin over reserves."
 
 [lib]

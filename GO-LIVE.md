@@ -7,7 +7,7 @@ The technical package for the security review is [AUDIT.md](AUDIT.md).
 
 | Item | State |
 |---|---|
-| EVM contracts | Built. 47 contract tests and 24 browser tests pass. Live on Sepolia (test network), earlier build without automatic fee payouts. |
+| EVM contracts | Built. 47 contract tests and 25 browser tests pass. Live on Sepolia (test network), earlier build without automatic fee payouts. |
 | Solana program | Built. Tested in GitHub Actions on every change. Live on devnet (test network), earlier build. |
 | Cross-network sale (Circle CCTP) | Built and tested against stand-ins. Not yet run on Circle's live test bridge. |
 | Real-network deployment, EVM | Done from the deploy page with your own wallet. Ready. |

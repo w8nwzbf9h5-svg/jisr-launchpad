@@ -125,7 +125,7 @@ Read this section before using the launchpad with anything of value.
 | Part | State |
 |---|---|
 | EVM contracts | Built and tested (47 contract tests) |
-| Web app and deploy page | Built and tested (24 browser tests), live |
+| Web app and deploy page | Built and tested (25 browser tests), live |
 | Test deployment | Live on the Sepolia test network, with test money that has no value |
 | Independent security audit | Not done |
 | Deployment on real networks | Not done. It follows the audit |

@@ -3,136 +3,165 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Jisr Launchpad</title>
+<title>Jisr Launchpad: coins with a floor that is paid for in advance</title>
+<meta name="description" content="Jisr sells each coin at one fixed price and keeps the money in a reserve nobody can withdraw. Operate the model yourself and read the proof live from the chain. Public test on Solana devnet and Ethereum Sepolia.">
+<script>
+/* Addresses of the launchpad that used to live here (#board, #coin-0x…, #launch) now belong to app.html. */
+if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html" + location.hash);
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=fa305785">
+<link rel="stylesheet" href="home.css?v=d869edf6">
 </head>
-<body>
+<body class="home">
 
 <header class="top">
   <div class="wrap">
-    <button class="brand" data-act="nav" data-v="board" aria-label="Jisr Launchpad, go to the board"><b>JISR</b><i></i><span>launchpad</span></button>
+    <a class="brand" href="./" aria-label="Jisr Launchpad, home"><b>JISR</b><i></i><span>launchpad</span></a>
     <nav aria-label="Main">
-      <button data-act="nav" data-v="board" id="nav-board">Board</button>
-      <button data-act="nav" data-v="launch" id="nav-launch">Launch a coin</button>
-      <button data-act="nav" data-v="how" id="nav-how">How it works</button>
-      <a href="solana.html" id="nav-solana">Solana</a>
-      <a href="whitepaper.html" id="nav-paper">White paper</a>
+      <a href="#machine">The model</a>
+      <a href="#proof">Live checks</a>
+      <a href="#try">Try it</a>
+      <a href="whitepaper.html">White paper</a>
     </nav>
     <div class="right">
-      <label class="sr" for="netSel" hidden>Network</label>
-      <select id="netSel" class="netsel" aria-label="Network"></select>
-      <button class="wbtn" id="walletBtn" data-act="connect"><span class="dot"></span><span id="walletTxt">Connect wallet</span></button>
+      <a class="btn" href="solana.html">Solana</a>
+      <a class="btn primary" href="app.html">Ethereum</a>
     </div>
   </div>
 </header>
-<div class="strip" id="strip" hidden><div class="wrap" id="stripTxt"></div></div>
+<div class="strip"><div class="wrap"><b>Public test.</b> Test networks only: the coins and the money here have no value. The contracts have not had an independent audit.</div></div>
 
 <main class="wrap">
 
-<section id="v-board">
-  <div class="hero">
-    <h1>Launch a coin with a floor that is <em>covered 100%.</em></h1>
-    <p>Every coin is sold at one fixed price, and the money stays in a reserve that nobody can withdraw. Any holder can sell back at the floor price at any time.</p>
-    <div class="cta"><button class="btn primary" data-act="nav" data-v="launch">Launch a coin</button><button class="btn" data-act="nav" data-v="how">How it works</button></div>
-    <div class="spec">
-      <div><span class="label">Sale price</span><strong id="specPrice">One fixed price</strong><small>Same price for everyone. No early discount.</small></div>
-      <div><span class="label">Trading fee</span><strong>5% per trade</strong><small>Creator 1 · floor reserve 2 · launchpad 2</small></div>
-      <div><span class="label">Pay with</span><strong id="specPay">Stablecoin or native</strong><small id="specNet">Choose a network to begin</small></div>
-      <div><span class="label">Wallet limit</span><strong>2.5% of supply</strong><small>For every wallet, the creator included</small></div>
+  <section class="open">
+    <div>
+      <h1>Launch a coin whose floor is paid for in advance.</h1>
+      <p class="lede">Jisr sells every coin at one fixed price and keeps the money in a reserve that no person controls. Any holder can sell back to that reserve at the floor price, at any time. Move the handle on the chart and watch the reserve keep up.</p>
+      <div class="doors">
+        <a class="btn primary" href="solana.html">Open on Solana devnet</a>
+        <a class="btn" href="app.html">Open on Ethereum Sepolia</a>
+      </div>
+      <p class="fine">There is no cheap early round and the creator receives no coins. A wallet may hold 2.5% of a coin at most. The whole method is in the <a href="whitepaper.html">white paper</a>, in ten languages.</p>
     </div>
-  </div>
-  <div class="boardhead">
-    <h2>Coins on the board</h2>
-    <button class="btn" data-act="refresh">Refresh</button>
-  </div>
-  <div class="board">
-    <div class="cols label"><span></span><span>Coin</span><span>Market cap</span><span>Sale progress</span><span style="text-align:right">Status</span></div>
-    <div id="rows"><div class="empty">Loading coins…</div></div>
-  </div>
-</section>
 
-<section id="v-coin" hidden></section>
+    <div class="machine" id="machine">
+      <h2>The model, running</h2>
+      <p class="sub">Drag across the chart. Every number below is worked out by the same arithmetic the contracts run.</p>
+      <div class="m-chart" id="mChart" aria-hidden="true">
+        <svg id="mSvg" viewBox="0 0 640 250"></svg>
+        <div class="zone" id="mZoneA">Sale: one price for everyone</div>
+      </div>
+      <ul class="m-key"><li><i class="sw-plat"></i>Price of the next coin, in sale prices</li><li><i class="sw-floor"></i>Floor price</li></ul>
+      <div class="m-ctl">
+        <div>
+          <label for="mSoldIn">Coins sold <output id="mSoldOut"></output></label>
+          <input type="range" id="mSoldIn" min="0" max="950" step="5">
+        </div>
+        <div id="mVolBox">
+          <label for="mVol">Money traded after the sale sold out <output id="mVolOut"></output></label>
+          <input type="range" id="mVol" min="0" max="5000000" step="100000">
+          <p class="hint" id="mVolHint"></p>
+        </div>
+      </div>
+      <div class="m-read">
+        <div><span>Price of the next coin</span><b id="rPrice"></b></div>
+        <div><span>Market value at that price</span><b id="rCap"></b></div>
+        <div><span>Floor price</span><b id="rFloor"></b></div>
+        <div><span>Held in the floor reserve</span><b id="rReserve"></b></div>
+      </div>
+      <div class="m-cover">
+        <div class="row1"><span>Needed to buy back every coin at the floor: <b id="rNeed"></b></span><span>Cover <b id="rCover"></b></span></div>
+        <div class="track"><div class="fill" id="rFill"></div></div>
+        <p id="rSpare"></p>
+      </div>
+      <div class="m-buy">
+        <div class="ask"><label for="bAmt">Buy at this point with</label><span class="amt">$<input id="bAmt" inputmode="decimal" autocomplete="off" aria-label="Amount in dollars"></span></div>
+        <p class="out" id="bOut"></p>
+        <div class="segs" id="bBar" role="img"></div>
+        <ul id="bKey"></ul>
+      </div>
+      <p class="m-foot">A model of one coin priced in dollars, with every coin bought in order and none sold back. Real coins move both ways; the reserve rule is the same.</p>
+    </div>
+  </section>
 
-<section id="v-launch" hidden>
-  <div class="page">
-    <h1>Launch a coin</h1>
-    <p>Every coin launches on the same terms, so buyers know what they are getting. You choose the network, the name, the picture and the links. Launching sends one transaction from your wallet.</p>
-    <div class="lgrid">
-      <form class="form card" id="launchForm" novalidate>
-        <div class="field"><label for="lName">Coin name</label><input type="text" id="lName" maxlength="32" placeholder="Desert Rocket" autocomplete="off"></div>
-        <div class="field"><label for="lTicker">Ticker</label><input type="text" id="lTicker" maxlength="10" placeholder="DRKT" autocomplete="off" style="text-transform:uppercase;font-family:var(--mono)"></div>
-        <div class="field"><label for="lNet">Network and currency</label><select id="lNet" class="netsel" style="max-width:100%;border-radius:8px;padding:10px 12px"></select><div class="hint" id="lNetHint"></div></div>
-        <div class="field"><label for="lImgFile">Picture, optional</label>
-          <input type="file" id="lImgFile" accept="image/png,image/jpeg,image/webp">
-          <div id="lImgPrev" class="imgprev"></div>
-          <input type="text" id="lImgUrl" maxlength="300" placeholder="or paste a picture link: https://…" autocomplete="off">
-          <div class="hint">A photo is shrunk to a small square and stored on the network with the coin, which adds to the launch fee. A link costs almost nothing.</div></div>
-        <div class="field"><label for="lDesc">Description, optional</label><textarea id="lDesc" maxlength="280" placeholder="What is this coin about?"></textarea></div>
-        <div class="field"><label for="l-x">X (Twitter) link, optional</label><input type="text" id="l-x" maxlength="200" placeholder="https://x.com/yourcoin" autocomplete="off"></div>
-        <div class="field"><label for="l-telegram">Telegram link, optional</label><input type="text" id="l-telegram" maxlength="200" placeholder="https://t.me/yourcoin" autocomplete="off"></div>
-        <div class="field"><label for="l-website">Website, optional</label><input type="text" id="l-website" maxlength="200" placeholder="https://yourcoin.com" autocomplete="off"></div>
-        <div class="err" id="lErr" role="alert"></div>
-        <button class="btn primary wide" type="submit" id="launchBtn">Launch the coin</button>
-        <div class="hint">You pay the network fee for one transaction. You receive no coins: you buy at the sale price like everyone else.</div>
-      </form>
-      <div class="card">
-        <span class="label">Launch terms, fixed for every coin</span>
-        <div class="kv"><span>Total supply</span><b class="num">1,000,000,000</b></div>
-        <div class="kv"><span>Sold in the sale</span><b class="num">800,000,000</b></div>
-        <div class="kv"><span>Sale price, same for everyone</span><b class="num" id="tPrice">One fixed price</b></div>
-        <div class="kv"><span>Market cap at the sale price</span><b class="num" id="tCap">—</b></div>
-        <div class="kv"><span>Graduation</span><b class="num">When the sale sells out</b></div>
-        <div class="kv"><span>Trading fee</span><b class="num">5%</b></div>
-        <div class="kv"><span>Your creator share</span><b class="num">1% of every trade</b></div>
-        <div class="kv"><span>To the floor reserve</span><b class="num">2%</b></div>
-        <div class="kv"><span>Launchpad share</span><b class="num">2%</b></div>
-        <div class="kv"><span>Most one wallet can hold</span><b class="num">2.5% of supply</b></div>
-        <div class="kv"><span>Who can withdraw the reserve</span><b class="num">Nobody</b></div>
+  <section class="sec" id="proof">
+    <h2>Read the chain yourself</h2>
+    <p class="say">Your browser is asking the networks these questions as you read. The answers come from the chain, not from us: this site has no server and stores nothing.</p>
+    <div class="console">
+      <div class="bar"><span>Live from the test networks</span><button id="cRun">Run again</button></div>
+      <ol id="cList"><li class="head">The checks start when this box comes into view.</li></ol>
+      <div class="sum" id="cSum">Each line links to the same fact on a public block explorer.</div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>How a coin lives</h2>
+    <p class="say">The same four stages for every coin, on every network.</p>
+    <ol class="steps">
+      <li><b>Launch</b><span>The creator pays the network fee and receives no coins. All one billion go to the coin's own market.</span></li>
+      <li><b>Sale</b><span>800 million coins at one fixed price. The value of every coin sold goes into the reserve.</span></li>
+      <li><b>Graduation</b><span>The sale sells out. The reserve holds about $81,684 for those 800 million coins.</span></li>
+      <li><b>After graduation</b><span>The last 200 million sell above the floor, and fees from trading keep raising the floor.</span></li>
+    </ol>
+  </section>
+
+  <section class="sec">
+    <h2>What exists today</h2>
+    <p class="say">A plain account, including what is not done.</p>
+    <dl class="facts">
+      <div><dt>Networks</dt><dd>Solana devnet and Ethereum Sepolia. Both are test networks.</dd></div>
+      <div><dt>Solana program</dt><dd>Deployed with its upgrade authority removed, so nobody can change it. The check above reads that from the network.</dd></div>
+      <div><dt>Ethereum contracts</dt><dd>47 automated contract tests and 25 browser test steps. Markets have no owner, no pause and no withdrawal.</dd></div>
+      <div><dt>Fees</dt><dd>5% of each trade: 1% to the coin's creator, 2% to the launchpad, 2% into the coin's own reserve. Paid out automatically as the coin trades.</dd></div>
+      <div><dt>Independent audit</dt><dd class="no">Not done yet.</dd></div>
+      <div><dt>Real money</dt><dd class="no">Not yet. Nothing is deployed on a real network.</dd></div>
+    </dl>
+  </section>
+
+  <section class="sec" id="try">
+    <h2>Try it with test money</h2>
+    <p class="say">Launching, buying and selling all work today. Nothing here costs or earns real money.</p>
+    <div class="two">
+      <div class="door">
+        <h3>Solana devnet</h3>
+        <p>Needs the Phantom wallet.</p>
+        <ol>
+          <li>Open the page in Phantom's browser and connect.</li>
+          <li>Press “Get SOL for fees”, then “Get 10,000 test dollars”.</li>
+          <li>Launch a coin, or buy one from the board.</li>
+        </ol>
+        <a class="btn primary" href="solana.html">Open on Solana devnet</a>
+      </div>
+      <div class="door">
+        <h3>Ethereum Sepolia</h3>
+        <p>Needs MetaMask and a little Sepolia ETH for fees, from any Sepolia faucet.</p>
+        <ol>
+          <li>Open the page in MetaMask's browser and connect.</li>
+          <li>Take test dollars from the bar at the top.</li>
+          <li>Launch a coin, or buy one from the board.</li>
+        </ol>
+        <a class="btn primary" href="app.html">Open on Ethereum Sepolia</a>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section id="v-how" hidden>
-  <div class="page">
-    <h1>How it works</h1>
-    <div class="how">
-      <div class="card"><h2><span>01</span>One fixed price for everyone</h2>
-        <p>Supply is 1 billion. 800 million are sold at one price. With a dollar stablecoin that is $0.0001 a coin, a $100K market cap from the first minute. The creator, the first buyer and the last buyer all pay the same.</p></div>
-      <div class="card"><h2><span>02</span>A reserve nobody can withdraw</h2>
-        <p>The money that buys coins goes into the coin's own contract, in the network's reserve currency: a dollar stablecoin, or on some networks a stock token. The contract has no owner and no withdrawal function. It pays sellers by formula, the creator 1% and the launchpad 2%. Nothing else can leave.</p></div>
-      <div class="card"><h2><span>03</span>A floor covered 100%</h2>
-        <p>Every coin that leaves the contract puts one floor price into the reserve, so the reserve can buy back every coin at the floor price at any time.</p>
-        <ul><li>Buy with $1,000 and you hold $950 of coins after the buy fee.</li><li>Sell them back at the floor and you receive about $902.</li><li>That 9.75% is the most a sale buyer loses by selling at the floor.</li></ul></div>
-      <div class="card"><h2><span>04</span>A floor that rises</h2>
-        <p>2% of every trade stays in the reserve. Once the sale has sold out, that surplus lifts the floor price. It never comes down.</p></div>
-      <div class="card"><h2><span>05</span>After the sale sells out</h2>
-        <p>The last 200 million coins trade above the floor. New demand pushes the price up. If buyers leave, the price falls back to the floor and stops there.</p></div>
-      <div class="card"><h2><span>06</span>Paying and getting paid</h2>
-        <p>Pay with the reserve currency, or, where the network has a swap route, with the network's own currency, which is swapped on the way in. When you sell, choose either one.</p></div>
-      <div class="card"><h2><span>07</span>What it cannot do</h2>
-        <div class="flag">A buyer who pays more than the floor can lose the difference. When the reserve is a stock token, the floor is a number of those tokens, so its dollar value moves with the stock. A stablecoin can lose its peg or freeze an address. A bug in a contract can lose funds, and nobody can pause or patch a live market. The 2.5% limit is per address. This is a capped loss, never a guarantee.</div></div>
-    </div>
-  </div>
-</section>
-
-<section id="xfers" class="card xfers" hidden aria-live="polite"></section>
-<footer id="foot"></footer>
+  <footer class="end">
+    <p>© 2026 Jisr Launchpad. All rights reserved. The code, the design and the documents are proprietary. Reading them is not permission to copy or reuse them.</p>
+    <p>This is a public test and not an offer of any kind. A floor limits how far a price can fall inside the launchpad; it does not make a coin a good purchase. <a href="whitepaper.html">White paper</a></p>
+  </footer>
 </main>
 
-<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
-
 <script>
-/* Load the scripts in order. deployments.js is always fetched fresh, so a newly linked contract shows at once. */
+/* Load the scripts in order. */
 (function () {
-  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "wallet.js?v=52c21746", "app.js?v=2fa2c9ef"];
+  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=3d68fd7e", "solana/config.js?v=50a882d9", "home.js?v=aa0943e6"];
   (function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");
-    s.src = files[i]; s.onload = s.onerror = function () { next(i + 1); };
+    s.src = files[i]; s.onload = function () { next(i + 1); }; s.onerror = function () { next(i + 1); };
     document.body.appendChild(s);
   })(0);
 })();
