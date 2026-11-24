@@ -14,7 +14,7 @@ Status: tested locally end to end and deployed on two test networks. **Not audit
 |---|---|
 | `contracts/` | The three contracts, plus test-only mocks |
 | `contracts/periphery/BridgeSeller.sol` | Optional helper beside a factory: sell a coin here and receive the USDC on another network through Circle's CCTP. No owner, holds nothing between transactions |
-| `test/` | 44 contract tests |
+| `test/` | 47 contract tests |
 | `web/` | The web app. Static files, no build step, no server |
 | `e2e/` | A browser test (24 steps) that drives the web app against a local chain |
 | `scripts/` | Deploy, local demo, local web server |

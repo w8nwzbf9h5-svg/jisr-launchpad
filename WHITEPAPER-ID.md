@@ -95,7 +95,7 @@ Harga dari rancangan ini: jika ditemukan bug setelah peluncuran, tidak ada yang 
 
 - Peluncuran memerlukan satu transaksi jaringan. Tidak ada biaya listing.
 - Pembuat tidak menerima koin. Untuk memegang koin, pembuat membeli pada harga jual seperti orang lain, dalam batas 2.5% yang sama.
-- Pembuat memperoleh 1% dari setiap transaksi koinnya dan dapat mengklaimnya kapan saja.
+- Pembuat memperoleh 1% dari setiap transaksi koinnya, dibayarkan otomatis ke dompetnya seiring koin diperdagangkan.
 - Tidak ada pembelian pembuat yang dikunci atau dilepas bertahap, karena pembuat membayar harga yang sama dengan pembeli lain.
 
 ## 5. Jaringan dan mata uang cadangan
@@ -124,7 +124,7 @@ Baca bagian ini sebelum menggunakan platform dengan apa pun yang bernilai.
 
 | Bagian | Keadaan |
 |---|---|
-| Kontrak EVM | Sudah dibangun dan diuji (44 pengujian kontrak) |
+| Kontrak EVM | Sudah dibangun dan diuji (47 pengujian kontrak) |
 | Aplikasi web dan halaman pemasangan | Sudah dibangun dan diuji (24 pengujian di peramban), sudah daring |
 | Pemasangan uji | Daring di jaringan uji Sepolia, dengan uang uji yang tidak bernilai |
 | Audit keamanan independen | Belum dilakukan |

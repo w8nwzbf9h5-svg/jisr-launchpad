@@ -95,7 +95,7 @@ Le coût de cette conception : si un bug est découvert après le lancement, per
 
 - Lancer un jeton coûte une transaction réseau. Il n'y a pas de frais de listing.
 - Le créateur ne reçoit aucun jeton. Pour en détenir, il achète au prix de vente comme tout le monde, dans la même limite de 2.5 %.
-- Le créateur gagne 1 % de chaque transaction sur son jeton et peut l'encaisser à tout moment.
+- Le créateur gagne 1 % de chaque transaction sur son jeton, versé automatiquement dans son portefeuille au fil des transactions.
 - Rien de ce que le créateur achète n'est bloqué ni libéré par étapes, puisqu'il a payé le même prix que tout autre acheteur.
 
 ## 5. Réseaux et monnaies de réserve
@@ -124,7 +124,7 @@ Lisez cette section avant d'utiliser la plateforme avec quoi que ce soit de vale
 
 | Partie | État |
 |---|---|
-| Contrats EVM | Construits et testés (44 tests de contrats) |
+| Contrats EVM | Construits et testés (47 tests de contrats) |
 | Application web et page de déploiement | Construites et testées (24 tests dans le navigateur), en ligne |
 | Déploiement de test | En ligne sur le réseau de test Sepolia, avec de l'argent de test sans valeur |
 | Audit de sécurité indépendant | Non réalisé |

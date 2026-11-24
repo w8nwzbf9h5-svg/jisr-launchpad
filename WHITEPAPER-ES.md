@@ -95,7 +95,7 @@ El coste de este diseño: si se encuentra un error después del lanzamiento, nad
 
 - Lanzar cuesta una transacción de red. No hay comisión de listado.
 - El creador no recibe monedas. Para tener la moneda, compra al precio de venta como todos, dentro del mismo límite del 2.5%.
-- El creador gana el 1% de cada operación con su moneda y puede cobrarlo en cualquier momento.
+- El creador gana el 1% de cada operación con su moneda, y se le paga automáticamente en su billetera a medida que la moneda se negocia.
 - Nada de lo que compra el creador queda bloqueado ni se libera por etapas, porque pagó el mismo precio que cualquier otro comprador.
 
 ## 5. Redes y monedas de reserva
@@ -124,7 +124,7 @@ Lee esta sección antes de usar la plataforma con algo de valor.
 
 | Parte | Estado |
 |---|---|
-| Contratos EVM | Construidos y probados (44 pruebas de contratos) |
+| Contratos EVM | Construidos y probados (47 pruebas de contratos) |
 | Aplicación web y página de despliegue | Construidas y probadas (24 pruebas en navegador), en línea |
 | Despliegue de prueba | En línea en la red de pruebas Sepolia, con dinero de prueba sin valor |
 | Auditoría de seguridad independiente | No realizada |

@@ -7,7 +7,7 @@ The technical package for the security review is [AUDIT.md](AUDIT.md).
 
 | Item | State |
 |---|---|
-| EVM contracts | Built. 44 contract tests and 24 browser tests pass. Live on Sepolia (test network). |
+| EVM contracts | Built. 47 contract tests and 24 browser tests pass. Live on Sepolia (test network), earlier build without automatic fee payouts. |
 | Solana program | Built. Tested in GitHub Actions on every change. Live on devnet (test network), earlier build. |
 | Cross-network sale (Circle CCTP) | Built and tested against stand-ins. Not yet run on Circle's live test bridge. |
 | Real-network deployment, EVM | Done from the deploy page with your own wallet. Ready. |
@@ -88,8 +88,12 @@ be emptied in step 9.
 
 ## 4. After going live
 
-- Fees collect inside each coin's market. Anyone can press the payout buttons; the money goes only to
-  the creator and to the platform wallet.
+- Fees are paid out automatically as coins trade: the creator's 1% to the creator, the launchpad's 2% to
+  the platform wallet. On EVM every trade does it in the contract. On Solana every trade made on the
+  page carries the payouts. A fee waits in the coin's market only when its wallet could not receive it;
+  then anyone can press Pay, and the money goes only to the creator and to the platform wallet.
+- On EVM this adds about 33,000 gas to each trade (roughly 30%). That is negligible on Base, Arbitrum
+  and BNB Chain, and noticeable on Ethereum itself.
 - The admin card on the Solana page, and the owner functions of the EVM factory, change the platform wallet.
 - Nothing else can be changed. There is no pause and no emergency withdrawal. If a fault is found in a
   deployed launchpad, the only remedy is to stop listing it on the site, tell holders to sell back at

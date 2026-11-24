@@ -41,7 +41,8 @@ interface IPlatformWallet {
 ///
 ///         Nobody controls this contract. There is no owner, no upgrade, no pause and no withdrawal.
 ///         Stablecoins leave only (a) to a seller, by the formula, (b) to the coin's creator, as the
-///         1% fee, (c) to the launchpad's platform wallet, as the 2% fee.
+///         1% fee, (c) to the launchpad's platform wallet, as the 2% fee. The two fees are paid out
+///         by every trade, as its last step.
 /// @dev Deployed as an EIP-1167 minimal proxy of one template. A minimal proxy cannot be upgraded.
 contract CoinMarket is Initializable, ReentrancyGuard {
     using SafeERC20 for IERC20;
@@ -160,6 +161,7 @@ contract CoinMarket is Initializable, ReentrancyGuard {
         _applyBuy(q, received - total);
         coin.safeTransfer(msg.sender, coinsOut);
         emit Bought(msg.sender, coinsOut, total, false);
+        _payFees();
     }
 
     /// @notice Buy exactly `coinsOut` coins with the chain's native currency (ETH or BNB).
@@ -195,6 +197,7 @@ contract CoinMarket is Initializable, ReentrancyGuard {
             if (!ok) revert RefundFailed();
         }
         emit Bought(msg.sender, coinsOut, total, true);
+        _payFees();
     }
 
     // ------------------------------------------------------------------ selling
@@ -214,6 +217,7 @@ contract CoinMarket is Initializable, ReentrancyGuard {
         _applySell(q);
         stable.safeTransfer(to, net);
         emit Sold(msg.sender, to, coinsIn, net, false);
+        _payFees();
     }
 
     /// @notice Sell `coinsIn` coins and receive the chain's native currency (ETH or BNB), paid to `to`.
@@ -236,11 +240,15 @@ contract CoinMarket is Initializable, ReentrancyGuard {
         stable.forceApprove(address(router), 0);
         nativeOut = amounts[amounts.length - 1];
         emit Sold(msg.sender, to, coinsIn, q.net, true);
+        _payFees();
     }
 
     // ------------------------------------------------------------------ fees
 
-    /// @notice Pay the creator the 1% fees collected so far. Anyone may call; the money goes to the creator.
+    // Every trade pays the fees out as its last step (see _payFees). The two functions below are for a
+    // payout that could not be made at that moment: once the cause is gone, anyone may send it.
+
+    /// @notice Pay the creator the 1% fees still held here. Anyone may call; the money goes to the creator.
     function claimCreatorFees() external nonReentrant returns (uint256 amount) {
         amount = creatorFees;
         creatorFees = 0;
@@ -248,7 +256,7 @@ contract CoinMarket is Initializable, ReentrancyGuard {
         emit CreatorFeesClaimed(creator, amount);
     }
 
-    /// @notice Pay the launchpad the 2% fees collected so far. Anyone may call; the money goes to the
+    /// @notice Pay the launchpad the 2% fees still held here. Anyone may call; the money goes to the
     ///         platform wallet set on the factory. This is the only wallet the launchpad team controls.
     function sweepPlatformFees() external nonReentrant returns (uint256 amount) {
         address wallet = IPlatformWallet(factory).platformWallet();
@@ -373,6 +381,41 @@ contract CoinMarket is Initializable, ReentrancyGuard {
         creatorFees += q.creatorFee;
         platformFees += q.platformFee;
         _raiseFloor();
+    }
+
+    /// Gas given to each fee payout made as part of a trade. A plain token transfer needs far less.
+    uint256 private constant PAYOUT_GAS = 200_000;
+
+    /// Pay out the fees collected so far, as the last step of every trade: the creator's 1% to the
+    /// creator, the launchpad's 2% to the platform wallet. Nobody has to call anything.
+    ///
+    /// A payout that cannot be made never stops the trade. If the stablecoin refuses the transfer
+    /// (for example because its issuer has blocked the receiving wallet) or uses more gas than
+    /// PAYOUT_GAS, the amount stays recorded in this contract and is paid by the next trade, or by
+    /// claimCreatorFees / sweepPlatformFees, which anyone may call.
+    function _payFees() private {
+        uint256 amount = creatorFees;
+        if (amount != 0) {
+            creatorFees = 0;
+            if (_trySend(creator, amount)) emit CreatorFeesClaimed(creator, amount);
+            else creatorFees = amount;
+        }
+        amount = platformFees;
+        if (amount != 0) {
+            address wallet = IPlatformWallet(factory).platformWallet();
+            platformFees = 0;
+            if (_trySend(wallet, amount)) emit PlatformFeesSwept(wallet, amount);
+            else platformFees = amount;
+        }
+    }
+
+    /// Transfer stablecoins without ever reverting. True only if the token reported success: it did
+    /// not revert, and it returned either nothing (as USDT does) or `true`.
+    function _trySend(address to, uint256 amount) private returns (bool) {
+        (bool ok, bytes memory ret) = address(stable).call{gas: PAYOUT_GAS}(abi.encodeCall(IERC20.transfer, (to, amount)));
+        if (!ok) return false;
+        if (ret.length == 0) return true;
+        return ret.length >= 32 && abi.decode(ret, (uint256)) == 1;
     }
 
     /// Raise the floor price to what the floor reserve can pay for every outstanding coin.

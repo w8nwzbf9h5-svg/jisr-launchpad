@@ -95,7 +95,7 @@ Bu tasarımın bedeli: çıkıştan sonra bir hata bulunursa, kimse çalışan b
 
 - Coin çıkarmak bir ağ işlemine mal olur. Listeleme ücreti yoktur.
 - Oluşturan kişi coin almaz. Coini tutmak isterse herkes gibi satış fiyatından, aynı %2.5 sınırı içinde satın alır.
-- Oluşturan kişi coinindeki her işlemin %1'ini kazanır ve bunu istediği zaman tahsil edebilir.
+- Oluşturan kişi coinindeki her işlemin %1'ini kazanır; bu tutar coin işlem gördükçe cüzdanına otomatik olarak ödenir.
 - Oluşturanın satın aldığı hiçbir şey kilitlenmez veya kademeli serbest bırakılmaz, çünkü diğer bütün alıcılarla aynı fiyatı ödemiştir.
 
 ## 5. Ağlar ve rezerv para birimleri
@@ -124,7 +124,7 @@ Platformu değeri olan herhangi bir şeyle kullanmadan önce bu bölümü okuyun
 
 | Bölüm | Durum |
 |---|---|
-| EVM sözleşmeleri | Yazıldı ve test edildi (44 sözleşme testi) |
+| EVM sözleşmeleri | Yazıldı ve test edildi (47 sözleşme testi) |
 | Web uygulaması ve kurulum sayfası | Yazıldı ve test edildi (24 tarayıcı testi), yayında |
 | Test kurulumu | Sepolia test ağında yayında, değeri olmayan test parasıyla |
 | Bağımsız güvenlik denetimi | Yapılmadı |

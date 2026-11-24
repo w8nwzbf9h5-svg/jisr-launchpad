@@ -95,7 +95,7 @@ O custo desse desenho: se um erro for encontrado depois do lançamento, ninguém
 
 - Lançar custa uma transação de rede. Não há taxa de listagem.
 - O criador não recebe moedas. Para ter a moeda, ele compra pelo preço de venda como todo mundo, dentro do mesmo limite de 2.5%.
-- O criador ganha 1% de cada negociação da sua moeda e pode sacar a qualquer momento.
+- O criador ganha 1% de cada negociação da sua moeda, pago automaticamente na sua carteira à medida que a moeda é negociada.
 - Nada do que o criador compra fica bloqueado ou é liberado em etapas, porque ele pagou o mesmo preço que qualquer outro comprador.
 
 ## 5. Redes e moedas de reserva
@@ -124,7 +124,7 @@ Leia esta seção antes de usar a plataforma com qualquer coisa de valor.
 
 | Parte | Situação |
 |---|---|
-| Contratos EVM | Construídos e testados (44 testes de contratos) |
+| Contratos EVM | Construídos e testados (47 testes de contratos) |
 | Aplicação web e página de implantação | Construídas e testadas (24 testes no navegador), no ar |
 | Implantação de teste | No ar na rede de testes Sepolia, com dinheiro de teste sem valor |
 | Auditoria de segurança independente | Não realizada |

@@ -28,7 +28,7 @@ async function setup(decimals, capTokens = 100000n, opts = {}) {
   const [owner, platform, creator, ...users] = signers;
   const cap = capTokens * 10n ** BigInt(decimals);
   const unit = cap / 100000n;
-  const stable = await (await ethers.getContractFactory("MockStable")).deploy(opts.symbol || "Mock USD", opts.symbol || "mUSD", decimals);
+  const stable = await (await ethers.getContractFactory(opts.odd ? "MockOddStable" : "MockStable")).deploy(opts.symbol || "Mock USD", opts.symbol || "mUSD", decimals);
   const weth = ethers.Wallet.createRandom().address;
   const router = await (await ethers.getContractFactory("MockRouter")).deploy(weth, stable.target, 3200n * unit);
   await ethers.provider.send("hardhat_setBalance", [router.target, "0x" + (100000n * E18).toString(16)]);
@@ -81,8 +81,10 @@ for (const R of RESERVES) {
       expect(before - (await stable.balanceOf(a.address))).to.equal(1000n * unit);
       expect(await coin.balanceOf(a.address)).to.equal(coins);
       expect(await market.floorReserve()).to.equal(970n * unit); // $950 + 2% community fee
-      expect(await market.creatorFees()).to.equal(10n * unit);
-      expect(await market.platformFees()).to.equal(20n * unit);
+      // the trade paid the two fees out as its last step: nothing waits in the market
+      expect(await market.creatorFees()).to.equal(0n);
+      expect(await market.platformFees()).to.equal(0n);
+      expect(await stable.balanceOf(market.target)).to.equal(970n * unit);
 
       // a later buyer pays exactly the same price
       await market.connect(b).buy(coins, 1000n * unit, FAR);
@@ -161,21 +163,89 @@ for (const R of RESERVES) {
       await reverts(a.sendTransaction({ to: market.target, value: 1n }), "OnlyRouter");
     });
 
-    it("pays fees only to the creator and to the platform wallet", async function () {
+    it("pays the fees out with every trade, only to the creator and to the platform wallet", async function () {
       const { market, stable, factory, owner, platform, creator, users, unit } = await setupR();
-      await market.connect(users[0]).buy((95n * M) / 10n, MAXU, FAR);
-      await market.connect(users[5]).claimCreatorFees(); // anyone can trigger; the creator is paid
+      const coins = (95n * M) / 10n;
+      // a $1,000 buy: $10 to the creator and $20 to the launchpad, in the same transaction
+      const rc = await (await market.connect(users[0]).buy(coins, MAXU, FAR)).wait();
+      const names = rc.logs.map((l) => { try { return market.interface.parseLog(l).name; } catch { return null; } }).filter(Boolean);
+      expect(names).to.deep.equal(["Bought", "CreatorFeesClaimed", "PlatformFeesSwept"]);
       expect(await stable.balanceOf(creator.address)).to.equal(10n * unit);
-      await market.connect(users[5]).sweepPlatformFees();
       expect(await stable.balanceOf(platform.address)).to.equal(20n * unit);
+      expect([await market.creatorFees(), await market.platformFees()]).to.deep.equal([0n, 0n]);
+      // selling pays them too: 1% and 2% of the $950 the coins are worth
+      await market.connect(users[0]).sell(coins, 0n, users[0].address, FAR);
+      expect(await stable.balanceOf(creator.address)).to.equal((195n * unit) / 10n);
+      expect(await stable.balanceOf(platform.address)).to.equal(39n * unit);
+      // so does a trade in the native currency
+      await market.connect(users[2]).buyWithNative(coins, FAR, { value: E18 });
+      expect(await stable.balanceOf(creator.address)).to.equal((295n * unit) / 10n);
+      await market.connect(users[2]).sellForNative(coins, 0n, users[2].address, FAR);
+      expect(await stable.balanceOf(creator.address)).to.equal(39n * unit);
+      expect(await stable.balanceOf(platform.address)).to.equal(78n * unit);
+      // with nothing waiting, the manual payouts move nothing; a bystander who calls them gains nothing
+      await market.connect(users[5]).claimCreatorFees();
+      await market.connect(users[5]).sweepPlatformFees();
+      expect(await stable.balanceOf(creator.address)).to.equal(39n * unit);
       expect(await stable.balanceOf(users[5].address)).to.equal(10_000_000n * unit);
 
       // only the factory owner can move the platform wallet, and that is all the owner can do
       await reverts(factory.connect(users[0]).setPlatformWallet(users[0].address), "OwnableUnauthorizedAccount");
       await factory.connect(owner).setPlatformWallet(users[9].address);
-      await market.connect(users[1]).buy((95n * M) / 10n, MAXU, FAR);
-      await market.sweepPlatformFees();
+      await market.connect(users[1]).buy(coins, MAXU, FAR);
       expect(await stable.balanceOf(users[9].address)).to.equal(10_000_000n * unit + 20n * unit);
+      expect(await stable.balanceOf(platform.address)).to.equal(78n * unit);
+    });
+
+    it("never lets a fee wallet that cannot receive stop a trade", async function () {
+      const { market, stable, coin, platform, creator, users, unit } = await setup(R.decimals, R.capTokens, Object.assign({}, R.opts, { odd: true }));
+      const [a, b] = users;
+      const coins = (95n * M) / 10n;
+      const fees = async () => [await market.creatorFees(), await market.platformFees()].map(String);
+      const held = async () => [await stable.balanceOf(creator.address), await stable.balanceOf(platform.address)].map(String);
+
+      // 1. The stablecoin refuses transfers to the creator, as an issuer's block list would.
+      await stable.setQuirk(creator.address, 1);
+      await market.connect(a).buy(coins, MAXU, FAR);
+      expect(await coin.balanceOf(a.address)).to.equal(coins);
+      expect(await fees()).to.deep.equal([String(10n * unit), "0"]); // the creator's $10 waits; the launchpad was paid
+      expect(await held()).to.deep.equal(["0", String(20n * unit)]);
+      await reverts(market.claimCreatorFees(), "ReceiverBlocked"); // the manual payout cannot go through either
+      // every later trade still works, and the amount that waits grows
+      await market.connect(a).sell(coins, 0n, a.address, FAR);
+      expect(await fees()).to.deep.equal([String((195n * unit) / 10n), "0"]);
+      // once the block is lifted, the next trade pays everything that waited
+      await stable.setQuirk(creator.address, 0);
+      await market.connect(b).buy(coins, MAXU, FAR);
+      expect(await fees()).to.deep.equal(["0", "0"]);
+      expect(await held()).to.deep.equal([String((295n * unit) / 10n), String(59n * unit)]);
+
+      // 2. The stablecoin answers "false" for transfers to the launchpad's wallet and moves nothing.
+      await stable.setQuirk(platform.address, 2);
+      await market.connect(b).sell(coins, 0n, b.address, FAR);
+      expect(await fees()).to.deep.equal(["0", String(19n * unit)]);
+      expect(await held()).to.deep.equal([String(39n * unit), String(59n * unit)]);
+
+      // 3. A transfer to the launchpad's wallet burns all the gas it is given. The payout is given a fixed
+      //    amount of gas, so the trade still completes and stays affordable.
+      await stable.setQuirk(platform.address, 3);
+      const rc = await (await market.connect(a).buy(coins, MAXU, FAR)).wait();
+      gt(rc.gasUsed, 200_000n);
+      gt(600_000n, rc.gasUsed);
+      expect(await fees()).to.deep.equal(["0", String(39n * unit)]);
+      // the money that waits is still set aside: the market holds its reserve plus exactly those fees
+      expect(await stable.balanceOf(market.target)).to.equal((await market.floorReserve()) + 39n * unit);
+      await stable.setQuirk(platform.address, 0);
+      await market.connect(users[7]).sweepPlatformFees(); // anyone may send the payout that waited
+      expect(await held()).to.deep.equal([String(49n * unit), String(98n * unit)]);
+
+      // 4. A stablecoin whose transfer returns no data at all (as USDT does) is paid out normally.
+      await stable.setSilent(true);
+      await market.connect(a).sell(coins, 0n, a.address, FAR);
+      expect(await fees()).to.deep.equal(["0", "0"]);
+      expect(await held()).to.deep.equal([String((585n * unit) / 10n), String(117n * unit)]);
+      expect(await market.outstanding()).to.equal(0n);
+      expect(await stable.balanceOf(market.target)).to.equal(await market.floorReserve());
     });
 
     it("turns stray stablecoins into extra floor reserve", async function () {

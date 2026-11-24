@@ -95,7 +95,7 @@ The cost of this design: if a bug is found after launch, nobody can pause or pat
 
 - Launching costs one network transaction. There is no listing fee.
 - The creator receives no coins. To hold the coin, the creator buys at the sale price like everyone else, within the same 2.5% limit.
-- The creator earns 1% of every trade in the coin, claimable at any time.
+- The creator earns 1% of every trade in the coin, paid out to the creator's wallet automatically as the coin trades.
 - Nothing the creator buys is locked or vested, because the creator paid the same price as every other buyer.
 
 ## 5. Networks and currencies
@@ -124,7 +124,7 @@ Read this section before using the launchpad with anything of value.
 
 | Part | State |
 |---|---|
-| EVM contracts | Built and tested (44 contract tests) |
+| EVM contracts | Built and tested (47 contract tests) |
 | Web app and deploy page | Built and tested (24 browser tests), live |
 | Test deployment | Live on the Sepolia test network, with test money that has no value |
 | Independent security audit | Not done |

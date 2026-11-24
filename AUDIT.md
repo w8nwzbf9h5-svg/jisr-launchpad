@@ -10,7 +10,7 @@ The plain-language description of the product is in [WHITEPAPER.md](WHITEPAPER.m
 
 | Part | File | Lines | What it does |
 |---|---|---|---|
-| EVM | `contracts/CoinMarket.sol` | 396 | Sells a coin and buys it back. Holds the coin's reserve. The core. |
+| EVM | `contracts/CoinMarket.sol` | about 440 | Sells a coin and buys it back. Holds the coin's reserve. Pays the two fees out at the end of every trade. The core. |
 | EVM | `contracts/LaunchpadFactory.sol` | 103 | Launches coins from two fixed templates. Holds the platform wallet setting. |
 | EVM | `contracts/Coin.sol` | 40 | Fixed-supply ERC-20 with a 2.5% wallet limit. |
 | EVM | `contracts/periphery/BridgeSeller.sol` | 151 | Optional helper: sell a coin and send the USDC to another network with Circle CCTP V2. |
@@ -51,8 +51,8 @@ Reference case used in every test suite: $1,000 buys 9,500,000 coins; selling th
 | Who | EVM | Solana |
 |---|---|---|
 | Factory owner / program admin | Change the platform wallet. Hand the role on (two steps). **Nothing else.** | Same. |
-| Platform wallet | Receives the 2% fee when anyone calls `sweepPlatformFees`. | Same (`sweep_platform_fees`). |
-| Coin creator | Receives the 1% fee when anyone calls `claimCreatorFees`. Gets no coins and no rights. | Same. |
+| Platform wallet | Receives the 2% fee, sent by every trade as its last step; if that could not be done, when anyone calls `sweepPlatformFees`. | Receives it when anyone sends `sweep_platform_fees`. The page adds that to every trade. |
+| Coin creator | Receives the 1% fee the same way (`claimCreatorFees` as the fallback). Gets no coins and no rights. | Same (`claim_creator_fees`). |
 | Anyone | Launch a coin, buy, sell, trigger fee payouts, call `reinforce`. | Same. |
 | Nobody | Withdraw a reserve, pause, upgrade, mint, freeze, blacklist, change fees or prices. | Same, **provided the program's upgrade authority has been removed**. |
 
@@ -77,7 +77,8 @@ Things a reviewer should try to break:
 | I3 | `floorPrice` never decreases. | same tests |
 | I4 | After any sequence of trades every holder can sell everything, and those sales succeed. | "lets every holder exit at the end" (EVM, math, Solana integration) |
 | I5 | A group of wallets trading among themselves cannot end with more reserve tokens than they started with. | "an attacker with 12 wallets cannot extract value" during the sale and after graduation; `jisr-math` `an_attacker_with_many_wallets_cannot_extract_value` |
-| I6 | Reserve tokens leave a market only to a seller (by formula), to the creator (the 1%), to the platform wallet (the 2%). | "exposes no function that could move or freeze the reserve"; "pays fees only to the creator and to the platform wallet"; Solana `full_lifecycle_of_a_coin` |
+| I6 | Reserve tokens leave a market only to a seller (by formula), to the creator (the 1%), to the platform wallet (the 2%). | "exposes no function that could move or freeze the reserve"; "pays the fees out with every trade, only to the creator and to the platform wallet"; Solana `full_lifecycle_of_a_coin` |
+| I11 | A fee wallet that cannot receive never stops a trade, and the fee it is owed stays set aside for it. | EVM "never lets a fee wallet that cannot receive stop a trade" (a stablecoin that reverts, returns false, burns all gas, or returns no data); Solana page test step 6 |
 | I7 | Coin supply is fixed at creation and cannot grow. | launch tests on both sides |
 | I8 | All rounding favours the reserve: buys round up, sells round down. | random-trading tests compare against exact expectations |
 | I10 | A Solana coin's wallet metadata cannot be edited by anyone after launch. | Rust `full_lifecycle_of_a_coin`; client test step 2 |
@@ -144,6 +145,24 @@ and the SOL returns.
 A reviewer may prefer a check in the program itself (only the upgrade authority may call
 `initialize`). We would welcome that recommendation.
 
+### Design notes a reviewer should check
+
+**D1. EVM: fees are pushed at the end of every trade (`_payFees`).** After a trade's own transfers, the
+market tries to send the creator's and the launchpad's accrued fees with a low-level `transfer` call
+limited to 200,000 gas. Success means: no revert, and either no return data or the value 1. On
+failure the amount is put back in `creatorFees` / `platformFees` and the trade completes. The
+amount is zeroed before the call and all entry points are `nonReentrant`. `claimCreatorFees` and
+`sweepPlatformFees` remain as the fallback and use `safeTransfer`. Cost: about 33,000 gas per trade.
+Things to try: a reserve token that reverts, returns false, returns nothing, returns garbage, or
+consumes gas; a platform wallet changed between trades; a receiver that is the market itself.
+
+**D2. Solana: fees are paid by instructions the page adds to each trade.** The program is unchanged:
+`claim_creator_fees` and `sweep_platform_fees` can be sent by anyone. The page appends them to a buy
+or sell only when the trade itself earns that receiver a fee and the receiver's token account exists
+and is not frozen (`readyPayoutIxs`), so the added instructions cannot make the trade fail. A trade
+sent by other software does not include them; its fees wait in the market until the next trade from
+the page, or until someone sends the payout.
+
 ### Known limits of the design
 
 **L1. The 2.5% wallet limit is a speed bump, not a wall.** One person can use many wallets. On EVM
@@ -187,7 +206,7 @@ recipient come from the seller. A wrong recipient on the other network cannot be
 
 | Suite | Count | Command |
 |---|---|---|
-| EVM contracts (Hardhat) | 44 | `npm test` |
+| EVM contracts (Hardhat) | 47 | `npm test` |
 | EVM pages in a real browser against a local chain | 24 steps | `npm run e2e` |
 | Solana pricing (`jisr-math`) | 7 | `cd solana && cargo test -p jisr-math` |
 | Solana program, in-process | 3 | `cd solana && cargo test -p jisr --release` |

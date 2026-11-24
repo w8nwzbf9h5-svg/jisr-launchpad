@@ -474,11 +474,11 @@
           '<div class="kv"><span>Floor price</span><b class="num">' + fPrice(m.floorPrice) + (rise > 0.005 ? " · up " + rise.toFixed(2) + "%" : "") + "</b></div>" +
           (S.stable.isUsd ? "" : '<div class="flag">Priced in ' + esc(S.stable.symbol) + ", not in dollars. The floor is a number of " + esc(S.stable.symbol) + ", so its dollar value moves with it.</div>") +
           '<p class="note">The contract that holds this reserve has no owner and no withdrawal function. <span class="addr">' + esc(m.marketAddr) + "</span></p></div></div>" +
-        '<div class="card"><span class="label">Fees waiting to be paid out</span>' +
+        '<div class="card"><span class="label">Fees waiting</span>' +
           '<div class="kv"><span>Creator, 1%</span><b class="num">' + fUsd(m.creatorFees) + "</b></div>" +
           '<div class="kv"><span>Launchpad, 2%</span><b class="num">' + fUsd(m.platformFees) + "</b></div>" +
           '<div class="chips" style="margin-top:8px"><button class="chip sm" data-act="claimCreator"' + (m.creatorFees === 0n ? " disabled" : "") + '>Pay the creator</button><button class="chip sm" data-act="sweepPlatform"' + (m.platformFees === 0n ? " disabled" : "") + ">Pay the launchpad</button></div>" +
-          '<p class="note">Anyone can press these. The money can only go to the creator and to the launchpad wallet.</p></div>' +
+          '<p class="note">Every trade pays the fees out automatically. A fee waits here only when its wallet could not receive it at that moment; then anyone can press Pay, and the money can only go to the creator and to the launchpad wallet.</p></div>' +
         '<div class="card"><span class="label">Latest trades</span><div class="trades">' +
           ((S.trades || []).length ? S.trades.map(t => '<div class="tr"><span class="pill ' + t.side + '">' + t.side + "</span><span>" + (t.side === "buy" ? "paid " : "to ") + esc(t.native ? S.cfg.native : S.stable.symbol) +
             '<br><span class="who">' + short(t.who) + "</span></span><span class=\"amt\">" + fUsd(t.usd) + "<small>" + fTok(t.coins) + "</small></span></div>").join("") : '<p class="note">No recent trades.</p>') +

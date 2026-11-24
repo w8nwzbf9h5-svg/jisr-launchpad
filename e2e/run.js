@@ -199,7 +199,9 @@ function waitFor(child, text, ms) {
     assert((await text("#quote")).includes("9.50M E2E"), "quote should show 9.50M: " + (await text("#quote")));
     await hush(); await click("#goBtn"); await toast("Bought"); await settle();
     assert(near(await coin.balanceOf(account), (95n * M) / 10n, 10n ** 13n), "should hold 9.5M coins");
-    assert(near(await stable.balanceOf(account), 9000n * 10n ** 6n, 10n), "should have paid $1,000");
+    // this wallet launched the coin, so the creator's 1% of its own trade ($10) came straight back with it
+    assert(near(await stable.balanceOf(account), 9010n * 10n ** 6n, 10n), "should have paid $1,000 and received the $10 creator fee");
+    assert.equal(await market.creatorFees(), 0n, "the fee was paid out by the trade");
     assert.equal(await market.floorReserve() >= await market.floorLiability(), true);
     step("buying with the stablecoin: $1,000 in, 9.5M coins out");
 
@@ -221,7 +223,8 @@ function waitFor(child, text, ms) {
     await hush(); await click("#goBtn"); await toast("Sold"); await settle();
     const got = (await stable.balanceOf(account)) - st0;
     const expectNet = ((held5 / 2n) * 100n * 95n) / 100n / 10n ** 18n; // $0.0001 a coin, less 5%
-    assert(near(got, expectNet, 5n), `sale should pay about ${expectNet}, paid ${got}`);
+    const creatorCut = ((held5 / 2n) * 100n) / 100n / 10n ** 18n; // and the creator's 1%, which is this same wallet
+    assert(near(got, expectNet + creatorCut, 5n), `sale should pay about ${expectNet} plus the creator fee ${creatorCut}, paid ${got}`);
     step("selling half pays the floor price less the 5% fee");
 
     // 7. Sell the rest for the native currency.
@@ -235,14 +238,14 @@ function waitFor(child, text, ms) {
     assert.equal(await market.outstanding(), 0n);
     step("selling the rest for the native currency empties the wallet's coins");
 
-    // 8. Creator fees: anyone can trigger, the creator is paid.
-    const owed = await market.creatorFees();
-    assert(owed > 0n);
-    const st1 = await stable.balanceOf(account);
-    await hush(); await click("[data-act=claimCreator]"); await toast("Creator fees paid"); await settle();
-    assert.equal((await stable.balanceOf(account)) - st1, owed);
+    // 8. Creator fees: every trade paid them out as it happened. Nothing waits and there is nothing to press.
+    const sum = (evs) => evs.reduce((t, e) => t + e.args.amount, 0n);
+    const paidToCreator = await market.queryFilter(market.filters.CreatorFeesClaimed());
+    assert(paidToCreator.length >= 2 && sum(paidToCreator) > 0n, "each trade paid the creator");
+    assert(paidToCreator.every((e) => e.args.creator.toLowerCase() === account.toLowerCase()), "only the creator was paid");
     assert.equal(await market.creatorFees(), 0n);
-    step("creator fees are paid out to the creator");
+    assert.equal(await page.$eval("[data-act=claimCreator]", (b) => b.disabled), true, "the Pay button has nothing to pay");
+    step("creator fees were paid to the creator by the trades themselves");
 
     // 9. The wallet limit trims an oversized buy to 25M coins.
     await click("[data-act=tab][data-v=buy]");
@@ -286,10 +289,12 @@ function waitFor(child, text, ms) {
 
     // 11. The launchpad fee goes to the platform wallet.
     const platform = await factory.platformWallet();
-    const p0 = await stable.balanceOf(platform), pOwed = await kMarket.platformFees();
-    await hush(); await click("[data-act=sweepPlatform]"); await toast("Launchpad fees paid"); await settle();
-    assert.equal((await stable.balanceOf(platform)) - p0, pOwed);
-    step("launchpad fees are paid to the platform wallet");
+    const swept = sum(await kMarket.queryFilter(kMarket.filters.PlatformFeesSwept())) + sum(await market.queryFilter(market.filters.PlatformFeesSwept()));
+    assert(swept > 0n, "the trades paid the launchpad");
+    assert.equal(await kMarket.platformFees(), 0n);
+    assert((await stable.balanceOf(platform)) >= swept, "the money is in the platform wallet");
+    assert.equal(await page.$eval("[data-act=sweepPlatform]", (b) => b.disabled), true, "the Pay button has nothing to pay");
+    step("launchpad fees were paid to the platform wallet by the trades themselves");
 
     // 12. The new coin is on the board.
     await click("[data-act=nav][data-v=board]");
