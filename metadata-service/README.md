@@ -8,7 +8,17 @@ This folder is the service that answers the link. It is one file, `worker.mjs`. 
 stores nothing: for each request it reads the coin's market account from Solana and returns what the
 creator entered at launch.
 
-## What happens without it
+## Two ways to answer the link
+
+| | How | When a new coin's picture appears |
+|---|---|---|
+| Files published with the site | `scripts/build-metadata.js` reads every coin from the chain and writes `meta/<market address>.json` whenever the site is published. Nothing to set up. **The public test uses this.** | At the next publish: on the next change to the site, or when someone presses "Run workflow" on *Publish site* in the Actions tab. |
+| This service | One file on Cloudflare (below). It reads the chain on each request. | At once. |
+
+Both return exactly the same content. Whichever is used, its address is written into every coin at
+launch and can never be changed, so for real coins it must be an address that will never move.
+
+## What happens without either
 
 Coins still launch and trade. Wallets show the name and the ticker, with no picture.
 

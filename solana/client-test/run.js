@@ -98,7 +98,7 @@ function raise(n) {
   await fails(send(J.createCoinIxs(programId, creator.publicKey, stableMint, 1n, "Long Link", "LINK", "", "https://meta.example/" + "x".repeat(180)).ixs, creator), "a metadata link over 200 bytes");
   await fails(send(J.createCoinIxs(programId, creator.publicKey, stableMint, 1n, "No Meta", "NOMETA", "").ixs, creator), "a launch without the metadata accounts");
   // what wallets and explorers show: written by the real Metaplex program, once, and unchangeable
-  assert.equal(link, service + "/" + made.market.toBase58());
+  assert.equal(link, service + "/" + made.market.toBase58() + ".json");
   const md = J.decodeMetadata(await conn.getAccountInfo(made.metadata));
   assert(md, "the coin has a Metaplex metadata account");
   assert.deepEqual([md.name, md.symbol, md.uri, md.mint.toBase58(), md.updateAuthority.toBase58(), md.isMutable, md.sellerFee, md.hasCreators],

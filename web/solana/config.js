@@ -14,8 +14,9 @@
     devnet: {
       name: "Solana devnet", rpcUrl: "https://api.devnet.solana.com", explorer: "https://explorer.solana.com", clusterParam: "?cluster=devnet",
       programId: "5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8", test: true,
-      // No metadata service is set up for devnet, so wallets show a test coin's name and ticker without a picture.
-      metadataBase: "",
+      // Where wallets fetch a coin's picture and description: files published with this site, made from the
+      // chain each time the site is published (scripts/build-metadata.js). The link is written into a coin for good.
+      metadataBase: "https://w8nwzbf9h5-svg.github.io/jisr-launchpad/meta",
       // Devnet only: the public deployer key left over from the deployment. The page uses it to hand a
       // little SOL for network fees to a wallet that has none. It guards nothing of value.
       feeHelperSeed: "064291e20f163c014a27b8e346d730d9d73d4d8c55365839b7b563c6f602c19f"
@@ -23,7 +24,8 @@
     mainnet: {
       name: "Solana", rpcUrl: "https://api.mainnet-beta.solana.com", explorer: "https://explorer.solana.com", clusterParam: "",
       programId: "", test: false, stableName: "USDC",
-      // The address of the metadata service (metadata-service/README.md). Wallets get a coin's picture through it.
+      // Where wallets fetch a coin's picture: the address of the metadata service (metadata-service/README.md),
+      // or of the files published with this site. It must be an address that will never move.
       // Set it BEFORE coins are launched: the link is written into each coin once and can never be changed.
       metadataBase: ""
     }

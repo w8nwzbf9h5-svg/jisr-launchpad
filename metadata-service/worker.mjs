@@ -34,7 +34,7 @@ const https = (v) => (typeof v === "string" && /^https:\/\/[^\s"'<>]+$/i.test(v)
 
 /* The coin's details as the launch page packs them: {"d": description, "i": picture, "x", "t", "w"}. An
    older or hand-made coin may hold a bare link or nothing. Same reading rules as the page (unpackMeta). */
-function details(text) {
+export function details(text) {
   let o = null;
   try { o = JSON.parse(text); } catch (_) { o = null; }
   if (!o || typeof o !== "object") return { description: "", image: https(text), x: "", telegram: "", website: "" };
@@ -76,7 +76,13 @@ export async function handle(request, env) {
   try { m = readMarket(Uint8Array.from(atob(account.data[0]), (c) => c.charCodeAt(0))); } catch (_) { m = null; }
   if (!m) return json(404, { error: "This is not a coin of this launchpad." });
 
-  const page = env.SITE_URL ? String(env.SITE_URL).split("#")[0] + "#coin/" + m.coinMint : "";
+  // a coin's name, ticker and details are written once at launch and never change, so the answer can be kept for a day
+  return json(200, build(m, env.SITE_URL), "public, max-age=86400");
+}
+
+/* What a wallet is given for one coin. `m` is { coinMint, name, symbol, details } with details as returned by details(). */
+export function build(m, siteUrl) {
+  const page = siteUrl ? String(siteUrl).split("#")[0] + "#coin/" + m.coinMint : "";
   const out = { name: m.name, symbol: m.symbol, description: m.details.description, image: m.details.image, external_url: m.details.website || page };
   const ext = {};
   if (m.details.website) ext.website = m.details.website;
@@ -84,8 +90,7 @@ export async function handle(request, env) {
   if (m.details.telegram) ext.telegram = m.details.telegram;
   if (page) ext.launchpad = page;
   if (Object.keys(ext).length) out.extensions = ext;
-  // a coin's name, ticker and details are written once at launch and never change, so the answer can be kept for a day
-  return json(200, out, "public, max-age=86400");
+  return out;
 }
 
 export default { fetch: (request, env) => handle(request, env) };

@@ -134,7 +134,7 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
     const [m0] = await J.getMarkets(conn, programId, 1n, 1);
     assert.deepEqual([m0.name, m0.symbol, m0.creator.toBase58()], ["Camel Cash", "CAMEL", wallet.publicKey.toBase58()]);
     const md = J.decodeMetadata(await conn.getAccountInfo(J.metadataAddress(m0.coinMint)));
-    assert.deepEqual([md.name, md.symbol, md.uri, md.isMutable], ["Camel Cash", "CAMEL", "https://meta.example/" + m0.address.toBase58(), false], "what wallets will show: the name, the ticker and the link to the metadata service");
+    assert.deepEqual([md.name, md.symbol, md.uri, md.isMutable], ["Camel Cash", "CAMEL", "https://meta.example/" + m0.address.toBase58() + ".json", false], "what wallets will show: the name, the ticker and the link to the metadata service");
     step("launch from the page: the coin is on the network with its picture, description and links, and with its name for wallets");
 
     // 4. buy: $1,000 for 9.5M coins

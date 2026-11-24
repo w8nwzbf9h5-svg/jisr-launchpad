@@ -8,3 +8,6 @@ e2e/*.png
 
 # fetched for the tests by scripts/solana-fetch-metaplex.sh
 solana/programs/jisr/tests/fixtures/
+
+# written from the chain when the site is published (scripts/build-metadata.js)
+web/meta/

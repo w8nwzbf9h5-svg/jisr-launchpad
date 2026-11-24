@@ -82,10 +82,11 @@
   const coinMintAddress = (programId, index) => pda([enc.encode("coin"), le8(index)], programId);
   const marketAddress = (programId, coinMint) => pda([enc.encode("market"), coinMint.toBytes()], programId);
   const metadataAddress = (coinMint) => pda([enc.encode("metadata"), METADATA_PROGRAM.toBytes(), coinMint.toBytes()], METADATA_PROGRAM);
-  /* The link written into a coin's wallet metadata: the metadata service's address, then the market's
-     address. The service (metadata-service/worker.mjs) answers it with the coin's name, picture and links.
-     With no service the link is empty, and wallets show the name and ticker without a picture. */
-  const metadataUri = (base, market) => base ? String(base).replace(/\/+$/, "") + "/" + market.toBase58() : "";
+  /* The link written into a coin's wallet metadata: the metadata address, then the market's address and
+     ".json". Whatever answers there returns the coin's name, picture and links: either files published
+     with the site (scripts/build-metadata.js) or the small service in metadata-service/worker.mjs.
+     With no address the link is empty, and wallets show the name and ticker without a picture. */
+  const metadataUri = (base, market) => base ? String(base).replace(/\/+$/, "") + "/" + market.toBase58() + ".json" : "";
   /* A wallet's one standard token account for a mint. `owner` may be a program address (the market's vaults). */
   const ata = (owner, mint) => pda([owner.toBytes(), TOKEN_PROGRAM.toBytes(), mint.toBytes()], ATA_PROGRAM);
 

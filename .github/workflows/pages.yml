@@ -1,6 +1,13 @@
 # Publishes the web/ folder as the public site.
 # Runs when anything under web/ changes on main, so editing web/deployments.js on GitHub
 # (to link the site to a deployed factory) republishes the site by itself.
+#
+# Wallets get a Solana coin's picture from a small file at  <site>/meta/<market address>.json.
+# Those files are made from the chain each time the site is published (scripts/build-metadata.js).
+# A coin launched since the last publish gets its file the next time this runs: on the next change
+# to the site, or when someone presses "Run workflow" for it in the Actions tab.
+# The job only reads the repository and the public chain. If the chain cannot be read, nothing is
+# published and the site stays as it was.
 name: Publish site
 
 on:
@@ -8,6 +15,8 @@ on:
     branches: [main]
     paths:
       - "web/**"
+      - "metadata-service/**"
+      - "scripts/build-metadata.js"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -28,6 +37,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+        id: pages
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Write the coins' metadata files from the chain
+        env:
+          SITE_URL: ${{ steps.pages.outputs.base_url }}
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund @solana/web3.js@1
+          node scripts/build-metadata.js
+          ls web/meta | head -20
       - uses: actions/upload-pages-artifact@v4
         with:
           path: web
