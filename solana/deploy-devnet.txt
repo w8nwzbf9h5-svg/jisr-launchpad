@@ -3,3 +3,4 @@ See .github/workflows/solana-devnet.yml. Each deployment gets a new address.
 
 deployment 1: 2026-11-23
 deployment 2: 2026-11-23, deployer funded by hand
+deployment 3: 2026-11-24, the build with the vault fix and wallet metadata

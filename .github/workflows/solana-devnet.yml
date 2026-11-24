@@ -62,7 +62,10 @@ jobs:
       - name: Check the deployer has enough devnet SOL
         run: |
           # about 2.44 SOL of rent stays with the program for good; the same again is held during the upload and returned
-          need=4950000000
+          # the program's rent twice (once for good, once held during the upload and returned) plus 0.02 SOL for fees
+          size=$(stat -c %s solana/target/deploy/jisr.so)
+          rent=$(solana rent $((size + 45)) --lamports -u devnet | grep -i exempt | grep -oE '[0-9]+' | head -1)
+          need=$((2 * rent + 20000000))
           bal=$(solana balance "$DEPLOYER" -u devnet --lamports | awk '{print $1}')
           echo "Deployer $DEPLOYER holds ${bal:-0} lamports; the deployment needs $need."
           if [ "${bal:-0}" -lt "$need" ]; then
@@ -72,7 +75,7 @@ jobs:
             bal=$(solana balance "$DEPLOYER" -u devnet --lamports | awk '{print $1}')
           fi
           if [ "${bal:-0}" -lt "$need" ]; then
-            echo "::error::The deployer address $DEPLOYER holds ${bal:-0} lamports and needs $need (4.95 SOL). Fund it at https://faucet.solana.com (devnet), then run this again."
+            echo "::error::The deployer address $DEPLOYER holds ${bal:-0} lamports and needs $need. Fund it at https://faucet.solana.com (devnet), then run this again."
             exit 1
           fi
       - name: Deploy, final
