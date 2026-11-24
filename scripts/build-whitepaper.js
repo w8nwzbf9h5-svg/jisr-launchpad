@@ -45,6 +45,14 @@ const page = `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jisr Launchpad">
+<meta property="og:title" content="Jisr Launchpad: coins with a floor that is paid for in advance">
+<meta property="og:description" content="One fixed price for everyone, and a reserve nobody can withdraw. Operate the model and read the proof live from the chain. Public test.">
+<meta property="og:image" content="https://w8nwzbf9h5-svg.github.io/jisr-launchpad/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <title>Jisr Launchpad: White Paper</title>
 <meta name="description" content="How Jisr Launchpad works: a fixed sale price, a floor covered 100% by a reserve nobody can withdraw, and the risks.">
 <link rel="preconnect" href="https://fonts.googleapis.com">

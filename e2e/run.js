@@ -124,11 +124,27 @@ function waitFor(child, text, ms) {
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true, "the home page fits a phone screen");
       assert.deepEqual(thrown, [], "the home page threw errors: " + thrown.join(" | "));
       page.off("pageerror", onErr);
+      // the stress test: 20 random sequences of each kind; the promised rules hold after every trade, everyone can exit, the attacker loses
+      const stress = await page.evaluate(() => {
+        const out = { broken: 0, unpaid: 0, attackerGain: 0, trades: 0 };
+        for (let seed = 1; seed <= 20; seed++) for (const mode of ["crowd", "attacker"]) {
+          const r = window.JISR_HOME.simulate(mode, seed);
+          out.broken += r.broken; out.trades += r.checks;
+          if (r.exits !== r.holders || r.left !== 0n) out.unpaid++;
+          if (mode === "attacker" && r.loss <= 0n) out.attackerGain++;
+        }
+        return out;
+      });
+      assert.deepEqual([stress.broken, stress.unpaid, stress.attackerGain], [0, 0, 0], "stress test over " + stress.trades + " trades: " + JSON.stringify(stress));
+      await page.evaluate(() => window.JISR_HOME.runStress("attacker", { seed: 3, animate: false }));
+      assert.equal(await text("#sBroken"), "0 times");
+      assert((await text("#sSay")).includes("a loss of $"), "the attacker's loss is reported");
+      assert.deepEqual(thrown, [], "the stress test threw errors: " + thrown.join(" | "));
       await page.goto("about:blank");
       await page.goto(WEB + "/#board", { waitUntil: "networkidle0" });
       assert(page.url().endsWith("/app.html#board"), "an old link to the board lands in the launchpad: " + page.url());
       await page.goto(APP, { waitUntil: "networkidle0" });
-      step("home page: the model matches the contracts, fits a phone, and old links still open the launchpad");
+      step("home page: the model matches the contracts, the stress test holds over " + stress.trades + " simulated trades, old links still open the launchpad");
     }
 
     // 1b. The white paper is linked from the site and reads in English and Arabic.

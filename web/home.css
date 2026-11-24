@@ -130,3 +130,30 @@
 .end{margin-top:60px;border-top:1px solid var(--line);padding:22px 0 40px;font-size:13.5px;line-height:1.6;color:var(--muted)}
 .end a{color:var(--muted)}
 .end p{margin:0 0 6px;max-width:60em}
+
+/* stress test */
+.stress{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px}
+.s-btns{display:flex;flex-wrap:wrap;gap:10px}
+.s-read{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:16px 0 14px}
+@media (min-width:760px){.s-read{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.s-read div{background:var(--raise);padding:10px 12px}
+.s-read span{display:block;font-size:12.5px;color:var(--muted)}
+.s-read b{display:block;font:600 17px var(--mono);margin-top:3px}
+.s-read .good b{color:var(--good)}
+.s-read .bad b{color:var(--bad)}
+.s-chart{display:block;width:100%;height:auto;overflow:visible;margin-bottom:6px}
+.s-chart .grid{stroke:var(--line);stroke-width:1}
+.s-chart .tick{font:12px var(--mono);fill:var(--muted)}
+.s-chart .ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.s-chart .ln-price{stroke:var(--f-plat)}
+.s-chart .ln-floor{stroke:var(--f-floor)}
+.s-chart .s-res{fill:var(--f-floor);opacity:.22}
+.s-chart .s-owed{stroke:var(--ink)}
+.s-chart .mark{stroke:var(--muted);stroke-width:1}
+.sw-res{background:var(--f-floor);opacity:.5;height:10px !important;border-radius:2px}
+.sw-owed{background:var(--ink)}
+@media (max-width:620px){.s-chart .tick{font-size:20px}.s-chart .ln{stroke-width:3.4}.s-chart .grid,.s-chart .mark{stroke-width:1.6}}
+.s-axis{font-size:12.5px;color:var(--muted);margin:0 0 12px;text-align:center}
+.s-cols{display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:980px){.s-cols{grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:30px;align-items:start}.s-say{padding-top:26px}}
+.s-say p{font-size:15px;line-height:1.6;margin:0 0 8px;max-width:60em}

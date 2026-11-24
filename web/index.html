@@ -3,6 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jisr Launchpad">
+<meta property="og:title" content="Jisr Launchpad: coins with a floor that is paid for in advance">
+<meta property="og:description" content="One fixed price for everyone, and a reserve nobody can withdraw. Operate the model and read the proof live from the chain. Public test.">
+<meta property="og:image" content="https://w8nwzbf9h5-svg.github.io/jisr-launchpad/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <title>Jisr Launchpad: coins with a floor that is paid for in advance</title>
 <meta name="description" content="Jisr sells each coin at one fixed price and keeps the money in a reserve nobody can withdraw. Operate the model yourself and read the proof live from the chain. Public test on Solana devnet and Ethereum Sepolia.">
 <script>
@@ -13,7 +21,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=fa305785">
-<link rel="stylesheet" href="home.css?v=d869edf6">
+<link rel="stylesheet" href="home.css?v=f36832f2">
 </head>
 <body class="home">
 
@@ -22,6 +30,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
     <a class="brand" href="./" aria-label="Jisr Launchpad, home"><b>JISR</b><i></i><span>launchpad</span></a>
     <nav aria-label="Main">
       <a href="#machine">The model</a>
+      <a href="#stress">Stress test</a>
       <a href="#proof">Live checks</a>
       <a href="#try">Try it</a>
       <a href="whitepaper.html">White paper</a>
@@ -84,6 +93,37 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
         <ul id="bKey"></ul>
       </div>
       <p class="m-foot">A model of one coin priced in dollars, with every coin bought in order and none sold back. Real coins move both ways; the reserve rule is the same.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="stress">
+    <h2>Try to break it</h2>
+    <p class="say">Start a crowd of traders, or an attacker. Every trade is priced by the launchpad's own arithmetic, in your browser, and after each one the page checks the rule that matters: the reserve can buy back every coin in circulation at the floor price.</p>
+    <div class="stress">
+      <div class="s-btns">
+        <button class="btn primary" id="sCrowd">Run 60 traders</button>
+        <button class="btn" id="sAttack">Run an attacker with 40 wallets</button>
+      </div>
+      <div id="stressBox" hidden>
+        <div class="s-read">
+          <div><span>Trades</span><b id="sT">0</b></div>
+          <div><span>Coins in circulation</span><b id="sOut">0</b></div>
+          <div><span>Floor price</span><b id="sFl"></b></div>
+          <div><span>Rule checked</span><b id="sChk">0</b></div>
+          <div><span>Rule broken</span><b id="sBroken">0 times</b></div>
+        </div>
+        <div class="s-cols">
+          <div>
+            <ul class="m-key"><li><i class="sw-plat"></i>Price of the next coin, in sale prices</li><li><i class="sw-floor"></i>Floor price</li></ul>
+            <svg class="s-chart" viewBox="0 0 640 230" role="img" aria-label="Price and floor price over the simulated trades"><g id="sTicks"></g><path class="ln ln-floor" id="sFloor"/><path class="ln ln-price" id="sPrice"/></svg>
+            <ul class="m-key"><li><i class="sw-res"></i>Held in the floor reserve</li><li><i class="sw-owed"></i>Needed to buy back every coin at the floor</li></ul>
+            <svg class="s-chart" viewBox="0 0 640 130" role="img" aria-label="The reserve and what it owes over the simulated trades"><g id="sTicksB"></g><path class="s-res" id="sRes"/><path class="ln s-owed" id="sOwed"/></svg>
+            <p class="s-axis">Trades, in the order they happened. After the vertical line, every holder sells everything.</p>
+          </div>
+          <div class="s-say" id="sSay" aria-live="polite"></div>
+        </div>
+      </div>
+      <p class="m-foot">A simulation in your browser, with a new random sequence each time. It uses the same pricing and rounding as the contracts; the contracts' own test suites run the same experiment on a real chain.</p>
     </div>
   </section>
 
@@ -157,7 +197,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <script>
 /* Load the scripts in order. */
 (function () {
-  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=f748f9bb", "solana/config.js?v=3d6c068a", "home.js?v=aa0943e6"];
+  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=f748f9bb", "solana/config.js?v=3d6c068a", "home.js?v=54f21605"];
   (function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");

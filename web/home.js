@@ -29,6 +29,11 @@
     if (n.floorOut === J.SALE_SUPPLY) n.graduated = true;
     return raise(n);
   }
+  function applySell(m, q) {
+    const n = Object.assign({}, m);
+    n.curveOut -= q.fromCurve; n.floorOut -= q.fromFloor; n.floorReserve = n.floorReserve - q.floorPart + q.communityFee; n.premiumReserve -= q.premiumPart;
+    return raise(n);
+  }
   /* A coin with `soldM` million coins in buyers' hands and `volume` dollars traded after the sale sold out. */
   function stateAt(soldM, volume) {
     let m = fresh();
@@ -129,6 +134,114 @@
     chart.addEventListener("pointermove", (ev) => { if (down) drag(ev); });
     ["pointerup", "pointercancel"].forEach((n) => chart.addEventListener(n, () => { down = false; }));
     render();
+  }
+
+  /* ---------- the stress test ----------
+     A crowd of wallets trades one coin at random, or one attacker trades with himself through forty
+     wallets (a wallet may hold 2.5% of a coin, so pushing the price takes many). Every trade is priced by the functions above. After each trade the page checks what the
+     launchpad promises: the reserve can buy back every coin in circulation at the floor price, the floor
+     has not gone down, and no dollar has appeared or vanished. At the end every holder sells everything. */
+  function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function simulate(mode, seed) {
+    const rand = rng(seed), attack = mode === "attacker";
+    const N = attack ? 40 : 60, START = (attack ? 12000n : 6000n) * USD, TRADES = attack ? 500 : 600;
+    const wallets = []; for (let i = 0; i < N; i++) wallets.push({ cash: START, coins: 0n });
+    const total = START * BigInt(N);
+    let m = fresh(), creator = 0n, platform = 0n, broken = 0, checks = 0, lastFloor = m.floorPrice, buys = 0, sells = 0, graduatedAt = -1;
+    const series = [];
+    const check = () => {
+      checks++;
+      const held = wallets.reduce((t, w) => t + w.cash, 0n);
+      if (m.floorReserve < liability(m) || m.floorPrice < lastFloor || held + m.floorReserve + m.premiumReserve + creator + platform !== total) broken++;
+      lastFloor = m.floorPrice;
+    };
+    const point = (kind) => series.push({ kind, price: Number(J.currentPrice(m)) / 1e18, floor: Number(m.floorPrice) / 1e18, reserve: Number(m.floorReserve) / 1e6, owed: Number(liability(m)) / 1e6, out: Number(J.outstanding(m) / J.COIN) });
+    const buy = (w, budget) => {
+      let coins = 0n; try { coins = J.coinsForBudget(m, budget, w.coins); } catch (_) { coins = 0n; }
+      if (coins <= 0n) return false;
+      const q = J.quoteBuy(m, coins); if (q.total > w.cash) return false;
+      m = applyBuy(m, q); w.cash -= q.total; w.coins += coins; creator += q.creatorFee; platform += q.platformFee; buys++;
+      if (m.graduated && graduatedAt < 0) graduatedAt = series.length;
+      return true;
+    };
+    const sell = (w, coins) => {
+      if (coins <= 0n || coins > w.coins) return false;
+      const q = J.quoteSell(m, coins);
+      m = applySell(m, q); w.cash += q.net; w.coins -= coins; creator += q.creatorFee; platform += q.platformFee; sells++;
+      return true;
+    };
+    point("start");
+    for (let i = 0; i < TRADES; i++) {
+      const w = wallets[Math.floor(rand() * N)], wantBuy = rand() < (attack ? 0.55 : 0.6);
+      let done = false;
+      if (wantBuy && w.cash > 50n * USD) done = buy(w, BigInt(Math.floor(Number(w.cash) * (0.08 + rand() * (attack ? 0.6 : 0.4)))));
+      if (!done && w.coins > 0n) done = sell(w, rand() < 0.3 ? w.coins : w.coins * BigInt(1 + Math.floor(rand() * 8)) / 10n);
+      if (!done) continue;
+      check(); point(wantBuy ? "buy" : "sell");
+    }
+    const tradesDone = buys + sells, peak = series.reduce((t, p) => Math.max(t, p.out), 0), exitFrom = series.length;
+    // the end: every holder sells everything, in a random order
+    const order = wallets.map((w, i) => i).sort(() => rand() - 0.5);
+    let exits = 0, holders = 0;
+    order.forEach((i) => { const w = wallets[i]; if (w.coins > 0n) { holders++; if (sell(w, w.coins)) exits++; check(); point("exit"); } });
+    const cashEnd = wallets.reduce((t, w) => t + w.cash, 0n);
+    return { mode, seed, series, exitFrom, graduatedAt, trades: tradesDone, buys, sells, checks, broken, holders, exits, peak, left: J.outstanding(m),
+      floorRise: Number(m.floorPrice * 10000n / SALE_PRICE) / 100 - 100, reserveLeft: m.floorReserve + m.premiumReserve, creator, platform, start: total, end: cashEnd, loss: total - cashEnd };
+  }
+
+  const T = { w: 640, h: 230, l: 58, r: 14, t: 12, b: 24 };
+  function drawStress(r, upTo) {
+    const s = r.series.slice(0, upTo), n = r.series.length - 1 || 1;
+    const x = (i) => T.l + i / n * (T.w - T.l - T.r);
+    const top = Math.max.apply(null, r.series.map((p) => p.price)) * 1.08, yp = (v) => T.t + (1 - v / top) * (T.h - T.t - T.b);
+    const d = (key, y) => s.map((p, i) => (i ? "L" : "M") + r1(x(i)) + " " + r1(y(p[key]))).join(" ");
+    $("#sPrice").setAttribute("d", d("price", yp)); $("#sFloor").setAttribute("d", d("floor", yp));
+    const topR = Math.max.apply(null, r.series.map((p) => Math.max(p.reserve, p.owed))) * 1.1 || 1, B = { t: 8, b: 20, h: 130 }, yr = (v) => B.t + (1 - v / topR) * (B.h - B.t - B.b);
+    $("#sRes").setAttribute("d", s.length ? d("reserve", yr) + " L" + r1(x(s.length - 1)) + " " + r1(yr(0)) + " L" + r1(x(0)) + " " + r1(yr(0)) + " Z" : "");
+    $("#sOwed").setAttribute("d", d("owed", yr));
+    // round tick values: prices as multiples of the $0.0001 sale price, money in thousands of dollars
+    const steps = (max, count) => { const raw = max / count, pow = Math.pow(10, Math.floor(Math.log10(raw))), nice = [1, 2, 2.5, 5, 10].find((k) => k * pow >= raw) * pow; const out = []; for (let v = nice; v <= max * 1.0001; v += nice) out.push(v); return out; };
+    const sale = 0.0001, tick = (v) => "$" + v.toFixed(6).replace(/0+$/, ""), money = (v) => "$" + (v >= 1000 ? (v / 1000).toLocaleString("en-US", { maximumFractionDigits: 1 }) + "K" : Math.round(v));
+    const rowAt = (y, label) => '<line class="grid" x1="' + T.l + '" x2="' + (T.w - T.r) + '" y1="' + r1(y) + '" y2="' + r1(y) + '"/><text class="tick" x="' + (T.l - 8) + '" y="' + (r1(y) + 4) + '" text-anchor="end">' + label + "</text>";
+    $("#sTicks").innerHTML = steps(top / sale, 4).map((k) => rowAt(yp(k * sale), (Math.round(k * 100) / 100) + "\u00d7")).join("") +
+      (upTo > r.exitFrom ? '<line class="mark" x1="' + r1(x(r.exitFrom)) + '" x2="' + r1(x(r.exitFrom)) + '" y1="' + T.t + '" y2="' + (T.h - T.b) + '"/>' : "");
+    $("#sTicksB").innerHTML = steps(topR, 2).map((v) => rowAt(yr(v), money(v))).join("");
+    const p = s[s.length - 1] || r.series[0], doneTrades = Math.min(r.trades, Math.max(0, Math.min(upTo, r.exitFrom) - 1));
+    $("#sT").textContent = doneTrades.toLocaleString("en-US"); $("#sOut").textContent = (p.out / 1e6).toFixed(1) + "M";
+    $("#sFl").textContent = tick(p.floor); $("#sChk").textContent = Math.max(0, upTo - 1).toLocaleString("en-US");
+  }
+  let stressTimer = 0;
+  function runStress(mode, opts) {
+    opts = opts || {};
+    const r = simulate(mode, opts.seed == null ? Math.floor(Math.random() * 1e9) : opts.seed), out = $("#sSay"), calm = opts.animate === false || (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    cancelAnimationFrame(stressTimer);
+    $("#stressBox").hidden = false; out.textContent = "";
+    $("#sBroken").textContent = "…"; $("#sBroken").parentNode.className = "";
+    const finish = () => {
+      drawStress(r, r.series.length);
+      $("#sBroken").textContent = r.broken === 0 ? "0 times" : r.broken + " times"; $("#sBroken").parentNode.className = r.broken === 0 ? "good" : "bad";
+      const lines = [];
+      if (mode === "attacker") {
+        lines.push("One attacker traded with himself through 40 wallets, because one wallet may hold only 2.5% of a coin: " + r.buys + " buys and " + r.sells + " sells, pushing " + (r.peak / 1e6).toFixed(0) + "M coins into circulation at the peak" + (r.graduatedAt >= 0 ? " and the price up the curve." : "."));
+        lines.push("He put in " + usd(r.start, 0) + " and left with " + usd(r.end, 0) + ": a loss of " + usd(r.loss, 0) + ". That money went to the creator (" + usd(r.creator, 0) + "), the launchpad (" + usd(r.platform, 0) + ") and the coin's reserve (" + usd(r.reserveLeft, 0) + ").");
+      } else {
+        lines.push("60 wallets made " + r.buys + " buys and " + r.sells + " sells. " + (r.graduatedAt >= 0 ? "The sale sold out, and the floor finished " + r.floorRise.toFixed(1) + "% above the sale price." : "The sale did not sell out this time, so the floor stayed at the sale price."));
+        lines.push("Then all " + r.holders + " holders sold everything, in a random order. " + (r.exits === r.holders ? "Every one of those sales was paid in full." : (r.holders - r.exits) + " of those sales could not be paid.") + " " + usd(r.reserveLeft, 0) + " is left in the reserve, with no coins in circulation.");
+      }
+      lines.push("After each of the " + r.checks.toLocaleString("en-US") + " trades the page checked three things: the reserve covers every coin at the floor, the floor has not gone down, and no dollar appeared or vanished. " + (r.broken === 0 ? "None failed." : r.broken + " failed."));
+      lines.forEach((t) => out.append(el("p", "", t)));
+      $("#stress").dataset.done = mode;
+    };
+    if (calm) { finish(); return r; }
+    const t0 = performance.now(), dur = 5200;
+    const frame = (now) => {
+      const k = Math.min(1, (now - t0) / dur), upTo = Math.max(1, Math.round(k * r.series.length));
+      drawStress(r, upTo);
+      if (k < 1) stressTimer = requestAnimationFrame(frame); else finish();
+    };
+    delete $("#stress").dataset.done;
+    stressTimer = requestAnimationFrame(frame);
+    return r;
   }
 
   /* ---------- live checks ---------- */
@@ -250,6 +363,8 @@
     if (!J || !web3) { $("#bOut").textContent = "This page could not load its scripts. Reload to try again."; return; }
     wireMachine();
     $("#cRun").addEventListener("click", runChecks);
+    $("#sCrowd").addEventListener("click", () => runStress("crowd"));
+    $("#sAttack").addEventListener("click", () => runStress("attacker"));
     // the checks start when they scroll into view, so a visitor sees them answer
     const box = $("#proof");
     if ("IntersectionObserver" in window) {
@@ -257,6 +372,6 @@
       io.observe(box);
     } else runChecks();
   }
-  window.JISR_HOME = { stateAt, applyBuy, liability, state: S, render, runChecks };
+  window.JISR_HOME = { stateAt, applyBuy, liability, state: S, render, runChecks, simulate, runStress };
   start();
 })();
