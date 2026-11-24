@@ -33,12 +33,12 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
   // a node that has only just started can answer oddly; wait until it has finalized a block before the page uses it
   for (let i = 0; i < 90 && (await conn.getSlot("finalized")) < 1; i++) await new Promise((r) => setTimeout(r, 1000));
   // sign and send from this script, for the steps a second wallet has to take
-  const sendAs = async (kp, ixs) => {
+  const sendAs = async (kp, ixs, extra) => {
     const tx = new web3.Transaction().add(...ixs);
     tx.feePayer = kp.publicKey;
     const bh = await conn.getLatestBlockhash();
     tx.recentBlockhash = bh.blockhash;
-    tx.sign(kp);
+    tx.sign(kp, ...(extra || []));
     const sig = await conn.sendRawTransaction(tx.serialize());
     const res = await conn.confirmTransaction({ signature: sig, blockhash: bh.blockhash, lastValidBlockHeight: bh.lastValidBlockHeight }, "confirmed");
     if (res.value.err) throw new Error("transaction failed: " + JSON.stringify(res.value.err));
@@ -142,26 +142,45 @@ const types = { ".html": "text/html", ".css": "text/css", ".js": "application/ja
     await has("#quote", "9.50M");
     assert((await text("#quote")).includes("$1,000.00") && (await text("#quote")).includes("$50.00"), "quote: " + (await text("#quote")));
     await click("#goBtn"); await toast("Bought 9.50M $CAMEL"); await idle();
-    await has("#walletTxt", "$9,000.00");
+    // This wallet is also the coin's creator and the launchpad's wallet, so the fees of its own trade come
+    // straight back in the same transaction: $10 for the creator and $20 for the launchpad.
+    await has("#walletTxt", "$9,030.00");
     await has("#v-coin .stats", "9.50M");
-    step("buy from the page: $1,000 buys 9.5M coins");
+    let paid = await J.getMarket(conn, programId, m0.coinMint);
+    assert.deepEqual([paid.creatorFees, paid.platformFees, paid.floorReserve].map(String), ["0", "0", "970000000"], "the fees were paid out with the trade; the reserve holds the floor value and its 2%");
+    assert.equal(await page.$("[data-act=payCreator]"), null, "nothing is left waiting, so there is nothing to press");
+    step("buy from the page: $1,000 buys 9.5M coins, and the fees are paid out in the same transaction");
 
     // 5. sell everything back: $902.50
     await click("[data-act=tab][data-v=sell]"); await click("[data-act=sellMax]");
     await has("#quote", "$902.50");
     await click("#goBtn"); await toast("Sold 9.50M $CAMEL"); await idle();
-    await has("#walletTxt", "$9,902.50");
-    step("sell from the page: the 9.5M coins return $902.50");
+    await has("#walletTxt", "$9,961.00"); // $902.50 for the coins, and this trade's fees: $9.50 and $19
+    paid = await J.getMarket(conn, programId, m0.coinMint);
+    assert.deepEqual([paid.floorOut, paid.curveOut, paid.creatorFees, paid.platformFees, paid.floorReserve].map(String), ["0", "0", "0", "0", "39000000"], "all coins are back, every fee is paid out, and the reserve kept its 2% of both trades");
+    step("sell from the page: the 9.5M coins return $902.50, and the fees are paid out in the same transaction");
 
-    // 6. fee payouts
-    await has("#v-coin", "$19.50"); // creator: 1% of $1,000 and of $950
+    // 6. fees from a trade made somewhere else wait in the market, and the Pay buttons pay them
+    const trader = web3.Keypair.generate();
+    await fund(trader.publicKey, 1);
+    await sendAs(trader, J.testDollarFaucetIxs(trader.publicKey, trader.publicKey, 1000n * 1000000n), [J.TEST_DOLLAR.faucetKey()]);
+    const q1 = J.quoteBuy(paid, 1000000n * J.COIN);
+    await sendAs(trader, J.buyIxs(programId, trader.publicKey, cfg.stableMint, m0.coinMint, 1000000n * J.COIN, q1.total)); // no payouts added
+    assert.deepEqual([q1.creatorFee, q1.platformFee].map(String), ["1052631", "2105263"]);
+    await click("[data-act=refresh]");
+    await has("#v-coin", "$1.05");
     await click("[data-act=payCreator]"); await toast("The creator was paid"); await idle();
-    await has("#walletTxt", "$9,922.00");
     await click("[data-act=payPlatform]"); await toast("The launchpad was paid"); await idle();
-    await has("#walletTxt", "$9,961.00");
     const m1 = await J.getMarket(conn, programId, m0.coinMint);
-    assert.deepEqual([m1.floorOut, m1.curveOut, m1.creatorFees, m1.platformFees, m1.floorReserve].map(String), ["0", "0", "0", "0", "39000000"], "all coins are back, fees paid out, and the reserve kept its 2% of both trades");
-    step("fees from the page: creator and launchpad paid; the reserve keeps its share");
+    assert.deepEqual([m1.creatorFees, m1.platformFees].map(String), ["0", "0"]);
+    assert.equal((await J.getBalances(conn, wallet.publicKey, cfg.stableMint, null)).stable, 9961000000n + 1052631n + 2105263n, "both payouts reached the wallet, to the last unit");
+    // the helper leaves a payout out when its wallet has no account to receive it, so a trade never fails or costs more because of a fee wallet
+    const nobody = web3.Keypair.generate().publicKey;
+    assert.equal((await J.readyPayoutIxs(conn, programId, cfg.stableMint, m0.coinMint, nobody, nobody, true, true)).length, 0);
+    assert.equal((await J.readyPayoutIxs(conn, programId, cfg.stableMint, m0.coinMint, wallet.publicKey, nobody, true, true)).length, 1);
+    assert.equal((await J.readyPayoutIxs(conn, programId, cfg.stableMint, m0.coinMint, wallet.publicKey, wallet.publicKey, true, false)).length, 1);
+    assert.equal((await J.readyPayoutIxs(conn, programId, cfg.stableMint, m0.coinMint, wallet.publicKey, wallet.publicKey, true, true)).length, 2);
+    step("fees from trades made elsewhere wait in the market; the Pay buttons pay them; a payout is skipped when its wallet cannot receive");
 
     // 7. the wallet limit in the quote, the board, and the page itself
     await click("[data-act=tab][data-v=buy]");

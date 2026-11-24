@@ -225,7 +225,7 @@
         '<div class="card"><span class="label">Fees waiting</span><div class="wallbox">' +
           '<div class="kv"><span>For the creator</span><b class="num">' + fUsd(m.creatorFees) + (m.creatorFees > 0n ? ' <button class="chip sm" data-act="payCreator">Pay the creator</button>' : "") + "</b></div>" +
           '<div class="kv"><span>For the launchpad</span><b class="num">' + fUsd(m.platformFees) + (m.platformFees > 0n ? ' <button class="chip sm" data-act="payPlatform">Pay the launchpad</button>' : "") + "</b></div>" +
-          '<p class="hint">Anyone can press these. The money goes only to the creator and to the launchpad\'s wallet.</p></div></div>' +
+          '<p class="hint">Fees are paid out automatically with every trade made on this page. A fee waits here only when its wallet could not receive it at that moment; then anyone can press Pay, and the money goes only to the creator and to the launchpad\'s wallet.</p></div></div>' +
       '</div><div class="side"><div class="card" id="trade"></div></div></div>';
     renderTrade();
   }
@@ -275,11 +275,18 @@
 
   /* ---------- actions ---------- */
   const mk = () => S.m.coinMint;
+  /* Every trade made here also pays out the fees: the creator's and the launchpad's go to their wallets in
+     the same transaction, so nobody has to press Pay. A payout is added only when it is certain to go
+     through (see readyPayoutIxs); otherwise the trade goes alone and the fee waits in the coin's market. */
+  async function payouts(q) {
+    try { return await J.readyPayoutIxs(S.conn, S.programId, S.cfg.stableMint, mk(), S.m.creator, S.cfg.platformWallet, q.creatorFee > 0n, q.platformFee > 0n); }
+    catch (_) { return []; }
+  }
   async function doBuy() {
     await run("Confirm the purchase in your wallet…", async () => {
       await refresh(); const p = plan(); if (!p.ok || p.kind !== "buy") return;
       const maxIn = p.q.total + p.q.total * SLIP_BPS / 10000n;
-      await send(J.buyIxs(S.programId, S.wallet, S.cfg.stableMint, mk(), p.coins, maxIn));
+      await send(J.buyIxs(S.programId, S.wallet, S.cfg.stableMint, mk(), p.coins, maxIn).concat(await payouts(p.q)));
       S.buyAmt = ""; toast("Bought " + fTok(p.coins) + " $" + S.m.symbol + ".");
     });
   }
@@ -287,7 +294,7 @@
     await run("Confirm the sale in your wallet…", async () => {
       await refresh(); const p = plan(); if (!p.ok || p.kind !== "sell") return;
       const minOut = p.q.net - p.q.net * SLIP_BPS / 10000n;
-      await send(J.sellIxs(S.programId, S.wallet, S.cfg.stableMint, mk(), p.coins, minOut));
+      await send(J.sellIxs(S.programId, S.wallet, S.cfg.stableMint, mk(), p.coins, minOut).concat(await payouts(p.q)));
       S.sellAmt = ""; toast("Sold " + fTok(p.coins) + " $" + S.m.symbol + " for about " + fUsd(p.q.net) + ".");
     });
   }

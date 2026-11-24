@@ -250,6 +250,22 @@
   }
   const claimCreatorFeesIxs = (programId, payer, stableMint, coinMint, creator) => payoutIxs(programId, payer, stableMint, coinMint, "claim_creator_fees", creator);
   const sweepPlatformFeesIxs = (programId, payer, stableMint, coinMint, platformWallet) => payoutIxs(programId, payer, stableMint, coinMint, "sweep_platform_fees", platformWallet);
+  /* Fee payouts to add to a trade, so that fees go out whenever anyone trades instead of waiting for
+     someone to press Pay. Returns the payout instructions, for the creator and for the launchpad, that are
+     certain to go through:
+       - the trade itself earns that receiver a fee (`creatorDue`, `platformDue`), so there is something to pay;
+       - the receiver's stablecoin account exists, is a token account, and is not frozen.
+     Anything else is left out. A trade must never fail, or cost the trader more, because of a fee wallet:
+     fees that are not paid out here stay in the coin's market, and the Pay buttons still work. */
+  async function readyPayoutIxs(conn, programId, stableMint, coinMint, creator, platformWallet, creatorDue, platformDue) {
+    const infos = await conn.getMultipleAccountsInfo([ata(creator, stableMint), ata(platformWallet, stableMint)]);
+    // a token account is 165 bytes; byte 108 is its state: 1 in use, 2 frozen
+    const ready = (info) => !!info && info.owner.equals(TOKEN_PROGRAM) && info.data.length >= 165 && info.data[108] === 1;
+    const out = [];
+    if (creatorDue && ready(infos[0])) out.push(payoutIxs(programId, creator, stableMint, coinMint, "claim_creator_fees", creator)[1]);
+    if (platformDue && ready(infos[1])) out.push(payoutIxs(programId, platformWallet, stableMint, coinMint, "sweep_platform_fees", platformWallet)[1]);
+    return out;
+  }
   function reinforceIx(programId, stableMint, coinMint) {
     const market = marketAddress(programId, coinMint);
     return ix(programId, "reinforce", [meta(configAddress(programId)), meta(market, true), meta(ata(market, stableMint))]);
@@ -307,7 +323,7 @@
     quoteBuy, quoteSell, coinsForBudget, currentPrice, marketCap, outstanding,
     configAddress, coinMintAddress, marketAddress, metadataAddress, metadataUri, ata,
     decodeConfig, decodeMarket, decodeMint, decodeMetadata, tokenAmount, getConfig, getMarkets, getMarket, getBalances,
-    ensureAtaIx, initializeIx, setPlatformWalletIx, proposeAdminIx, acceptAdminIx, createCoinIxs, buyIxs, sellIxs, claimCreatorFeesIxs, sweepPlatformFeesIxs, reinforceIx,
+    ensureAtaIx, initializeIx, setPlatformWalletIx, proposeAdminIx, acceptAdminIx, createCoinIxs, buyIxs, sellIxs, claimCreatorFeesIxs, sweepPlatformFeesIxs, readyPayoutIxs, reinforceIx,
     TEST_DOLLAR, createTestDollarIxs, testDollarFaucetIxs, packMeta, unpackMeta, byteLength
   };
 });
