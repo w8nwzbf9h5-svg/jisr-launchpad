@@ -1,4 +1,4 @@
-/* Jisr on Solana: everything the page needs to read the program and build its transactions.
+/* Landing Pad on Solana: everything the page needs to read the program and build its transactions.
    No DOM and no wallet code here, so the same file runs in the browser and in the automated test
    that drives a real local Solana node (solana/client-test/run.js).
    Amounts are BigInt in base units: a coin has 6 decimals; the stablecoin has its own. */

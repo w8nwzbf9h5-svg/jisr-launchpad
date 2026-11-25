@@ -25,16 +25,16 @@ function html(file, lang) {
 
 // English is the reference text. To add a language: add its Markdown file and one line here.
 const LANGS = [
-  { code: "en", file: "WHITEPAPER.md", name: "English", title: "Jisr Launchpad: White Paper", back: "Open the launchpad" },
-  { code: "ar", file: "WHITEPAPER-AR.md", name: "العربية", title: "منصة جسر: الورقة البيضاء", back: "افتح المنصة", rtl: true },
-  { code: "zh", file: "WHITEPAPER-ZH.md", name: "中文", title: "Jisr Launchpad：白皮书", back: "打开平台" },
-  { code: "es", file: "WHITEPAPER-ES.md", name: "Español", title: "Jisr Launchpad: Libro blanco", back: "Abrir la plataforma" },
-  { code: "hi", file: "WHITEPAPER-HI.md", name: "हिन्दी", title: "Jisr Launchpad: श्वेत पत्र", back: "प्लेटफ़ॉर्म खोलें" },
-  { code: "fr", file: "WHITEPAPER-FR.md", name: "Français", title: "Jisr Launchpad : livre blanc", back: "Ouvrir la plateforme" },
-  { code: "ru", file: "WHITEPAPER-RU.md", name: "Русский", title: "Jisr Launchpad: Белая книга", back: "Открыть площадку" },
-  { code: "pt", file: "WHITEPAPER-PT.md", name: "Português", title: "Jisr Launchpad: White Paper", back: "Abrir a plataforma" },
-  { code: "tr", file: "WHITEPAPER-TR.md", name: "Türkçe", title: "Jisr Launchpad: Teknik Doküman", back: "Platformu aç" },
-  { code: "id", file: "WHITEPAPER-ID.md", name: "Bahasa Indonesia", title: "Jisr Launchpad: Buku Putih", back: "Buka platform" },
+  { code: "en", file: "WHITEPAPER.md", name: "English", title: "Landing Pad: White Paper", back: "Open the launchpad" },
+  { code: "ar", file: "WHITEPAPER-AR.md", name: "العربية", title: "منصة Landing Pad: الورقة البيضاء", back: "افتح المنصة", rtl: true },
+  { code: "zh", file: "WHITEPAPER-ZH.md", name: "中文", title: "Landing Pad：白皮书", back: "打开平台" },
+  { code: "es", file: "WHITEPAPER-ES.md", name: "Español", title: "Landing Pad: Libro blanco", back: "Abrir la plataforma" },
+  { code: "hi", file: "WHITEPAPER-HI.md", name: "हिन्दी", title: "Landing Pad: श्वेत पत्र", back: "प्लेटफ़ॉर्म खोलें" },
+  { code: "fr", file: "WHITEPAPER-FR.md", name: "Français", title: "Landing Pad : livre blanc", back: "Ouvrir la plateforme" },
+  { code: "ru", file: "WHITEPAPER-RU.md", name: "Русский", title: "Landing Pad: Белая книга", back: "Открыть площадку" },
+  { code: "pt", file: "WHITEPAPER-PT.md", name: "Português", title: "Landing Pad: White Paper", back: "Abrir a plataforma" },
+  { code: "tr", file: "WHITEPAPER-TR.md", name: "Türkçe", title: "Landing Pad: Teknik Doküman", back: "Platformu aç" },
+  { code: "id", file: "WHITEPAPER-ID.md", name: "Bahasa Indonesia", title: "Landing Pad: Buku Putih", back: "Buka platform" },
 ];
 const articles = LANGS.map((l) => `<article id="paper-${l.code}" lang="${l.code}"${l.rtl ? ' dir="rtl"' : ""}${l.code === "en" ? "" : " hidden"}>\n${html(l.file, l.code)}\n</article>`).join("\n");
 const options = LANGS.map((l) => `<option value="${l.code}">${l.name}</option>`).join("");
@@ -48,13 +48,13 @@ const page = `<!DOCTYPE html>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Jisr Launchpad">
-<meta property="og:title" content="Jisr Launchpad: coins with a floor that is paid for in advance">
+<meta property="og:site_name" content="Landing Pad">
+<meta property="og:title" content="Landing Pad: coins with a floor that is paid for in advance">
 <meta property="og:description" content="One fixed price for everyone, and a reserve nobody can withdraw. Operate the model and read the proof live from the chain. Public test.">
 <meta property="og:image" content="https://w8nwzbf9h5-svg.github.io/jisr-launchpad/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<title>Jisr Launchpad: White Paper</title>
-<meta name="description" content="How Jisr Launchpad works: a fixed sale price, a floor covered 100% by a reserve nobody can withdraw, and the risks.">
+<title>Landing Pad: White Paper</title>
+<meta name="description" content="How Landing Pad works: a fixed sale price, a floor covered 100% by a reserve nobody can withdraw, and the risks.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -92,7 +92,7 @@ ${FIG.CSS}@media print{body{background:#fff;color:#000}.top{display:none}.paper 
 <body>
 <header class="top">
   <div class="wrap ptop">
-    <a class="brand" href="./" aria-label="Jisr Launchpad, home"><b>JISR</b><i></i><span>launchpad</span></a>
+    <a class="brand" href="./" aria-label="Landing Pad, home"><b>LANDING</b><i></i><span>pad</span></a>
     <div class="acts">
       <a href="app.html" id="backLink">Open the launchpad</a>
       <select id="langSel" aria-label="Language">${options}</select>

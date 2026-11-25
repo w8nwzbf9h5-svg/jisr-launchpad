@@ -1,18 +1,18 @@
-# Jisr Launchpad: Buku Putih
+# Landing Pad: Buku Putih
 
 Versi 0.1 · 22 November 2026 · Tahap jaringan uji
 
-Jisr (جسر, "jembatan") adalah platform peluncuran meme coin. Setiap koin di sini memiliki harga dasar yang dijamin oleh dana dalam kontrak yang tidak bisa ditarik oleh siapa pun. Dokumen ini menjelaskan cara kerjanya, apa yang dilindunginya, apa yang tidak dilindunginya, dan apa yang sudah dibangun saat ini.
+Landing Pad adalah platform peluncuran meme coin. Setiap koin di sini memiliki harga dasar yang dijamin oleh dana dalam kontrak yang tidak bisa ditarik oleh siapa pun. Dokumen ini menjelaskan cara kerjanya, apa yang dilindunginya, apa yang tidak dilindunginya, dan apa yang sudah dibangun saat ini.
 
 ## 1. Masalahnya
 
 Sebagian besar peluncuran meme coin berakhir dengan cara yang sama. Pembeli awal dan pembuat koin memegang koin yang hampir tidak ada biayanya, lalu menjualnya kepada pembeli yang datang belakangan. Pada kurva bonding klasik, dana di pool hanya sebagian kecil dari nilai pasar, sehingga tidak ada yang menopang harga ketika penjualan dimulai. Perlindungan yang lazim (penguncian, pelepasan bertahap, pajak jual) bergantung pada janji seseorang atau pada aturan yang bisa diubah.
 
-Jisr menghapus koin murah di awal dan menaruh dana nyata di bawah setiap koin.
+Landing Pad menghapus koin murah di awal dan menaruh dana nyata di bawah setiap koin.
 
 ## 2. Cara kerja sebuah koin
 
-Semua koin yang diluncurkan di Jisr memiliki ketentuan yang sama. Pembuat hanya memilih nama, simbol, gambar, deskripsi, dan tautan.
+Semua koin yang diluncurkan di Landing Pad memiliki ketentuan yang sama. Pembuat hanya memilih nama, simbol, gambar, deskripsi, dan tautan.
 
 | Ketentuan | Nilai |
 |---|---|
@@ -141,6 +141,6 @@ Pemasangan uji di Sepolia:
 
 ## 8. Pemberitahuan
 
-Dokumen ini menjelaskan sebuah perangkat lunak. Ini bukan penawaran koin apa pun dan bukan nasihat keuangan. Koin yang diluncurkan di Jisr dibuat oleh pembuatnya, bukan oleh platform. Siapa pun yang menggunakan platform bertanggung jawab atas keputusannya sendiri.
+Dokumen ini menjelaskan sebuah perangkat lunak. Ini bukan penawaran koin apa pun dan bukan nasihat keuangan. Koin yang diluncurkan di Landing Pad dibuat oleh pembuatnya, bukan oleh platform. Siapa pun yang menggunakan platform bertanggung jawab atas keputusannya sendiri.
 
 Ini adalah terjemahan. Versi bahasa Inggris adalah acuan; jika ada perbedaan, teks bahasa Inggris yang berlaku.

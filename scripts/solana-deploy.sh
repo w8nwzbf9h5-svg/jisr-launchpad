@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploys the Jisr program to a Solana network, starts it, and makes it final.
+# Deploys the Landing Pad program to a Solana network, starts it, and makes it final.
 # Used by .github/workflows/solana-mainnet.yml for the real network, and rehearsed against a local
 # node on every change by .github/workflows/solana.yml, so these exact commands are tested.
 #

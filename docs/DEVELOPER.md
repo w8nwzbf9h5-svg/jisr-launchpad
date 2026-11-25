@@ -1,4 +1,4 @@
-# Jisr Launchpad: developer notes
+# Landing Pad: developer notes
 
 The technical reference for people working on the code. The public overview is the [README](../README.md).
 Paths below are from the repository root.

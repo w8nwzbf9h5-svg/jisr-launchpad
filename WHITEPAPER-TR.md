@@ -1,18 +1,18 @@
-# Jisr Launchpad: Teknik Doküman (White Paper)
+# Landing Pad: Teknik Doküman (White Paper)
 
 Sürüm 0.1 · 22 Kasım 2026 · Test ağı aşaması
 
-Jisr (جسر, "köprü"), her coinin bir taban fiyatına sahip olduğu bir meme coin çıkarma platformudur. Bu taban fiyat, kimsenin para çekemediği bir sözleşmede tutulan parayla karşılanır. Bu doküman platformun nasıl çalıştığını, neye karşı koruduğunu, neye karşı korumadığını ve bugün neyin hazır olduğunu anlatır.
+Landing Pad, her coinin bir taban fiyatına sahip olduğu bir meme coin çıkarma platformudur. Bu taban fiyat, kimsenin para çekemediği bir sözleşmede tutulan parayla karşılanır. Bu doküman platformun nasıl çalıştığını, neye karşı koruduğunu, neye karşı korumadığını ve bugün neyin hazır olduğunu anlatır.
 
 ## 1. Sorun
 
 Meme coin çıkışlarının çoğu aynı şekilde biter. İlk alıcılar ve coini oluşturan kişi, neredeyse bedavaya gelmiş coinleri tutar ve bunları sonradan gelenlere satar. Klasik bir bağlanma eğrisinde havuzdaki para piyasa değerinin yalnızca küçük bir kısmıdır; bu yüzden satış başladığında fiyatın altında hiçbir şey yoktur. Alışılmış önlemler (kilitler, kademeli serbest bırakma, satış vergileri) ya birinin sözünü tutmasına ya da değiştirilebilen bir kurala dayanır.
 
-Jisr, erken dönemin ucuz coinlerini kaldırır ve her coinin altına gerçek para koyar.
+Landing Pad, erken dönemin ucuz coinlerini kaldırır ve her coinin altına gerçek para koyar.
 
 ## 2. Bir coin nasıl çalışır
 
-Jisr'de çıkarılan her coinin koşulları aynıdır. Oluşturan kişi yalnızca adı, sembolü, görseli, açıklamayı ve bağlantıları seçer.
+Landing Pad'de çıkarılan her coinin koşulları aynıdır. Oluşturan kişi yalnızca adı, sembolü, görseli, açıklamayı ve bağlantıları seçer.
 
 | Koşul | Değer |
 |---|---|
@@ -141,6 +141,6 @@ Sepolia'daki test kurulumu:
 
 ## 8. Bildirim
 
-Bu doküman bir yazılımı anlatır. Herhangi bir coinin teklifi değildir ve finansal tavsiye değildir. Jisr'de çıkarılan coinleri platform değil, onları oluşturanlar yaratır. Platformu kullanan herkes kendi kararlarından sorumludur.
+Bu doküman bir yazılımı anlatır. Herhangi bir coinin teklifi değildir ve finansal tavsiye değildir. Landing Pad'de çıkarılan coinleri platform değil, onları oluşturanlar yaratır. Platformu kullanan herkes kendi kararlarından sorumludur.
 
 Bu bir çeviridir. Esas alınan sürüm İngilizce olandır; bir fark varsa İngilizce metin geçerlidir.

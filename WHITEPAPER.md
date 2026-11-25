@@ -1,18 +1,18 @@
-# Jisr Launchpad: White Paper
+# Landing Pad: White Paper
 
 Version 0.1 · 22 November 2026 · Test network stage
 
-Jisr (جسر, "bridge") is a launchpad for meme coins in which every coin has a price floor backed by money held in a contract that nobody can withdraw from. This paper describes how it works, what it protects against, what it does not, and what is built today.
+Landing Pad is a launchpad for meme coins in which every coin has a price floor backed by money held in a contract that nobody can withdraw from. This paper describes how it works, what it protects against, what it does not, and what is built today.
 
 ## 1. The problem
 
 Most meme coin launches end the same way. Early buyers and the creator hold coins that cost them almost nothing, and they sell into later buyers. On a classic bonding curve the money in the pool is only a fraction of the market value, so the price has nothing under it when selling starts. The usual defences (locks, vesting, sell taxes) depend on someone keeping a promise or on a rule that can be changed.
 
-Jisr removes the cheap early coins and puts real money under every coin.
+Landing Pad removes the cheap early coins and puts real money under every coin.
 
 ## 2. How a coin works
 
-Every coin launched on Jisr has the same terms. The creator chooses only the name, the ticker, the picture, the description and the links.
+Every coin launched on Landing Pad has the same terms. The creator chooses only the name, the ticker, the picture, the description and the links.
 
 | Term | Value |
 |---|---|
@@ -141,4 +141,4 @@ Test deployment on Sepolia:
 
 ## 8. Notice
 
-This paper describes software. It is not an offer of any coin, and it is not financial advice. Coins launched on Jisr are created by their creators, not by the launchpad. Anyone using the launchpad is responsible for their own decisions.
+This paper describes software. It is not an offer of any coin, and it is not financial advice. Coins launched on Landing Pad are created by their creators, not by the launchpad. Anyone using the launchpad is responsible for their own decisions.

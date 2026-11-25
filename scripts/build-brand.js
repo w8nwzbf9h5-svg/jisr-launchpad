@@ -26,7 +26,7 @@ function line(w, h) {
 const page = (w, h, body, css) => `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${FONTS}*{box-sizing:border-box;margin:0}html,body{width:${w}px;height:${h}px}body{background:#0A0D14;color:#EAEEF6;font-family:"Plus Jakarta Sans",sans-serif;overflow:hidden;position:relative}${css || ""}</style></head><body>${body}</body></html>`;
 
 const og = page(1200, 630, `
-<div class="brand">${mark(56, false)}<b>JISR</b><span>launchpad</span></div>
+<div class="brand">${mark(56, false)}<b>LANDING</b><span>pad</span></div>
 <h1>Launch a coin whose floor is paid for in advance.</h1>
 <p>One fixed price for everyone. A reserve nobody can withdraw. Sell back at the floor at any time.</p>
 <div class="tag">Public test on Solana devnet and Ethereum Sepolia</div>

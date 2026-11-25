@@ -1,6 +1,6 @@
 # Going live: the checklist
 
-What has to happen, in order, before Jisr handles real money, and how each deployment is done.
+What has to happen, in order, before Landing Pad handles real money, and how each deployment is done.
 The technical package for the security review is [AUDIT.md](AUDIT.md).
 
 ## Where things stand

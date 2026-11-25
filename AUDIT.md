@@ -1,4 +1,4 @@
-# Jisr: package for a security review
+# Landing Pad: package for a security review
 
 This file is for an outside reviewer. It says what to review, what the code promises, who can do
 what, what was already checked and how, and what is known to be weak. It is written by the builders.

@@ -1,4 +1,4 @@
-/* Jisr on Solana: the page. Reads the program through web/solana/jisr-solana.js and asks the
+/* Landing Pad on Solana: the page. Reads the program through web/solana/jisr-solana.js and asks the
    visitor's Phantom wallet to sign. The wallet's key never leaves the wallet. */
 (function () {
   "use strict";
@@ -159,7 +159,7 @@
   const shown = () => (!S.programId || !S.loaded || S.loadError || !S.cfg ? "setup" : S.view);
   function renderSetup() {
     const el = $("#v-setup");
-    if (!S.programId) { el.innerHTML = '<div class="card"><h2>Solana is not live yet</h2><p class="note">The Jisr program has not been deployed to ' + esc(C.name) + ". The Ethereum-family networks are on the <a href=\"./\">main page</a>.</p></div>"; return; }
+    if (!S.programId) { el.innerHTML = '<div class="card"><h2>Solana is not live yet</h2><p class="note">The Landing Pad program has not been deployed to ' + esc(C.name) + ". The Ethereum-family networks are on the <a href=\"./\">main page</a>.</p></div>"; return; }
     if (!S.loaded) { el.innerHTML = '<div class="empty">Reading the program on ' + esc(C.name) + "…</div>"; return; }
     if (S.loadError) { el.innerHTML = '<div class="card"><h2>Could not read the network</h2><p class="note">' + esc(S.loadError) + '</p><button class="btn" data-act="refresh">Try again</button></div>'; return; }
     if (!TEST) { el.innerHTML = '<div class="card"><h2>Not started yet</h2><p class="note">The program is deployed on ' + esc(C.name) + " but the launchpad has not been started. That step is part of the deployment and is not done from this page.</p></div>"; return; }

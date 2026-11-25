@@ -1,7 +1,7 @@
-// Jisr metadata service for Solana.
+// Landing Pad metadata service for Solana.
 //
 // Wallets and explorers show a token's picture by opening the link in its Metaplex metadata and
-// reading a small JSON file there. For a Jisr coin that link is  <this service>/<market address>.
+// reading a small JSON file there. For a Landing Pad coin that link is  <this service>/<market address>.
 // This service answers it: it reads the coin's market account from Solana and returns the name,
 // ticker, description, picture and links the creator entered at launch.
 //
@@ -10,7 +10,7 @@
 //
 // Settings (environment variables):
 //   RPC_URL     a Solana RPC address for the network the launchpad is on
-//   PROGRAM_ID  the Jisr program's address
+//   PROGRAM_ID  the Landing Pad program's address
 //   SITE_URL    the Solana page, e.g. https://example.com/solana.html  (used for the "website" link back)
 //
 // Deploying it and pointing the launchpad at it: see metadata-service/README.md.

@@ -1,4 +1,4 @@
-# Jisr Launchpad
+# Landing Pad
 
 A launchpad for meme coins where every coin is sold at one fixed price, and every coin sold puts its
 floor price into a reserve that nobody can withdraw. Any holder can sell back to that reserve at the
@@ -59,6 +59,6 @@ Worked example: $1,000 buys 9,500,000 coins; selling them straight back returns 
 
 ## Rights
 
-Copyright © 2026 Jisr Launchpad. **All rights reserved.** This repository is published so that the
+Copyright © 2026 Landing Pad. **All rights reserved.** This repository is published so that the
 code can be read and verified. It is not open source: copying, modifying, deploying or reusing any
 part of it needs written permission. See [LICENSE](LICENSE).

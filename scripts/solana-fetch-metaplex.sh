@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Fetches the Metaplex Token Metadata program, as deployed on Solana, for the tests.
-# The Jisr program calls it when a coin is launched, so the tests run against the real thing:
+# The Landing Pad program calls it when a coin is launched, so the tests run against the real thing:
 # the in-process Rust tests load it from tests/fixtures/, and the local test node is started with it.
 # The file is not kept in this repository; it is the program anyone can read from the network.
 set -euo pipefail

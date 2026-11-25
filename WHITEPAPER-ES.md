@@ -1,18 +1,18 @@
-# Jisr Launchpad: Libro blanco
+# Landing Pad: Libro blanco
 
 Versión 0.1 · 22 de noviembre de 2026 · Etapa de red de pruebas
 
-Jisr (جسر, «puente») es una plataforma de lanzamiento de meme coins en la que cada moneda tiene un precio mínimo respaldado por dinero guardado en un contrato del que nadie puede retirar. Este documento explica cómo funciona, de qué protege, de qué no protege y qué está construido hoy.
+Landing Pad es una plataforma de lanzamiento de meme coins en la que cada moneda tiene un precio mínimo respaldado por dinero guardado en un contrato del que nadie puede retirar. Este documento explica cómo funciona, de qué protege, de qué no protege y qué está construido hoy.
 
 ## 1. El problema
 
 La mayoría de los lanzamientos de meme coins terminan igual. Los primeros compradores y el creador tienen monedas que casi no les costaron nada y las venden a quienes llegan después. En una curva de vinculación clásica, el dinero del fondo es solo una fracción del valor de mercado, así que el precio no tiene nada debajo cuando empiezan las ventas. Las defensas habituales (bloqueos, liberación gradual, impuestos de venta) dependen de que alguien cumpla una promesa o de una regla que se puede cambiar.
 
-Jisr elimina las monedas baratas del inicio y pone dinero real debajo de cada moneda.
+Landing Pad elimina las monedas baratas del inicio y pone dinero real debajo de cada moneda.
 
 ## 2. Cómo funciona una moneda
 
-Todas las monedas lanzadas en Jisr tienen las mismas condiciones. El creador solo elige el nombre, el símbolo, la imagen, la descripción y los enlaces.
+Todas las monedas lanzadas en Landing Pad tienen las mismas condiciones. El creador solo elige el nombre, el símbolo, la imagen, la descripción y los enlaces.
 
 | Condición | Valor |
 |---|---|
@@ -141,6 +141,6 @@ Despliegue de prueba en Sepolia:
 
 ## 8. Aviso
 
-Este documento describe un software. No es una oferta de ninguna moneda ni asesoramiento financiero. Las monedas lanzadas en Jisr las crean sus creadores, no la plataforma. Quien use la plataforma es responsable de sus propias decisiones.
+Este documento describe un software. No es una oferta de ninguna moneda ni asesoramiento financiero. Las monedas lanzadas en Landing Pad las crean sus creadores, no la plataforma. Quien use la plataforma es responsable de sus propias decisiones.
 
 Esta es una traducción. La versión en inglés es la de referencia; si hay alguna diferencia, vale el texto en inglés.

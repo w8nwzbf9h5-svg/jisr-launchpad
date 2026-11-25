@@ -1,7 +1,7 @@
 # Metadata service for Solana coins
 
 Wallets such as Phantom show a token's **name and ticker** from its on-chain metadata, and its
-**picture** from a small file that the metadata links to. The Jisr program writes the name, the
+**picture** from a small file that the metadata links to. The Landing Pad program writes the name, the
 ticker and that link when a coin is launched, and nobody can change them afterwards.
 
 This folder is the service that answers the link. It is one file, `worker.mjs`. It holds no keys and
@@ -34,7 +34,7 @@ Use an address you control and will keep (your own domain is best).
 2. Replace the sample code with the content of `worker.mjs`. Deploy.
 3. In the Worker's Settings, Variables, add:
    - `RPC_URL`: your Solana RPC address for the network the launchpad is on
-   - `PROGRAM_ID`: the Jisr program's address
+   - `PROGRAM_ID`: the Landing Pad program's address
    - `SITE_URL`: the address of the Solana page, for example `https://your-domain/solana.html`
 4. Optional: under Triggers, add a custom domain, for example `meta.your-domain`.
 5. Put the service's address in `web/solana/config.js` as `metadataBase` for that network,

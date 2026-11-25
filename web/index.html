@@ -6,13 +6,13 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Jisr Launchpad">
-<meta property="og:title" content="Jisr Launchpad: coins with a floor that is paid for in advance">
+<meta property="og:site_name" content="Landing Pad">
+<meta property="og:title" content="Landing Pad: coins with a floor that is paid for in advance">
 <meta property="og:description" content="One fixed price for everyone, and a reserve nobody can withdraw. Operate the model and read the proof live from the chain. Public test.">
 <meta property="og:image" content="https://w8nwzbf9h5-svg.github.io/jisr-launchpad/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<title>Jisr Launchpad: coins with a floor that is paid for in advance</title>
-<meta name="description" content="Jisr sells each coin at one fixed price and keeps the money in a reserve nobody can withdraw. Operate the model yourself and read the proof live from the chain. Public test on Solana devnet and Ethereum Sepolia.">
+<title>Landing Pad: coins with a floor that is paid for in advance</title>
+<meta name="description" content="Landing Pad sells each coin at one fixed price and keeps the money in a reserve nobody can withdraw. Operate the model yourself and read the proof live from the chain. Public test on Solana devnet and Ethereum Sepolia.">
 <script>
 /* Addresses of the launchpad that used to live here (#board, #coin-0x…, #launch) now belong to app.html. */
 if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html" + location.hash);
@@ -27,7 +27,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="./" aria-label="Jisr Launchpad, home"><b>JISR</b><i></i><span>launchpad</span></a>
+    <a class="brand" href="./" aria-label="Landing Pad, home"><b>LANDING</b><i></i><span>pad</span></a>
     <nav aria-label="Main">
       <a href="#machine">The model</a>
       <a href="#stress">Stress test</a>
@@ -48,7 +48,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
   <section class="open">
     <div>
       <h1>Launch a coin whose floor is paid for in advance.</h1>
-      <p class="lede">Jisr sells every coin at one fixed price and keeps the money in a reserve that no person controls. Any holder can sell back to that reserve at the floor price, at any time. Move the handle on the chart and watch the reserve keep up.</p>
+      <p class="lede">Landing Pad sells every coin at one fixed price and keeps the money in a reserve that no person controls. Any holder can sell back to that reserve at the floor price, at any time. Move the handle on the chart and watch the reserve keep up.</p>
       <div class="doors">
         <a class="btn primary" href="solana.html">Open on Solana devnet</a>
         <a class="btn" href="app.html">Open on Ethereum Sepolia</a>
@@ -189,7 +189,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
   </section>
 
   <footer class="end">
-    <p>© 2026 Jisr Launchpad. All rights reserved. The code, the design and the documents are proprietary. Reading them is not permission to copy or reuse them.</p>
+    <p>© 2026 Landing Pad. All rights reserved. The code, the design and the documents are proprietary. Reading them is not permission to copy or reuse them.</p>
     <p>This is a public test and not an offer of any kind. A floor limits how far a price can fall inside the launchpad; it does not make a coin a good purchase. <a href="whitepaper.html">White paper</a></p>
   </footer>
 </main>
@@ -197,7 +197,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <script>
 /* Load the scripts in order. */
 (function () {
-  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=f748f9bb", "solana/config.js?v=3d6c068a", "home.js?v=54f21605"];
+  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=1a0b97dd", "solana/config.js?v=3d6c068a", "home.js?v=54f21605"];
   (function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");

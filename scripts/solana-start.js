@@ -1,4 +1,4 @@
-// Starts a freshly deployed Jisr program on Solana and hands the admin role on.
+// Starts a freshly deployed Landing Pad program on Solana and hands the admin role on.
 // Run by scripts/solana-deploy.sh, between deploying the program and making it final.
 //
 //   RPC_URL=... PROGRAM_ID=... node scripts/solana-start.js <deployer key file> <stablecoin mint> <platform wallet> <admin wallet>

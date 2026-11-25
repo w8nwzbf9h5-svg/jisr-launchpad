@@ -1,18 +1,18 @@
-# Jisr Launchpad: White Paper
+# Landing Pad: White Paper
 
 Versão 0.1 · 22 de novembro de 2026 · Fase de rede de testes
 
-Jisr (جسر, "ponte") é uma plataforma de lançamento de meme coins em que cada moeda tem um preço mínimo coberto por dinheiro guardado num contrato do qual ninguém pode sacar. Este documento explica como funciona, do que protege, do que não protege e o que está construído hoje.
+Landing Pad é uma plataforma de lançamento de meme coins em que cada moeda tem um preço mínimo coberto por dinheiro guardado num contrato do qual ninguém pode sacar. Este documento explica como funciona, do que protege, do que não protege e o que está construído hoje.
 
 ## 1. O problema
 
 A maioria dos lançamentos de meme coins termina do mesmo jeito. Os primeiros compradores e o criador têm moedas que quase não lhes custaram nada e vendem para quem chega depois. Numa curva de vinculação clássica, o dinheiro do pool é só uma fração do valor de mercado, então o preço não tem nada por baixo quando as vendas começam. As defesas habituais (bloqueios, liberação gradual, taxas de venda) dependem de alguém cumprir uma promessa ou de uma regra que pode ser alterada.
 
-Jisr elimina as moedas baratas do início e coloca dinheiro real debaixo de cada moeda.
+Landing Pad elimina as moedas baratas do início e coloca dinheiro real debaixo de cada moeda.
 
 ## 2. Como funciona uma moeda
 
-Todas as moedas lançadas na Jisr têm as mesmas condições. O criador escolhe apenas o nome, o símbolo, a imagem, a descrição e os links.
+Todas as moedas lançadas na Landing Pad têm as mesmas condições. O criador escolhe apenas o nome, o símbolo, a imagem, a descrição e os links.
 
 | Condição | Valor |
 |---|---|
@@ -141,6 +141,6 @@ Implantação de teste na Sepolia:
 
 ## 8. Aviso
 
-Este documento descreve um software. Não é uma oferta de nenhuma moeda nem aconselhamento financeiro. As moedas lançadas na Jisr são criadas por seus criadores, não pela plataforma. Quem usa a plataforma é responsável pelas próprias decisões.
+Este documento descreve um software. Não é uma oferta de nenhuma moeda nem aconselhamento financeiro. As moedas lançadas na Landing Pad são criadas por seus criadores, não pela plataforma. Quem usa a plataforma é responsável pelas próprias decisões.
 
 Esta é uma tradução. A versão em inglês é a referência; se houver diferença, vale o texto em inglês.

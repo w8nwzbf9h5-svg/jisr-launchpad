@@ -1,4 +1,4 @@
-/* Jisr Launchpad web app. No build step: plain script, ethers v6 from vendor/.
+/* Landing Pad web app. No build step: plain script, ethers v6 from vendor/.
    Everything shown on screen is read from the chain. Nothing is stored on a server. */
 (function () {
   "use strict";

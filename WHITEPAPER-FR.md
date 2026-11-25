@@ -1,18 +1,18 @@
-# Jisr Launchpad : livre blanc
+# Landing Pad : livre blanc
 
 Version 0.1 · 22 novembre 2026 · Phase de réseau de test
 
-Jisr (جسر, « pont ») est une plateforme de lancement de meme coins où chaque jeton a un prix plancher couvert par de l'argent conservé dans un contrat dont personne ne peut retirer les fonds. Ce document explique son fonctionnement, ce qu'elle protège, ce qu'elle ne protège pas, et ce qui est construit aujourd'hui.
+Landing Pad est une plateforme de lancement de meme coins où chaque jeton a un prix plancher couvert par de l'argent conservé dans un contrat dont personne ne peut retirer les fonds. Ce document explique son fonctionnement, ce qu'elle protège, ce qu'elle ne protège pas, et ce qui est construit aujourd'hui.
 
 ## 1. Le problème
 
 La plupart des lancements de meme coins finissent de la même manière. Les premiers acheteurs et le créateur détiennent des jetons qui ne leur ont presque rien coûté, et ils les vendent à ceux qui arrivent ensuite. Sur une courbe de liaison classique, l'argent du pool ne représente qu'une fraction de la valeur de marché : le prix n'a donc rien sous lui quand les ventes commencent. Les protections habituelles (blocages, libération progressive, taxes à la vente) reposent sur une promesse à tenir ou sur une règle qui peut être modifiée.
 
-Jisr supprime les jetons bon marché du début et place de l'argent réel sous chaque jeton.
+Landing Pad supprime les jetons bon marché du début et place de l'argent réel sous chaque jeton.
 
 ## 2. Fonctionnement d'un jeton
 
-Tous les jetons lancés sur Jisr ont les mêmes conditions. Le créateur choisit seulement le nom, le symbole, l'image, la description et les liens.
+Tous les jetons lancés sur Landing Pad ont les mêmes conditions. Le créateur choisit seulement le nom, le symbole, l'image, la description et les liens.
 
 | Condition | Valeur |
 |---|---|
@@ -141,6 +141,6 @@ Déploiement de test sur Sepolia :
 
 ## 8. Avertissement
 
-Ce document décrit un logiciel. Ce n'est ni une offre d'un jeton ni un conseil financier. Les jetons lancés sur Jisr sont créés par leurs créateurs, pas par la plateforme. Toute personne qui utilise la plateforme est responsable de ses propres décisions.
+Ce document décrit un logiciel. Ce n'est ni une offre d'un jeton ni un conseil financier. Les jetons lancés sur Landing Pad sont créés par leurs créateurs, pas par la plateforme. Toute personne qui utilise la plateforme est responsable de ses propres décisions.
 
 Ceci est une traduction. La version anglaise fait référence ; en cas de différence, le texte anglais s'applique.
