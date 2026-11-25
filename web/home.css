@@ -207,5 +207,11 @@
 .contact select:focus,.contact textarea:focus,.contact input:focus{border-color:var(--accent);outline:none}
 .c-go{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
 .c-go .btn{flex:1 1 180px;text-align:center;padding:13px 16px}
-.c-go .btn[aria-disabled="true"]{opacity:.42;pointer-events:none}
+.c-trap{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.c-alt,.c-fine{margin:4px 0 0;font-size:13.5px;line-height:1.5;color:var(--muted)}
+.c-alt a{color:var(--accent);font-weight:600;text-decoration:underline;cursor:pointer}
+.c-alt a[aria-disabled="true"]{color:var(--muted);pointer-events:none;text-decoration:none}
+.c-note.good{color:var(--good)}
+.c-note.bad{color:#F08A76}
+.say a{color:var(--accent)}
 .c-note{margin:6px 0 0;font-size:13.5px;line-height:1.5;color:var(--muted)}

@@ -126,16 +126,26 @@ function waitFor(child, text, ms) {
       assert(roadText.includes("GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump") && roadText.includes("100 pieces of feedback") && roadText.includes("$1M market cap") && roadText.includes("does not have the floor"),
         "the road to mainnet shows the coin's address, the two marks and the warning");
       assert.equal(await page.$eval("#road a.btn.primary", (a) => a.href), "https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump");
-      // the contact form hands a message to X or GitHub and sends nothing itself
-      assert.equal(await page.$eval("#cX", (a) => a.getAttribute("aria-disabled")), "true", "nothing to send before a message is written");
+      // the contact form sends a message to the project's inbox through the form service, and says so when it cannot
+      assert.equal(await page.$eval("#cSend", (b) => b.disabled), true, "nothing to send before a message is written");
       await page.type("#cMsg", "The sell button stays grey after I connect.");
-      await page.type("#cReach", "@tester");
+      await page.type("#cEmail", "tester@example.org");
       const sendX = await page.$eval("#cX", (a) => a.href), sendGh = await page.$eval("#cGh", (a) => a.href);
-      assert(sendX.startsWith("https://x.com/intent/post?text=") && decodeURIComponent(sendX).includes("@landingpadfun Bug or problem: The sell button stays grey") && decodeURIComponent(sendX).includes("@tester"), "the message goes to X addressed to the project: " + sendX);
+      assert(sendX.startsWith("https://x.com/intent/post?text=") && decodeURIComponent(sendX).includes("@landingpadfun Bug or problem: The sell button stays grey"), "the message can also go to X: " + sendX);
       assert(sendGh.includes("/issues/new?title=") && decodeURIComponent(sendGh).includes("The sell button stays grey after I connect."), "or to GitHub as a report: " + sendGh);
-      await page.type("#cMsg", " ".concat("More detail. ".repeat(30)));
-      assert.equal(await page.$eval("#cX", (a) => a.getAttribute("aria-disabled")), "true", "a message too long for X is offered to GitHub only");
-      assert.equal(await page.$eval("#cGh", (a) => a.getAttribute("aria-disabled")), "false");
+      await page.evaluate(() => { window.__sent = []; window.__realFetch = window.fetch; window.fetch = (url, opt) => { if (String(url).startsWith("https://formsubmit.co/")) { window.__sent.push({ url: String(url), body: JSON.parse(opt.body) }); return Promise.resolve(new Response(JSON.stringify({ success: window.__answer }), { status: 200, headers: { "content-type": "application/json" } })); } return window.__realFetch(url, opt); }; window.__answer = "false"; });
+      await page.click("#cSend");
+      await page.waitForFunction(() => document.querySelector("#cNote").textContent.includes("feedback@landingpad.fun"));
+      assert.equal(await page.$eval("#cMsg", (m) => m.value.length > 0), true, "a message that was not delivered stays in the box, and the visitor is told where to email it");
+      await page.evaluate(() => { window.__answer = "true"; });
+      await page.click("#cSend");
+      await page.waitForFunction(() => document.querySelector("#cNote").textContent.startsWith("Sent."));
+      const posted = await page.evaluate(() => window.__sent);
+      assert.equal(posted.length, 2);
+      assert.equal(posted[1].url, "https://formsubmit.co/ajax/feedback%40landingpad.fun");
+      assert(posted[1].body.message === "The sell button stays grey after I connect." && posted[1].body.topic === "Bug or problem" && posted[1].body._replyto === "tester@example.org", "the message, its topic and the reply address are sent: " + JSON.stringify(posted[1].body));
+      assert.equal(await page.$eval("#cMsg", (m) => m.value), "", "the box is cleared once the message is sent");
+      await page.evaluate(() => { window.fetch = window.__realFetch; });
       assert((await text("#rCoins")).length > 0 && (await text("#rVisits")).length > 0, "the counts of coins and visits are shown, or say they are not available");
       const setIn = (id, v) => page.evaluate((id, v) => { const e = document.querySelector(id); e.value = v; e.dispatchEvent(new Event("input", { bubbles: true })); }, id, v);
       await setIn("#mSoldIn", 0); await setIn("#bAmt", "1000");

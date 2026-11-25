@@ -438,24 +438,46 @@
     const v = await (window.JISR_VISITS || Promise.resolve(null));
     $("#rVisits").textContent = v == null ? "not available now" : Number(v).toLocaleString("en-US");
   }
-  /* Contact: the message is never sent by this site. The two buttons open X or GitHub with it filled in. */
+  /* Contact: Send message posts the message to FormSubmit, which emails it to the project's inbox. If that
+     fails for any reason the visitor is given the address to write to, so a message is never lost silently.
+     The two links underneath open X or GitHub with the message filled in, for those who prefer it public. */
   function contact() {
     const msg = $("#cMsg"), L = window.JISR_LAUNCH || {};
     if (!msg) return;
-    const topic = $("#cTopic"), reach = $("#cReach"), x = $("#cX"), gh = $("#cGh"), note = $("#cNote");
+    const topic = $("#cTopic"), email = $("#cEmail"), x = $("#cX"), gh = $("#cGh"), note = $("#cNote"), send = $("#cSend"), to = L.contactEmail || "";
     const set = (a, href) => { if (href) { a.href = href; a.setAttribute("aria-disabled", "false"); } else { a.removeAttribute("href"); a.setAttribute("aria-disabled", "true"); } };
+    const say = (text, cls) => { note.textContent = text; note.className = "c-note" + (cls ? " " + cls : ""); };
+    let busy = false;
     function update() {
-      const text = msg.value.trim(), who = reach.value.trim();
-      if (text.length < 10) { set(x, ""); set(gh, ""); note.textContent = text ? "Add a few more words so we can understand it." : "Write your message, then choose where to send it."; return; }
-      const post = "@landingpadfun " + topic.value + ": " + text + (who ? " (reach me: " + who + ")" : "");
+      const text = msg.value.trim();
+      send.disabled = busy || text.length < 10;
+      if (text.length < 10) { set(x, ""); set(gh, ""); if (!busy && note.dataset.kept !== "1") say(text ? "Add a few more words so we can understand it." : "Write your message, then press Send message."); return; }
+      const post = "@landingpadfun " + topic.value + ": " + text;
       set(x, post.length <= 280 ? "https://x.com/intent/post?text=" + encodeURIComponent(post) : "");
       set(gh, "https://github.com/" + (L.repo || "w8nwzbf9h5-svg/jisr-launchpad") + "/issues/new?title=" + encodeURIComponent(topic.value + ": " + text.slice(0, 70)) +
-        "&body=" + encodeURIComponent(text + (who ? "\n\nReach me: " + who : "") + "\n\nSent from the contact form on landingpad.fun"));
-      note.textContent = post.length <= 280 ? "Both open in a new tab with your message filled in. You press send there." : "This is " + (post.length - 280) + " characters too long for one post on X. Send it on GitHub, or shorten it.";
+        "&body=" + encodeURIComponent(text + "\n\nSent from the contact form on landingpad.fun"));
+      if (!busy && note.dataset.kept !== "1") say("Ready to send.");
     }
-    [msg, reach].forEach((e) => e.addEventListener("input", update));
+    [msg, email].forEach((e) => e.addEventListener("input", () => { note.dataset.kept = ""; update(); }));
     topic.addEventListener("change", update);
-    $("#cForm").addEventListener("submit", (e) => e.preventDefault());
+    $("#cForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = msg.value.trim(), from = email.value.trim();
+      if (busy || text.length < 10) return;
+      if ($("#cTrap").value) return;                                   // filled in only by a robot
+      if (from && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(from)) { say("That email address does not look right. Fix it, or leave it empty.", "bad"); note.dataset.kept = "1"; return; }
+      busy = true; update(); say("Sending…");
+      const fallback = () => { say("We could not send it from here. Please email it to " + to + ".", "bad"); note.dataset.kept = "1"; };
+      try {
+        const body = { _subject: "Landing Pad contact: " + topic.value, _template: "table", _captcha: "false", topic: topic.value, message: text, page: location.href };
+        if (from) { body.email = from; body._replyto = from; }
+        const r = await fetch("https://formsubmit.co/ajax/" + encodeURIComponent(L.contactKey || to), { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(body) });
+        const j = await r.json().catch(() => ({}));
+        if (r.ok && String(j.success) === "true") { msg.value = ""; say("Sent. Thank you" + (from ? ", we will reply to " + from + "." : "."), "good"); note.dataset.kept = "1"; }
+        else fallback();
+      } catch (_) { fallback(); }
+      busy = false; update();
+    });
     update();
   }
   window.JISR_HOME = { stateAt, applyBuy, liability, state: S, render, runChecks, simulate, runStress, road, counts };
