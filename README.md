@@ -25,6 +25,7 @@ Worked example: $1,000 buys 9,500,000 coins; selling them straight back returns 
 ## See it work
 
 - **[Home page](https://landingpad.fun/)**: operate the model yourself, and watch your browser read the proof from the chain.
+- **[Charts](https://landingpad.fun/markets.html)**: every coin with its price chart, trades and holders, read from the chain.
 - **[Launchpad on Solana devnet](https://landingpad.fun/solana.html)** (Phantom).
 - **[Launchpad on Ethereum Sepolia](https://landingpad.fun/app.html)** (MetaMask).
 - **[White paper](https://landingpad.fun/whitepaper.html)**, with figures, in ten languages:
@@ -41,7 +42,7 @@ Worked example: $1,000 buys 9,500,000 coins; selling them straight back returns 
 
 | | |
 |---|---|
-| Ethereum-family contracts | Built. 47 contract tests and 25 browser test steps. |
+| Ethereum-family contracts | Built. 47 contract tests and 26 browser test steps. |
 | Solana program | Built. Tested on every change against a local node and the real Metaplex program. |
 | Selling to another network | Built with Circle's CCTP. Tested against stand-ins, not yet on Circle's live test bridge. |
 | Independent security audit | **Not done.** |

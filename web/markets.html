@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Landing Pad">
+<meta property="og:title" content="Landing Pad charts: every coin, its price chart, its trades and its holders">
+<meta property="og:description" content="Price charts, trades and holders for every coin launched on Landing Pad, read straight from the chain. Public test.">
+<meta property="og:image" content="https://landingpad.fun/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@landingpadfun">
+<title>Landing Pad · Charts</title>
+<meta name="description" content="Price charts, trades and holders for every coin launched on Landing Pad, read straight from the chain.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=fa305785">
+<link rel="stylesheet" href="markets.css?v=42c30b4e">
+</head>
+<body class="mk">
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./" aria-label="Landing Pad, home"><b>LANDING</b><i></i><span>pad</span></a>
+    <nav aria-label="Main">
+      <a href="./">Home</a>
+      <a href="markets.html" aria-current="page">Charts</a>
+      <a href="whitepaper.html">White paper</a>
+    </nav>
+    <div class="right">
+      <a class="btn" href="solana.html">Solana</a>
+      <a class="btn primary" href="app.html">Ethereum</a>
+    </div>
+  </div>
+</header>
+<div class="strip"><div class="wrap"><b>Public test.</b> Test networks only: the coins and the money here have no value. Everything on this page is read from the chain as you open it.</div></div>
+
+<main class="wrap mk-main" id="mk">
+  <section class="mk-list" id="list" aria-label="All coins">
+    <div class="mk-tools">
+      <label class="mk-search"><span class="sr">Search coins</span><input id="q" type="search" placeholder="Search name or ticker" autocomplete="off"></label>
+      <div class="mk-sort" role="group" aria-label="Sort coins">
+        <button type="button" data-sort="new" aria-pressed="true">Newest</button>
+        <button type="button" data-sort="cap" aria-pressed="false">Market cap</button>
+        <button type="button" data-sort="sold" aria-pressed="false">Most sold</button>
+      </div>
+    </div>
+    <div class="mk-head" aria-hidden="true"><span>Coin</span><span>Price</span><span>Market cap</span></div>
+    <div id="rows" class="mk-rows" role="list"><p class="mk-note">Reading the coins from the chain…</p></div>
+    <p class="mk-note" id="listNote" hidden></p>
+  </section>
+
+  <section class="mk-detail" id="detail" aria-live="polite" hidden>
+    <button type="button" class="linkbtn mk-back" id="back">← All coins</button>
+    <div class="mk-title">
+      <span id="dAva"></span>
+      <div class="mk-name">
+        <h1 id="dName"></h1>
+        <p id="dSub"></p>
+      </div>
+      <div class="mk-acts">
+        <a class="btn primary" id="dTrade" href="#">Trade</a>
+        <button type="button" class="btn" id="dRefresh">Refresh</button>
+      </div>
+    </div>
+
+    <dl class="mk-stats" id="dStats"></dl>
+
+    <div class="mk-chartbox">
+      <div class="mk-chartbar">
+        <div class="mk-tf" role="group" aria-label="Candle length">
+          <button type="button" data-tf="60">1m</button>
+          <button type="button" data-tf="300">5m</button>
+          <button type="button" data-tf="900">15m</button>
+          <button type="button" data-tf="3600">1h</button>
+          <button type="button" data-tf="14400">4h</button>
+          <button type="button" data-tf="86400">1d</button>
+        </div>
+        <p class="mk-ohlc num" id="ohlc"></p>
+      </div>
+      <div class="mk-chartwrap">
+        <div id="chart" class="mk-chart" role="img" aria-label="Price chart"></div>
+        <p class="mk-empty" id="chartNote" hidden></p>
+      </div>
+      <ul class="mk-key">
+        <li><i class="k up"></i>Price rose in the candle</li>
+        <li><i class="k down"></i>Price fell</li>
+        <li><i class="k floor"></i>Floor: the price the reserve pays on any sale</li>
+        <li><i class="k vol"></i>Volume traded</li>
+      </ul>
+    </div>
+
+    <div class="mk-tabs" role="tablist" aria-label="Coin details">
+      <button type="button" role="tab" data-tab="trades" aria-selected="true">Trades</button>
+      <button type="button" role="tab" data-tab="holders" aria-selected="false">Holders</button>
+      <button type="button" role="tab" data-tab="checks" aria-selected="false">Checks</button>
+    </div>
+    <div class="mk-pane" id="pane"></div>
+  </section>
+</main>
+
+<footer class="wrap mk-foot">
+  <p>Charts drawn with <a href="https://www.tradingview.com/lightweight-charts/" rel="noopener">TradingView Lightweight Charts</a>. Prices are the launchpad's own price after each trade. History is read from the chain in your browser, so very old trades may not be listed. Not audited. <a href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad/issues/new" rel="noopener">Give feedback</a></p>
+</footer>
+
+<script>
+/* Load the scripts in order. deployments.js is always fetched fresh, so a newly linked contract shows at once. */
+(function () {
+  var files = ["vendor/ethers.umd.min.js?v=53295051", "deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "wallet.js?v=52c21746", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/config.js?v=06202dc5", "solana/jisr-solana.js?v=1a0b97dd", "vendor/lightweight-charts.standalone.production.js?v=338a625e", "markets.js?v=65baabcc"];
+  (function next(i) {
+    if (i >= files.length) return;
+    var s = document.createElement("script");
+    s.src = files[i]; s.onload = s.onerror = function () { next(i + 1); };
+    document.body.appendChild(s);
+  })(0);
+})();
+</script>
+</body>
+</html>

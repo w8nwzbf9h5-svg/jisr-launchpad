@@ -421,6 +421,47 @@ function waitFor(child, text, ms) {
     assert((await text("#foot")).includes(realFactory));
     step("two currencies on one network: each factory is offered separately with its own coins");
 
+    // 16b. Markets: every coin with its chart, its trades and its holders, read from the chain with no wallet.
+    {
+      await page.goto(WEB + "/markets.html", { waitUntil: "domcontentloaded" });
+      await page.waitForSelector("#rows .mk-row", { timeout: 60000 });
+      const listed = await page.$$eval("#rows .mk-row .nm b", (b) => b.map((x) => x.textContent));
+      assert(listed.includes("Camel Cash"), "the markets page lists the coins: " + listed.join(", "));
+      assert.equal(await page.$eval("#detail", (d) => d.hidden), true, "on a phone the list comes first");
+      // open the coin that has been traded the most in the steps above
+      await page.evaluate(() => { const M = window.JISR_MARKETS; M.pick(M.state.coins.slice().sort((a, b) => b.sold - a.sold)[0].id, true); });
+      await page.waitForFunction(() => { const s = window.JISR_MARKETS.state, d = s.cur && s.cache[s.cur.id]; return !!d; }, { timeout: 60000 });
+      await sleep(300);
+      const mk = await page.evaluate(() => {
+        const s = window.JISR_MARKETS.state, c = s.cur, d = s.cache[c.id];
+        return { failed: !!d.failed, trades: d.trades.length, priced: d.trades.every((t) => t.price >= c.sale * 0.999 && t.t > 0), last: d.trades.length ? d.trades[d.trades.length - 1].price : 0, price: c.price, floor: c.floor,
+          holders: d.holders ? d.holders.length : -1, canvas: !!document.querySelector("#chart canvas"), rows: document.querySelectorAll("#pane tbody tr").length,
+          stats: document.querySelector("#dStats").textContent, fits: document.documentElement.scrollWidth <= document.documentElement.clientWidth, hash: location.hash };
+      });
+      assert.equal(mk.failed, false, "the coin's history was read");
+      assert(mk.trades > 0 && mk.rows === Math.min(mk.trades, 200), "its trades are listed: " + JSON.stringify(mk));
+      assert(mk.priced, "every trade has a time and a price at or above the sale price");
+      assert(mk.canvas, "the chart is drawn");
+      assert(mk.stats.includes("Reserve") && mk.stats.includes("covered"), "the stats show the reserve and what it covers: " + mk.stats);
+      assert(mk.fits, "the markets page fits a phone screen");
+      assert(mk.hash.startsWith("#e/31337/"), "the coin has its own address: " + mk.hash);
+      if (process.env.MK_SHOT) {
+        await page.screenshot({ path: "/tmp/mk-phone.png", fullPage: true });
+        await page.setViewport({ width: 1320, height: 900 }); await sleep(900);
+        await page.screenshot({ path: "/tmp/mk-desk.png" });
+        await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 }); await sleep(500);
+      }
+      await page.click('.mk-tabs [data-tab="holders"]');
+      assert((await page.$$eval("#pane tbody tr", (r) => r.length)) > 1, "the holders are listed, with the unsold coins in the launchpad");
+      assert((await text("#pane")).includes("held by the launchpad"));
+      await page.click('.mk-tabs [data-tab="checks"]');
+      const checks = await text("#pane");
+      assert(checks.includes("The reserve covers every coin at the floor") && !checks.includes("FAIL"), "the checks pass: " + checks);
+      await page.click("#back");
+      assert.equal(await page.$eval("#detail", (d) => d.hidden), true, "back to the list");
+      step("markets: every coin is listed, and a coin shows its chart, trades, holders and checks from the chain");
+    }
+
     // 15b. A limited mobile wallet: no gas estimates, and no transactions without a recipient.
     // The deploy page goes through the standard CREATE2 deployer and the public endpoint, and still finishes.
     await provider.send("hardhat_setCode", ["0x4e59b44847b379578588920cA78FbF26c0B4956C", "0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe03601600081602082378035828234f58015156039578182fd5b8082525050506014600cf3"]);
