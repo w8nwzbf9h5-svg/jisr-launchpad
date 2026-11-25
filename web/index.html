@@ -18,12 +18,12 @@
 /* Addresses of the launchpad that used to live here (#board, #coin-0x…, #launch) now belong to app.html. */
 if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html" + location.hash);
 </script>
-<script src="i18n.js?v=8fa9087e"></script>
+<script src="i18n.js?v=90df8f93"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=5256bb75">
-<link rel="stylesheet" href="home.css?v=1e7860e5">
+<link rel="stylesheet" href="home.css?v=3ef54e4f">
 </head>
 <body class="home">
 
@@ -36,6 +36,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
       <a href="#proof">Live checks</a>
       <a href="#try">Try it</a>
       <a href="markets.html">Charts</a>
+      <a href="#vote">Vote</a>
       <a href="#lpad">LPAD coin</a>
       <a href="#contact">Contact</a>
       <a href="whitepaper.html">White paper</a>
@@ -134,6 +135,40 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
       </dl>
     </div>
     <p class="fine r-warn">LPAD is a meme coin. It trades on pump.fun's curve, so it does not have the floor that coins launched on Landing Pad get, and it carries no claim on the launchpad or its fees. Other coins can copy the name: check the address above before you buy.</p>
+  </section>
+
+  <section class="sec" id="vote">
+    <h2>Three proposed rule changes</h2>
+    <p class="say">These are proposals, not the rules. Coins in the test keep today's rules. The rules for the real launch are settled after this vote. The vote is advisory: we read every answer, and the team decides.</p>
+    <form class="vote" id="vForm" novalidate>
+      <fieldset class="v-card">
+        <legend>Take the ceiling off the price</legend>
+        <p>Today a coin's market stops selling when 190 million of its last 200 million coins are sold, at a market cap of about $40M. The proposal lets it sell almost all of them, so the price can keep rising with demand.</p>
+        <p class="v-cost"><b>The cost.</b> The higher the price, the smaller the share of it that real money stands behind: about 1.2% at $40M, about 0.2% at $1B.</p>
+        <div class="v-pick"><label><input type="radio" name="vCap" value="Yes"><span>Yes</span></label><label><input type="radio" name="vCap" value="No"><span>No</span></label><label><input type="radio" name="vCap" value="Not sure"><span>Not sure</span></label></div>
+      </fieldset>
+      <fieldset class="v-card">
+        <legend>A brake on mass selling</legend>
+        <p>When the price falls from its recent high, the fee on selling above the floor climbs gradually from 5% to 25%. The extra goes into the coin's floor reserve, not to the launchpad or the creator. Selling at the floor price stays at 5%.</p>
+        <p class="v-cost"><b>The cost.</b> A seller in a falling market keeps less, and the fall is slowed, not stopped.</p>
+        <div class="v-pick"><label><input type="radio" name="vBrake" value="Yes"><span>Yes</span></label><label><input type="radio" name="vBrake" value="No"><span>No</span></label><label><input type="radio" name="vBrake" value="Not sure"><span>Not sure</span></label></div>
+      </fieldset>
+      <fieldset class="v-card">
+        <legend>A share of every premium for the floor</legend>
+        <p>10% of every dollar paid above the floor goes straight into the floor reserve and stays there, so the floor rises as the price does.</p>
+        <p class="v-cost"><b>The cost.</b> Someone who buys above the floor and sells straight back gets about 81% back instead of 90%.</p>
+        <div class="v-pick"><label><input type="radio" name="vShare" value="Yes"><span>Yes</span></label><label><input type="radio" name="vShare" value="No"><span>No</span></label><label><input type="radio" name="vShare" value="Not sure"><span>Not sure</span></label></div>
+      </fieldset>
+      <div class="v-end">
+        <label for="vWhy">Anything to add? You can leave this empty.</label>
+        <input id="vWhy" type="text" maxlength="400" autocomplete="off">
+        <div class="v-go">
+          <button type="submit" class="btn primary" id="vSend">Send my vote</button>
+          <a class="btn" href="simulator.html">Try the numbers first</a>
+        </div>
+        <p class="c-note" id="vNote" role="status">Choose an answer for each proposal.</p>
+      </div>
+    </form>
   </section>
 
   <section class="sec" id="stress">
@@ -326,7 +361,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <script>
 /* Load the scripts in order. */
 (function () {
-  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=1a0b97dd", "solana/config.js?v=06202dc5", "visits.js?v=04b65a9c", "launch.js?v=42d6bcf1", "home.js?v=0ea648bf"];
+  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=1a0b97dd", "solana/config.js?v=06202dc5", "visits.js?v=04b65a9c", "launch.js?v=42d6bcf1", "home.js?v=7dc4323f"];
   function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");

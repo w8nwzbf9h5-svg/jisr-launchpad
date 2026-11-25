@@ -7,6 +7,7 @@ mlh3jc	Main
 1fcs3tg	Live checks
 1c7r8bb	Try it
 1wn7420	Charts
+1te54xh	Vote
 1c7vye9	LPAD coin
 w3fq2r	Contact
 1xpeqv8	White paper
@@ -51,6 +52,24 @@ qertfw	Trades, 24h
 t9d9b9	Network
 1oy2zwu	Supply
 edewnu	LPAD is a meme coin. It trades on pump.fun's curve, so it does not have the floor that coins launched on Landing Pad get, and it carries no claim on the launchpad or its fees. Other coins can copy the name: check the address above before you buy.
+q6kxm6	Three proposed rule changes
+1b6sw	These are proposals, not the rules. Coins in the test keep today's rules. The rules for the real launch are settled after this vote. The vote is advisory: we read every answer, and the team decides.
+1rquull	Take the ceiling off the price
+17l1ku7	Today a coin's market stops selling when 190 million of its last 200 million coins are sold, at a market cap of about $40M. The proposal lets it sell almost all of them, so the price can keep rising with demand.
+1ualogy	<1>The cost.</1> The higher the price, the smaller the share of it that real money stands behind: about 1.2% at $40M, about 0.2% at $1B.
+1dudzcg	Yes
+r5wqai	No
+qhud7f	Not sure
+i33djg	A brake on mass selling
+d0lelu	When the price falls from its recent high, the fee on selling above the floor climbs gradually from 5% to 25%. The extra goes into the coin's floor reserve, not to the launchpad or the creator. Selling at the floor price stays at 5%.
+8b6gsn	<1>The cost.</1> A seller in a falling market keeps less, and the fall is slowed, not stopped.
+j61v8g	A share of every premium for the floor
+hsd11t	10% of every dollar paid above the floor goes straight into the floor reserve and stays there, so the floor rises as the price does.
+18chau2	<1>The cost.</1> Someone who buys above the floor and sells straight back gets about 81% back instead of 90%.
+r863bb	Anything to add? You can leave this empty.
+b6t6rl	Send my vote
+1v34vmd	Try the numbers first
+qyxw4p	Choose an answer for each proposal.
 so3jod	Try to break it
 pjd74	Start a crowd of traders, or an attacker. Every trade is priced by the launchpad's own arithmetic, in your browser, and after each one the page checks the rule that matters: the reserve can buy back every coin in circulation at the floor price.
 1hgw6tp	Run 60 traders
@@ -234,10 +253,12 @@ oi2nno	The figures could not be read. Trying again shortly.
 1gblqs9	Live. Read {n} s ago.
 13bzcw5	Copied
 11lqlvd	Select the address to copy it
+oi6gl4	Your vote from this browser is already in. Thank you.
+15r3dgd	Sending…
+jf732p	We could not send it from here. Please email it to {to}.
+lf6sqk	Your vote is in. Thank you.
 1viwxr9	Ready to send.
 1yx9n7a	Add a few more words so we can understand it.
 1nfzawn	That email address does not look right. Fix it, or leave it empty.
-15r3dgd	Sending…
-jf732p	We could not send it from here. Please email it to {to}.
 19yndlq	Sent. Thank you, we will reply to {to}.
 v2sgny	Sent. Thank you.

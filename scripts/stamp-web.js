@@ -13,7 +13,7 @@ const assets = ["styles.css", "home.css", "home.js", "app.js", "admin.js", "wall
 const langs = fs.existsSync(path.join(web, "lang")) ? fs.readdirSync(path.join(web, "lang")).sort().map((f) => "lang/" + f) : [];
 const hash = (f) => { const h = crypto.createHash("sha256"); for (const x of f === "i18n.js" ? [f].concat(langs) : [f]) h.update(fs.readFileSync(path.join(web, x))); return h.digest("hex").slice(0, 8); };
 
-for (const page of ["index.html", "app.html", "admin.html", "whitepaper.html", "solana.html", "markets.html"]) {
+for (const page of ["index.html", "app.html", "admin.html", "whitepaper.html", "solana.html", "markets.html", "simulator.html"]) {
   let html = fs.readFileSync(path.join(web, page), "utf8");
   for (const a of assets) {
     const re = new RegExp('"' + a.replace(/[.\/]/g, "\\$&") + '(\\?v=[0-9a-f]*)?"', "g");

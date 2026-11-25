@@ -277,3 +277,24 @@ a.tile:hover .t-go{text-decoration:underline}
 [dir="rtl"] .strip .linkbtn{margin-left:0;margin-right:6px}
 [dir="rtl"] .n-again{margin-left:0;margin-right:4px}
 [dir="rtl"] .welcome .w-x{right:auto;left:12px}
+
+/* the vote on the proposed rule changes */
+.vote{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.v-card{min-width:0;margin:0;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.v-card legend{float:left;width:100%;padding:0;margin:0 0 8px;font-weight:800;font-size:17.5px;line-height:1.35}
+[dir="rtl"] .v-card legend{float:right}
+.v-card p{clear:both;margin:0 0 10px;font-size:14.5px;line-height:1.65;color:var(--ink);opacity:.86}
+.v-card .v-cost{color:var(--muted);opacity:1}
+.v-card .v-cost b{color:var(--floor)}
+.v-pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:12px}
+.v-pick label{position:relative;display:block}
+.v-pick input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.v-pick span{display:grid;place-items:center;min-height:44px;padding:8px 6px;border:1px solid var(--line);border-radius:10px;background:var(--raise);font-weight:700;font-size:14.5px;text-align:center}
+.v-pick input:checked+span{border-color:var(--accent);background:rgba(76,125,255,.16)}
+.v-pick input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.v-pick input:disabled+span{opacity:.55}
+.v-end{display:grid;gap:8px}
+.v-end label{font-weight:600;font-size:14.5px}
+.v-end input[type="text"]{width:100%;min-height:46px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+.v-go{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+@media (min-width:900px){.vote{grid-template-columns:repeat(3,minmax(0,1fr))}.v-end{grid-column:1/-1;max-width:640px}}

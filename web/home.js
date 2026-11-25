@@ -607,6 +607,40 @@
     }, 1000);
     document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && LIVE.at && Date.now() - LIVE.at >= EVERY) refresh(false); });
   }
+  /* The vote on the proposed rule changes: three answers and an optional remark, sent to the project's inbox
+     the same way the contact form is. One vote is kept per browser. The answers are sent in English whatever
+     language the page is in, so they can be counted together. */
+  function vote() {
+    const form = $("#vForm"), L = window.JISR_LAUNCH || {};
+    if (!form) return;
+    const note = $("#vNote"), send = $("#vSend"), to = L.contactEmail || "", names = ["vCap", "vBrake", "vShare"];
+    const say = (text, cls) => { note.textContent = text; note.className = "c-note" + (cls ? " " + cls : ""); };
+    const picked = (name) => { const on = form.querySelector('input[name="' + name + '"]:checked'); return on ? on.value : ""; };
+    let done = false, busy = false;
+    try { done = localStorage.getItem("jisr.voted") === "1"; } catch (_) {}
+    const close = () => { send.disabled = true; form.querySelectorAll("input").forEach((i) => { i.disabled = true; }); };
+    if (done) { close(); say(tr("Your vote from this browser is already in. Thank you."), "good"); return; }
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (busy || done) return;
+      const got = names.map(picked);
+      if (got.some((v) => !v)) { say(tr("Choose an answer for each proposal."), "bad"); return; }
+      busy = true; send.disabled = true; say(tr("Sending…"));
+      const why = $("#vWhy").value.trim();
+      const fallback = () => { say(tr("We could not send it from here. Please email it to {to}.", { to }), "bad"); send.disabled = false; };
+      try {
+        const body = { _subject: "Landing Pad vote", _template: "table", _captcha: "false", topic: "Vote on proposed rules",
+          ceiling_off: got[0], brake_on_selling: got[1], floor_share: got[2], message: why || "(no remark)", page: location.href };
+        const r = await fetch("https://formsubmit.co/ajax/" + encodeURIComponent(L.contactKey || to), { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(body) });
+        const j = await r.json().catch(() => ({}));
+        if (r.ok && String(j.success) === "true") {
+          done = true; try { localStorage.setItem("jisr.voted", "1"); } catch (_) {}
+          close(); say(tr("Your vote is in. Thank you."), "good");
+        } else fallback();
+      } catch (_) { fallback(); }
+      busy = false;
+    });
+  }
   /* Contact: Send message posts the message to FormSubmit, which emails it to the project's inbox. The visitor
      stays on this page. If sending fails for any reason they are given the address to write to, so a message
      is never lost silently. */
@@ -648,5 +682,6 @@
   start();
   welcome();
   road();
+  vote();
   contact();
 })();

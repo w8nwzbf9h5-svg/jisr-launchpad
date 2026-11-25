@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Landing Pad: try the proposed rules</title>
+<meta name="description" content="A simulator for three proposed rule changes on Landing Pad: no price ceiling, a brake on mass selling, and a share of every premium for the floor.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#0A0D14;--surface:#11151F;--raise:#171C28;--line:#242B3B;--ink:#EAEEF6;--muted:#8C95A9;--now:#4C7DFF;--new:#F5A524;--good:#2EBD85;--bad:#F6465D;
+  --body:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 15.5px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+main{max-width:860px;margin:0 auto;padding:22px 16px 48px}
+h1{font-size:clamp(24px,6vw,32px);line-height:1.3;margin:0 0 8px;font-weight:700}
+h2{font-size:19px;line-height:1.4;margin:34px 0 6px;font-weight:700}
+p{margin:0 0 12px}
+.lede{color:var(--muted);max-width:42em}
+.flag{display:inline-block;margin:0 0 14px;padding:4px 10px;border:1px solid var(--line);border-radius:8px;background:var(--raise);font-size:13.5px;color:var(--new)}
+.n{font-family:var(--mono);font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate;display:inline-block}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.ctl{display:grid;gap:18px}
+.ctl label{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-weight:600;font-size:15px}
+.ctl output{font:600 15px var(--mono);color:var(--ink);direction:ltr;unicode-bidi:isolate}
+.ctl small{display:block;color:var(--muted);font-size:13.5px;line-height:1.6;margin-top:4px}
+input[type=range]{width:100%;margin:8px 0 0;accent-color:var(--now);direction:ltr;height:28px}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px}
+.seg button{min-height:44px;padding:8px 6px;border:1px solid var(--line);border-radius:10px;background:var(--raise);color:var(--ink);font:600 14px var(--body);cursor:pointer}
+.seg button[aria-pressed=true]{border-color:var(--now);background:#1a2547}
+:focus-visible{outline:2px solid var(--now);outline-offset:2px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.stats div{background:var(--surface);padding:14px;min-width:0}
+.stats div>span{display:block;font-size:13.5px;color:var(--muted);line-height:1.5}
+.stats b{display:block;font:600 clamp(18px,5vw,24px)/1.3 var(--mono);margin:4px 0 2px}
+.stats small{display:block;font-size:13px;color:var(--muted);line-height:1.5}
+.verdict{margin:14px 0 0;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--surface);line-height:1.75}
+.verdict.bad{border-color:#5a2530;background:#1d1217}
+.verdict.ok{border-color:#1f4a3a;background:#101b18}
+.verdict b{font-weight:700}
+.key{display:flex;flex-wrap:wrap;gap:6px 18px;list-style:none;margin:10px 0 6px;padding:0;font-size:14px;color:var(--muted)}
+.key i{display:inline-block;width:18px;height:3px;border-radius:2px;margin-right:7px;vertical-align:middle}
+.chart{direction:ltr;position:relative;touch-action:pan-y}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.grid{stroke:var(--line);stroke-width:1}
+.tick{fill:var(--muted);font:500 11.5px var(--mono)}
+.ax{fill:var(--muted);font:500 13px var(--body)}
+.ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.cross{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+.read{min-height:52px;margin:8px 0 0;font-size:14px;color:var(--muted);line-height:1.7}
+.read b{color:var(--ink);font-weight:600}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14.5px}
+th,td{padding:10px 6px;border-top:1px solid var(--line);text-align:left;vertical-align:baseline}
+thead th{border-top:0;color:var(--muted);font-weight:600;font-size:13.5px}
+td.n{display:table-cell;text-align:right;white-space:nowrap}
+th.end{text-align:right;white-space:nowrap}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+.back{display:inline-block;margin:0 0 16px;color:var(--now);font-weight:600;text-decoration:none}
+.back:hover{text-decoration:underline}
+.go{display:inline-block;margin-top:6px;padding:11px 18px;border-radius:10px;background:var(--now);color:#fff;font-weight:700;text-decoration:none}
+.fine{color:var(--muted);font-size:13.5px;line-height:1.75}
+.fine li{margin-bottom:4px}
+@media (min-width:720px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}.ctl{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 28px}.ctl .wide{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="./#vote">Back to Landing Pad and the vote</a><br>
+  <span class="flag">A model to try. The rules on the site and in the contracts have not changed.</span>
+  <h1>What would the proposed rules do?</h1>
+  <p class="lede">One coin after its first 800 million have sold out. The price climbs with no ceiling to the top you choose, then every holder sells, one after another. Change the numbers and see who gets what.</p>
+
+  <h2>Set the numbers</h2>
+  <div class="box ctl">
+    <div class="wide">
+      <label for="iCap">Market cap at the top <output id="oCap"></output></label>
+      <input type="range" id="iCap" min="0" max="1000" step="1" value="490">
+    </div>
+    <div class="wide">
+      <label for="iSkim">Share of every premium that goes to the floor <output id="oSkim"></output></label>
+      <input type="range" id="iSkim" min="0" max="30" step="1" value="10">
+      <small>Of every dollar paid above the floor, this share goes into the floor reserve at once and stays there.</small>
+    </div>
+    <div class="wide">
+      <label id="lMode">An extra lock at steps?</label>
+      <div class="seg" role="group" aria-labelledby="lMode">
+        <button type="button" data-mode="fixed" aria-pressed="false">Every $500K</button>
+        <button type="button" data-mode="double" aria-pressed="false">At each doubling</button>
+        <button type="button" data-mode="none" aria-pressed="true">None</button>
+      </div>
+      <small id="sMode"></small>
+    </div>
+    <div>
+      <label for="iLock">Share locked at each step <output id="oLock"></output></label>
+      <input type="range" id="iLock" min="0" max="100" step="5" value="50">
+      <small>Moved from the premium reserve to the floor reserve, for good.</small>
+    </div>
+    <div>
+      <label for="iFee">Highest fee on selling above the floor <output id="oFee"></output></label>
+      <input type="range" id="iFee" min="5" max="45" step="1" value="25">
+      <small>The brake on mass selling. Everything above 5% goes into the floor reserve.</small>
+    </div>
+    <div class="wide">
+      <label for="iDd">Fall from the top at which the fee is highest <output id="oDd"></output></label>
+      <input type="range" id="iDd" min="10" max="90" step="5" value="50">
+      <small>The fee climbs gradually from 5% as the price falls, so there is no line to race to sell ahead of.</small>
+    </div>
+  </div>
+
+  <h2>At the top</h2>
+  <div class="stats">
+    <div><span>Price of a coin</span><b id="sPrice"></b><small id="sPriceNote"></small></div>
+    <div><span>Real money in the reserves</span><b id="sReal"></b><small id="sRealNote"></small></div>
+    <div><span>Covered floor</span><b id="sFloor"></b><small id="sFloorNote"></small></div>
+    <div><span>Buy at the top, sell at once, and you get back</span><b id="sBack"></b><small id="sBackNote"></small></div>
+  </div>
+  <p class="verdict" id="verdict"></p>
+
+  <h2>If everybody sold</h2>
+  <p class="lede">What a seller receives for each coin, by their place in the line of sellers.</p>
+  <div class="box">
+    <ul class="key">
+      <li><i style="background:var(--now)"></i>Today's rules, with the ceiling taken off</li>
+      <li><i style="background:var(--new)"></i>With the numbers you chose</li>
+    </ul>
+    <div class="chart" id="chart"><svg id="svg" viewBox="0 0 640 310" role="img" aria-label="What a seller receives per coin, by their place in the line of sellers"></svg></div>
+    <p class="read" id="read">Move over the chart to read the figures at any point.</p>
+    <table>
+      <thead><tr><th>Sellers</th><th class="end"><span class="dot" style="background:var(--now)"></span>Today's rules</th><th class="end"><span class="dot" style="background:var(--new)"></span>Your numbers</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="read" id="ratio"></p>
+  </div>
+
+  <h2>What the model assumes</h2>
+  <ul class="fine">
+    <li>One billion coins: 800 million at the fixed price of <span class="n">$0.0001</span>, then today's curve on the last 200 million, without the stop at 190 million.</li>
+    <li>The basic fee is 5% of every buy and every sell: 2% to the reserve and 3% to the creator and the launchpad, as today.</li>
+    <li>A step counts once the market cap is 10% past it. Selling at the floor price always costs 5%; the brake applies only to what is paid above the floor.</li>
+    <li>The top is reached by buying with no selling, then everyone sells with no buying. A real market moves both ways.</li>
+    <li>This is arithmetic in your browser, not a contract. The figures are approximate, and new contracts would need their own tests and an audit before any real money.</li>
+  </ul>
+  <p><a class="go" href="./#vote">Vote on the proposals</a></p>
+</main>
+<script>
+/* The model behind the simulator. One coin priced in dollars, after its sale has sold out.
+   Money is conserved: every dollar paid in is in a reserve, paid to a seller, or paid out as the 3% fee. */
+const P = 0.0001, C = 200e6, SALE = 800e6, R0 = 81684.21;
+const prem = (s) => P * s * s / (C - s);                        // premium held when s curve coins are out
+const spot = (F, s) => F + P * (Math.pow(C / (C - s), 2) - 1);  // price of the next coin
+function simulate(o) {
+  // o: target (market cap at the top), lock (share of the premium reserve locked at each step), step, margin,
+  //    feeMax (extra sell fee on the part above the floor, at its highest), ddFull (fall from the top at which it is highest)
+  let s = 0, Rf = R0, Rp = 0, F = R0 / SALE, locks = 0, paidOut3 = 0, paidIn = 0;
+  const lift = () => { const f = Rf / Math.max(SALE + s, SALE); if (f > F) F = f; };
+  let guard = 0;
+  while (spot(F, s) * 1e9 < o.target && guard++ < 40000) {
+    const left = C - s, ds = Math.min(left * 0.0015, left - 50);
+    if (ds <= 0) break;
+    const dP = prem(s + ds) - prem(s), base = F * ds + dP;
+    const sk = (o.skim || 0) * dP;                                  // the share of each premium dollar that goes straight to the floor
+    Rf += F * ds + 0.02 * base + sk; Rp += dP - sk; paidOut3 += 0.03 * base; paidIn += 1.05 * base; s += ds; lift();
+    while (o.lock > 0 && o.mode !== "none" && spot(F, s) * 1e9 >= (o.mode === "double" ? o.step * Math.pow(2, locks) : (locks + 1) * o.step) * (1 + o.margin)) { const m = o.lock * Rp; Rp -= m; Rf += m; locks++; lift(); }
+  }
+  const kTop = prem(s) > 0 ? Math.min(1, Rp / prem(s)) : 1, pTop = spot(F, s);
+  // someone who buys the next coin at the top and sells it straight back: what they pay and what they get
+  const top = { s, F, Rf, Rp, price: pTop, cap: pTop * 1e9, locks, real: Rf + Rp, coins: SALE + s, paidIn, buyNow: pTop * 1.05, sellNow: (F + kTop * (pTop - F)) * 0.95 };
+  // everyone sells, one after another
+  const N = 400, total = SALE + s, chunk = total / N, out = [];
+  let coins = total, paid = 0, extraAll = 0;
+  for (let i = 0; i < N; i++) {
+    let need = chunk, got = 0;
+    while (need > 1e-6) {
+      if (s > 1e-6) {
+        const left = C - s, ds = Math.min(need, s, Math.max(left * 0.004, 1));
+        const k = prem(s) > 0 ? Math.min(1, Rp / prem(s)) : 0;
+        const gp = k * (prem(s) - prem(s - ds)), gf = F * ds;
+        const mid = spot(F, s - ds / 2), dd = Math.max(0, 1 - mid / top.price);
+        const extra = Math.min(1, dd / o.ddFull) * o.feeMax * gp, fee = 0.05 * (gf + gp - extra);
+        got += gf + gp - extra - fee; extraAll += extra; paidOut3 += 0.6 * fee;
+        Rf += -gf + extra + 0.4 * fee; Rp -= gp; s -= ds; coins -= ds; need -= ds; lift();
+      } else {
+        const dc = Math.min(need, coins), gf = F * dc, fee = 0.05 * gf;
+        got += gf - fee; paidOut3 += 0.6 * fee; Rf += -gf + 0.4 * fee; coins -= dc; need -= dc; lift();
+        if (dc <= 0) break;
+      }
+    }
+    out.push(got / chunk); paid += got;
+  }
+  return { top, out, paid, extraAll, left: Rf + Rp, fees3: paidOut3 };
+}
+
+(function () {
+  "use strict";
+  var $ = function (q) { return document.querySelector(q); };
+  var mode = "none", last = null;
+  var n = function (text) { return '<span class="n">' + text + "</span>"; };
+  // $462K, $2.1M, $1.3B
+  function big(v) {
+    var a = Math.abs(v);
+    if (a >= 1e9) return n("$" + (v / 1e9).toFixed(a >= 1e10 ? 1 : 2).replace(/\.?0+$/, "") + "B");
+    if (a >= 1e6) return n("$" + (v / 1e6).toFixed(a >= 1e7 ? 1 : 2).replace(/\.?0+$/, "") + "M");
+    if (a >= 1e4) return n("$" + Math.round(v / 1e3) + "K");
+    return n("$" + Math.round(v).toLocaleString("en-US"));
+  }
+  function coin(v) {
+    if (v >= 100) return "$" + Math.round(v).toLocaleString("en-US");
+    if (v >= 1) return "$" + v.toFixed(2);
+    if (v >= 0.01) return "$" + v.toFixed(4);
+    return "$" + v.toFixed(6);
+  }
+  var avg = function (a, i, j) { var t = 0; for (var k = i; k < j; k++) t += a[k]; return t / (j - i); };
+
+  function read() {
+    var target = 2e5 * Math.pow(5e4, Number($("#iCap").value) / 1000);
+    return { target: target, mode: mode, skim: Number($("#iSkim").value) / 100, lock: Number($("#iLock").value) / 100, step: 5e5, margin: 0.1,
+      feeMax: (Number($("#iFee").value) - 5) / 100, ddFull: Number($("#iDd").value) / 100 };
+  }
+  function draw(base, mine) {
+    // one unit of the drawing is one pixel on the screen, so the labels keep their size on a phone
+    var svg = $("#svg"), W = Math.max(280, Math.round($("#chart").clientWidth || 640)), H = W < 480 ? 280 : 320, L = 70, R = 10, T = 12, B = 40;
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    var lo = Math.min(Math.min.apply(null, base.out), Math.min.apply(null, mine.out)), hi = Math.max(base.out[0], mine.out[0]);
+    var a = Math.floor(Math.log10(lo) - 0.05), b = Math.ceil(Math.log10(hi) + 0.05);
+    if (b - a < 1) b = a + 1;
+    var x = function (i) { return L + (W - L - R) * i / (base.out.length - 1); };
+    var y = function (v) { return T + (H - T - B) * (1 - (Math.log10(v) - a) / (b - a)); };
+    var g = [];
+    for (var e = a; e <= b; e++) g.push('<line class="grid" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(Math.pow(10, e)).toFixed(1) + '" y2="' + y(Math.pow(10, e)).toFixed(1) + '"/><text class="tick" x="' + (L - 8) + '" y="' + (y(Math.pow(10, e)) + 4).toFixed(1) + '" text-anchor="end">' + coin(Math.pow(10, e)).replace(/(\.\d*?[1-9])0+$/, "$1") + "</text>");
+    var path = function (o) { return o.map(function (v, i) { return (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1); }).join(" "); };
+    g.push('<text class="ax" x="' + L + '" y="' + (H - 12) + '" text-anchor="start">First to sell</text><text class="ax" x="' + (W - R) + '" y="' + (H - 12) + '" text-anchor="end">Last to sell</text>');
+    g.push('<path class="ln" stroke="#4C7DFF" d="' + path(base.out) + '"/><path class="ln" stroke="#F5A524" d="' + path(mine.out) + '"/>');
+    g.push('<g id="mark" visibility="hidden"><line class="cross" id="cross" y1="' + T + '" y2="' + (H - B) + '" x1="-9" x2="-9"/><circle id="cA" r="4" fill="#4C7DFF" stroke="#11151F" stroke-width="2" cx="-9" cy="-9"/><circle id="cB" r="4" fill="#F5A524" stroke="#11151F" stroke-width="2" cx="-9" cy="-9"/></g>');
+    svg.innerHTML = g.join("");
+    last = { base: base, mine: mine, x: x, y: y, L: L, R: R, W: W };
+  }
+  function point(clientX) {
+    if (!last) return;
+    var box = $("#svg").getBoundingClientRect(), px = (clientX - box.left) / box.width * last.W;
+    var len = last.base.out.length, i = Math.max(0, Math.min(len - 1, Math.round((px - last.L) / (last.W - last.L - last.R) * (len - 1))));
+    var cx = last.x(i).toFixed(1);
+    $("#mark").setAttribute("visibility", "visible");
+    $("#cross").setAttribute("x1", cx); $("#cross").setAttribute("x2", cx);
+    $("#cA").setAttribute("cx", cx); $("#cA").setAttribute("cy", last.y(last.base.out[i]).toFixed(1));
+    $("#cB").setAttribute("cx", cx); $("#cB").setAttribute("cy", last.y(last.mine.out[i]).toFixed(1));
+    $("#read").innerHTML = "After " + n(((i + 0.5) / len * 100).toFixed(1) + "%") + " of the coins have been sold: today's rules pay <b>" + n(coin(last.base.out[i])) + "</b> a coin, your numbers <b>" + n(coin(last.mine.out[i])) + "</b>.";
+  }
+  function render() {
+    var o = read(), mine = simulate(o), base = simulate({ target: o.target, mode: "none", lock: 0, step: o.step, margin: o.margin, feeMax: 0, ddFull: o.ddFull });
+    var t = mine.top, tb = base.top;
+    $("#oCap").textContent = "$" + (o.target >= 1e9 ? (o.target / 1e9).toFixed(2) + "B" : o.target >= 1e6 ? (o.target / 1e6).toFixed(1) + "M" : Math.round(o.target / 1e3) + "K");
+    $("#oLock").textContent = Math.round(o.lock * 100) + "%";
+    $("#oSkim").textContent = Math.round(o.skim * 100) + "%";
+    $("#oFee").textContent = Math.round(o.feeMax * 100 + 5) + "%";
+    $("#oDd").textContent = Math.round(o.ddFull * 100) + "%";
+    $("#iLock").disabled = mode === "none";
+    $("#sMode").textContent = mode === "fixed" ? "At $500K, $1M, $1.5M and so on. Steps locked on the way to the top: " + t.locks + "."
+      : mode === "double" ? "At $500K, $1M, $2M, $4M and so on. Steps locked on the way to the top: " + t.locks + "."
+      : "No steps: the floor rises from the share above, from the 2% fee, and from the brake.";
+    $("#sPrice").textContent = coin(t.price);
+    $("#sPriceNote").innerHTML = n((t.s / 1e6).toFixed(2) + "M") + " of the last 200M sold";
+    $("#sReal").innerHTML = big(t.real);
+    $("#sRealNote").innerHTML = n((t.real / t.cap * 100).toFixed(t.real / t.cap < 0.01 ? 2 : 1) + "%") + " of the market cap";
+    $("#sFloor").textContent = coin(t.F);
+    $("#sFloorNote").innerHTML = "Equal to a market cap of " + big(t.F * 1e9) + ". Today's rules: " + big(tb.F * 1e9);
+    var back = t.sellNow / t.buyNow * 100, backB = tb.sellNow / tb.buyNow * 100;
+    $("#sBack").textContent = back.toFixed(back < 10 ? 1 : 0) + "%";
+    $("#sBackNote").innerHTML = "Today's rules: " + n(backB.toFixed(0) + "%");
+    var v = $("#verdict");
+    if (back < 60) { v.className = "verdict bad"; v.innerHTML = "<b>With these numbers the climb stops.</b> A buyer at the top pays " + n(coin(t.buyNow)) + " a coin and would get only " + n(coin(t.sellNow)) + " by selling at once. Nobody buys to lose " + n((100 - back).toFixed(0) + "%") + " on the spot, so the price would never reach this top. Lower the floor share or the lock."; }
+    else if (back < 80) { v.className = "verdict"; v.innerHTML = "<b>The cost shows.</b> Buying at the top and selling at once loses " + n((100 - back).toFixed(0) + "%") + ", against " + n((100 - backB).toFixed(0) + "%") + " under today's rules. That protects those who stay, and it slows buying above the floor."; }
+    else { v.className = "verdict ok"; v.innerHTML = "<b>Buying above the floor still makes sense.</b> Selling at once loses " + n((100 - back).toFixed(0) + "%") + ", against " + n((100 - backB).toFixed(0) + "%") + " under today's rules. The price can keep climbing, and the protection in a mass sale comes from the brake and the floor share."; }
+    draw(base, mine);
+    var len = mine.out.length, groups = [["First 1%", 0, len / 100], ["First 10%", 0, len / 10], ["Middle", len / 2 - 2, len / 2 + 2], ["Last 10%", len * 0.9, len]];
+    $("#rows").innerHTML = groups.map(function (g) { return "<tr><td>" + g[0] + '</td><td class="n">' + coin(avg(base.out, g[1], g[2])) + '</td><td class="n">' + coin(avg(mine.out, g[1], g[2])) + "</td></tr>"; }).join("");
+    var rb = avg(base.out, 0, len / 100) / avg(base.out, len * 0.9, len), rm = avg(mine.out, 0, len / 100) / avg(mine.out, len * 0.9, len);
+    var times = function (r) { return n((r >= 10 ? Math.round(r) : r.toFixed(1)) + "×"); };
+    $("#ratio").innerHTML = "The first 1% of sellers get <b>" + times(rb) + "</b> what the last 10% get for a coin under today's rules, and <b>" + times(rm) + "</b> with your numbers. The brake moved " + big(mine.extraAll) + " from the first sellers into the floor.";
+    $("#read").textContent = "Move over the chart to read the figures at any point.";
+  }
+  ["#iCap", "#iSkim", "#iLock", "#iFee", "#iDd"].forEach(function (q) { $(q).addEventListener("input", render); });
+  Array.prototype.forEach.call(document.querySelectorAll(".seg button"), function (b) {
+    b.addEventListener("click", function () {
+      mode = b.getAttribute("data-mode");
+      Array.prototype.forEach.call(document.querySelectorAll(".seg button"), function (o) { o.setAttribute("aria-pressed", String(o === b)); });
+      render();
+    });
+  });
+  var chart = $("#chart");
+  chart.addEventListener("pointermove", function (e) { point(e.clientX); });
+  chart.addEventListener("pointerdown", function (e) { point(e.clientX); });
+  var again = null;
+  window.addEventListener("resize", function () { clearTimeout(again); again = setTimeout(render, 150); });
+  render();
+})();
+</script>
+<script src="visits.js?v=04b65a9c"></script>
+</body>
+</html>

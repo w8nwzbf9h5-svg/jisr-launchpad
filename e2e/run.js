@@ -145,6 +145,19 @@ function waitFor(child, text, ms) {
       assert(posted[1].body.message === "The sell button stays grey after I connect." && posted[1].body.topic === "Bug or problem" && posted[1].body._replyto === "tester@example.org", "the message, its topic and the reply address are sent: " + JSON.stringify(posted[1].body));
       assert.equal(await page.$eval("#cMsg", (m) => m.value), "", "the box is cleared once the message is sent");
       await page.evaluate(() => { window.fetch = window.__realFetch; });
+      // the vote on the proposed rule changes: all three answers are needed, they are sent in English, and one vote is kept per browser
+      await page.evaluate(() => { window.__votes = []; window.__fetchBefore = window.fetch; window.fetch = (u, o) => (String(u).includes("formsubmit.co") ? (window.__votes.push({ url: String(u), body: JSON.parse(o.body) }), Promise.resolve(new Response(JSON.stringify({ success: "true" }), { status: 200 }))) : window.__fetchBefore(u, o)); });
+      await page.$eval("#vSend", (b) => b.click());
+      assert.equal(await text("#vNote"), "Choose an answer for each proposal.");
+      assert.equal(await page.evaluate(() => window.__votes.length), 0, "a vote with a missing answer is not sent");
+      await page.evaluate(() => { [["vCap", "Yes"], ["vBrake", "No"], ["vShare", "Not sure"]].forEach(([n, v]) => document.querySelector('input[name="' + n + '"][value="' + v + '"]').click()); document.querySelector("#vWhy").value = "Keep the fee low."; });
+      await page.$eval("#vSend", (b) => b.click());
+      await page.waitForFunction(() => document.querySelector("#vNote").textContent.startsWith("Your vote is in."));
+      const ballot = await page.evaluate(() => window.__votes);
+      assert.equal(ballot.length, 1);
+      assert(/^https:\/\/formsubmit\.co\/ajax\/[0-9a-f]{32}$/.test(ballot[0].url) && ballot[0].body.ceiling_off === "Yes" && ballot[0].body.brake_on_selling === "No" && ballot[0].body.floor_share === "Not sure" && ballot[0].body.message === "Keep the fee low.", "the three answers and the remark are sent: " + JSON.stringify(ballot[0]));
+      assert.equal(await page.$eval("#vSend", (b) => b.disabled), true, "the vote cannot be sent twice");
+      await page.evaluate(() => { window.fetch = window.__fetchBefore; });
       assert((await text("#rCoins")).length > 0 && (await text("#rVisits")).length > 0, "the counts of coins and visits are shown, or say they are not available");
       // the scoreboard at the foot of the page: four figures, a line saying how fresh they are, and a button to read again
       assert.equal(await page.$$eval("#nTiles .tile", (t) => t.length), 4, "the scoreboard has four figures");
@@ -220,6 +233,15 @@ function waitFor(child, text, ms) {
       await page.waitForFunction(() => window.JISR_HOME && document.documentElement.lang === "es");
       await page.select(".lang-pick", "en");
       await page.waitForFunction((t) => window.JISR_HOME && document.querySelector("h1").textContent === t, {}, english);
+      // the simulator for the proposed rules works out its figures and fits a phone
+      const simErr = [], onSim = (e) => simErr.push(String(e));
+      page.on("pageerror", onSim);
+      await page.goto(WEB + "/simulator.html", { waitUntil: "domcontentloaded" });
+      await page.waitForFunction(() => document.querySelectorAll("#rows tr").length === 4 && /%$/.test(document.querySelector("#sBack").textContent));
+      const sim = await page.evaluate(() => ({ back: document.querySelector("#sBack").textContent, real: document.querySelector("#sReal").textContent, fits: document.documentElement.scrollWidth <= document.documentElement.clientWidth, lines: document.querySelectorAll("#svg path.ln").length }));
+      assert(sim.back === "81%" && /^\$4\d\dK$/.test(sim.real) && sim.fits && sim.lines === 2, "the simulator shows the proposed setup at a $40M top: " + JSON.stringify(sim));
+      assert.deepEqual(simErr, [], "the simulator threw errors: " + simErr.join(" | "));
+      page.off("pageerror", onSim);
       await page.goto(APP, { waitUntil: "networkidle0" });
     }
 
