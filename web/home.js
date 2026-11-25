@@ -450,6 +450,11 @@
     const v = await (window.JISR_VISITS || Promise.resolve(null));
     $("#rVisits").textContent = v == null ? "not available now" : Number(v).toLocaleString("en-US");
   }
+  /* The visits figure this browser saw last time is shown at once; counts() replaces it when the counter answers. */
+  function visitsNow() {
+    const last = window.JISR_VISITS_LAST;
+    if ($("#rVisits") && last) $("#rVisits").textContent = Number(last).toLocaleString("en-US");
+  }
   /* Contact: Send message posts the message to FormSubmit, which emails it to the project's inbox. The visitor
      stays on this page. If sending fails for any reason they are given the address to write to, so a message
      is never lost silently. */
@@ -491,6 +496,7 @@
   start();
   welcome();
   road();
+  visitsNow();
   counts();
   contact();
 })();
