@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How the Landing Pad floor works, step by step | Landing Pad</title><meta name="description" content="The numbers behind a Landing Pad coin: the fixed sale, the reserve, the curve for the last 200M coins, the fee, and why $1,000 in and straight out returns $902.50.">
+<meta property="og:title" content="How the Landing Pad floor works, step by step | Landing Pad"><meta property="og:description" content="The numbers behind a Landing Pad coin: the fixed sale, the reserve, the curve for the last 200M coins, the fee, and why $1,000 in and straight out returns $902.50.">
+<meta property="og:image" content="https://landingpad.fun/og.png"><meta property="og:url" content="https://landingpad.fun/learn/how-the-floor-works.html"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@landingpadfun">
+<link rel="canonical" href="https://landingpad.fun/learn/how-the-floor-works.html"><link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>:root{color-scheme:dark;--bg:#0A0D14;--surface:#11151F;--line:#242B3B;--ink:#EAEEF6;--muted:#8C95A9;--now:#4C7DFF;--new:#F5A524}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.7 "Plus Jakarta Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:720px;margin:0 auto;padding:22px 18px 64px}
+.back{display:inline-block;margin:0 0 22px;color:var(--now);font-weight:600;text-decoration:none;font-size:15px}
+a{color:var(--now)}a:hover,.back:hover{text-decoration:underline}
+h1{font-size:clamp(28px,6vw,40px);line-height:1.2;margin:0 0 14px;font-weight:800;letter-spacing:-.02em}
+h2{font-size:22px;line-height:1.35;margin:40px 0 10px;font-weight:700}
+p,ul,ol{margin:0 0 16px}li{margin:0 0 6px}
+.lede{color:#AAB2C4;font-size:19px}
+pre{font:500 15px/1.6 "JetBrains Mono",monospace;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.note{margin-top:40px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--muted);font-size:15px}
+.more{margin-top:36px;border-top:1px solid var(--line);padding-top:20px}.more h3{font-size:16px;margin:0 0 10px}
+.list a{display:block;padding:18px 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.list a b{display:block;font-size:20px;line-height:1.35}.list a span{color:var(--muted);font-size:15.5px}.list a:hover b{color:var(--now)}</style></head><body><main><a class="back" href="./"><img src="../favicon.svg" width="24" height="24" alt="" style="vertical-align:-6px;margin-right:8px">Learn</a>
+<article><h1>How the Landing Pad floor works, step by step</h1><p class="lede">The numbers behind a Landing Pad coin: the fixed sale, the reserve, the curve for the last 200M coins, the fee, and why $1,000 in and straight out returns $902.50.</p>
+<p>This is the full walk-through of a single coin on Landing Pad, with the numbers. You can check every figure on <a href="../">landingpad.fun</a>, where the same calculation runs in your browser.</p>
+<h2>One coin, one billion</h2>
+<p>Every coin launched on Landing Pad has a fixed supply of 1,000,000,000. None of it is set aside: the creator gets no coins, there is no team allocation, and there is no presale. The whole supply belongs to the coin's own market.</p>
+<p>The supply sells in two parts:</p>
+<ol>
+<li><strong>The sale:</strong> the first 800M coins, all at $0.0001 each.</li>
+<li><strong>The curve:</strong> the last 200M coins, priced above the floor and rising as more are sold.</li>
+</ol>
+<h2>Part 1: the fixed sale</h2>
+<p>During the sale, everyone pays the same price, $0.0001 per coin. It does not matter whether you are the first buyer or the ten-thousandth.</p>
+<p>The full value of every coin sold goes into the coin's reserve. If 787M coins have been sold, the reserve holds the $78,700 they cost, plus the reserve's share of fees. Nobody can withdraw from the reserve. It pays out only when a holder sells coins back to it.</p>
+<p>Because every coin was paid for at the same price, and that payment is sitting in the reserve, the reserve can always buy every coin back at that price.</p>
+<h2>The fee, and where it goes</h2>
+<p>Every buy and every sell pays a 5% fee:</p>
+<ul>
+<li>1% to the coin's creator</li>
+<li>2% to the launchpad</li>
+<li>2% to the coin's own reserve</li>
+</ul>
+<p>The fees are paid automatically by the contract on every trade. Nobody claims them by hand, and nobody can change the split.</p>
+<h2>Your $1,000, in and straight out</h2>
+<p>Here is what happens to $1,000 if you buy during the sale and sell straight back:</p>
+<ul>
+<li>The 5% fee is $50: $10 to the creator, $20 to the launchpad, $20 to the reserve.</li>
+<li>The other $950 buys 9.5M coins at $0.0001.</li>
+<li>You sell the 9.5M coins back to the reserve at the floor, $0.0001, which is $950.</li>
+<li>The 5% fee on the way out is $47.50.</li>
+<li>You receive <strong>$902.50</strong>.</li>
+</ul>
+<p>The round trip costs you 9.75% of what you put in. The page shows this number before you confirm a buy. It is the worst case if you buy at the floor and nothing else happens: no one else can make it worse.</p>
+<h2>Why the floor rises</h2>
+<p>The floor is what the reserve pays for each coin. The reserve starts with exactly enough to pay $0.0001 for every coin sold. Then the fee adds 2% of every trade to the reserve without creating any new coins.</p>
+<p>More money for the same coins means a higher price per coin. So the floor rises with trading, and it is never lowered. When the sale sells out and the coin graduates, the reserve holds about $81,684, enough for a floor around 2.1% above the sale price. A coin that keeps trading keeps lifting its floor.</p>
+<h2>Part 2: the curve</h2>
+<p>Once the first 800M coins are sold, the last 200M go on sale along a curve. The price of the next coin is the floor plus a premium that grows as the remaining supply shrinks:</p>
+<pre>price = floor + $0.0001 × ((200M ÷ (200M − sold))² − 1)</pre>
+<p>where "sold" is how many of the last 200M coins have been bought. At the start of the curve the premium is zero, so the price equals the floor. As more coins sell, the premium rises faster and faster.</p>
+<p>The curve stops at 190M of the 200M coins, which puts the maximum market cap around $40M. That limit is part of the current contracts. A proposal to remove it, along with a brake on mass selling, is open for a community vote on <a href="../">landingpad.fun</a>, with a simulator to try each rule first. Nothing in the contracts has changed.</p>
+<h2>What you can lose</h2>
+<p>If you buy on the curve, you pay the floor plus a premium. If you then sell back to the reserve, you get the floor, less the fee. The premium is the part you can lose. It can be small near the start of the curve and large near the top.</p>
+<p>So the honest summary is:</p>
+<ul>
+<li>At the floor, the most you can lose on a round trip is the fee, 9.75%.</li>
+<li>Above the floor, you can also lose the premium you paid.</li>
+<li>In both cases, the reserve can pay you. It does not depend on another buyer showing up.</li>
+</ul>
+<h2>Limits that protect the reserve</h2>
+<p>A few more rules keep the system honest:</p>
+<ul>
+<li><strong>Wallet cap.</strong> One wallet can hold at most 2.5% of a coin, 25M coins.</li>
+<li><strong>No withdraw.</strong> There is no function that lets anyone take money out of a reserve except by selling coins back.</li>
+<li><strong>Same rules for everyone.</strong> The creator, the launchpad and every buyer use the same price and the same fee.</li>
+</ul>
+<p>A large holder can split coins across wallets. The stress test on the site does exactly that, with one attacker using 40 wallets. After every trade the page checks that the reserve can still buy back every coin at the floor. In every run, it could.</p>
+<h2>Check it yourself</h2>
+<p>Landing Pad is a public test on Solana devnet and Ethereum Sepolia, with test money that has no value. The contracts are not audited yet. You can launch a coin, buy it, sell it back, and compare the numbers with this page. If anything does not match, open an issue on GitHub or send feedback from the site.</p></article><p class="note">Landing Pad is a public test on Solana devnet and Ethereum Sepolia, with test money that has no value. The contracts are not audited yet. Nothing here is financial advice or a promise of profit.</p><div class="more"><h3>More to read</h3><a href="why-meme-coins-crash.html">Why most meme coins crash, and what a paid-for floor changes</a><br><a href="where-the-fee-goes.html">The 5% fee: where it goes and why 2% stays in the coin</a><br><a href="rug-pull-checklist.html">A rug pull checklist: three questions before you buy any meme coin</a></div></main><script src="../visits.js"></script></body></html>

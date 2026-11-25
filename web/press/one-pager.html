@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Landing Pad: one-pager</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+@page{size:A4;margin:0}
+*{box-sizing:border-box}html,body{margin:0}
+body{width:210mm;height:297mm;background:#0A0D14;color:#EAEEF6;font:400 10.5pt/1.5 "Plus Jakarta Sans",sans-serif;padding:16mm 16mm 12mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;position:relative}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12mm}.top img{width:34px}.top b{font-weight:800;font-size:15pt;letter-spacing:.06em}.top span{color:#8C95A9;font-size:9pt;letter-spacing:.14em;font-weight:600}
+h1{font-size:28pt;line-height:1.08;margin:0 0 5mm;font-weight:800;letter-spacing:-.02em}
+.lede{font-size:12.5pt;color:#AAB2C4;margin:0 0 9mm;max-width:150mm}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6mm 9mm}
+h2{font-size:12pt;margin:0 0 2mm;color:#F5A524}
+p{margin:0}
+.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm;margin:9mm 0}
+.nums div{background:#11151F;border:1px solid #242B3B;border-radius:8px;padding:4mm}
+.nums b{display:block;font:600 16pt "JetBrains Mono",monospace}.nums span{color:#8C95A9;font-size:9pt}
+ul{margin:0;padding-left:4.5mm}li{margin-bottom:1mm}
+.foot{position:absolute;left:16mm;right:16mm;bottom:12mm;border-top:1px solid #242B3B;padding-top:4mm;display:flex;justify-content:space-between;font-size:9pt;color:#8C95A9}
+.foot b{color:#EAEEF6}
+.warn{margin-top:8mm;padding:4mm;border:1px solid #242B3B;border-radius:8px;color:#AAB2C4;font-size:9.5pt}
+</style></head><body>
+<div class="top"><img src="../favicon.svg" alt=""><b>LANDING</b><span>PAD</span></div>
+<h1>A meme coin launchpad where the floor is paid for in advance.</h1>
+<p class="lede">Every coin sold puts its full price into a reserve that no person controls. Any holder can sell back to that reserve at the floor price, at any time. The floor rises with trading and is never lowered.</p>
+<div class="nums"><div><b>$0.0001</b><span>one price for the first 800M coins</span></div><div><b>5%</b><span>fee: 1% creator, 2% launchpad, 2% reserve</span></div><div><b>$902.50</b><span>back from $1,000 in and straight out</span></div><div><b>0</b><span>coins for the creator at launch</span></div></div>
+<div class="grid">
+<div><h2>The problem</h2><p>Most meme coins crash within days. Early wallets and creator bags sell into a pool that only exists while people keep buying. Late buyers are left with coins nobody will buy back.</p></div>
+<div><h2>How Landing Pad works</h2><ul><li>1B supply per coin; no presale, no team allocation.</li><li>First 800M coins at one fixed price, full value into the coin's reserve.</li><li>Last 200M on a curve above the floor.</li><li>Sell back to the reserve at the floor, any time.</li></ul></div>
+<div><h2>What it rules out</h2><ul><li>Creator bags: the creator gets zero coins and earns 1% of trading fees.</li><li>Pulled liquidity: the reserve has no withdraw.</li><li>Whales: one wallet holds at most 2.5%.</li></ul></div>
+<div><h2>Tested in public</h2><p>A stress test in the browser runs 60 traders, or one attacker with 40 wallets, and checks after every trade that the reserve can still buy back every coin at the floor. All code and tests are public on GitHub.</p></div>
+<div><h2>Status</h2><p>Public test on Solana devnet and Ethereum Sepolia, with test money. Contracts not audited yet. Mainnet opens at 100 pieces of tester feedback, or when $LPAD reaches a $1M market cap.</p></div>
+<div><h2>$LPAD</h2><p>The project's own meme coin on pump.fun. It has no floor and no claim on the launchpad.<br><span style="font:500 8.5pt 'JetBrains Mono',monospace;color:#AAB2C4">GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump</span></p></div>
+</div>
+<p class="warn">A floor limits the loss; it does not make a coin a good buy. Buying above the floor can lose the premium paid. Nothing here is financial advice or a promise of profit.</p>
+<div class="foot"><span><b>landingpad.fun</b></span><span>x.com/landingpadfun</span><span>t.me/landingpadfun</span><span>github.com/w8nwzbf9h5-svg/jisr-launchpad</span></div>
+</body></html>

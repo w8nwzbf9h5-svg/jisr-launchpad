@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why most meme coins crash, and what a paid-for floor changes | Landing Pad</title><meta name="description" content="Most meme coins lose almost all their value within days. Here is the mechanism behind it, and how a reserve filled before anyone buys changes what late buyers can get back.">
+<meta property="og:title" content="Why most meme coins crash, and what a paid-for floor changes | Landing Pad"><meta property="og:description" content="Most meme coins lose almost all their value within days. Here is the mechanism behind it, and how a reserve filled before anyone buys changes what late buyers can get back.">
+<meta property="og:image" content="https://landingpad.fun/og.png"><meta property="og:url" content="https://landingpad.fun/learn/why-meme-coins-crash.html"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@landingpadfun">
+<link rel="canonical" href="https://landingpad.fun/learn/why-meme-coins-crash.html"><link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>:root{color-scheme:dark;--bg:#0A0D14;--surface:#11151F;--line:#242B3B;--ink:#EAEEF6;--muted:#8C95A9;--now:#4C7DFF;--new:#F5A524}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.7 "Plus Jakarta Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:720px;margin:0 auto;padding:22px 18px 64px}
+.back{display:inline-block;margin:0 0 22px;color:var(--now);font-weight:600;text-decoration:none;font-size:15px}
+a{color:var(--now)}a:hover,.back:hover{text-decoration:underline}
+h1{font-size:clamp(28px,6vw,40px);line-height:1.2;margin:0 0 14px;font-weight:800;letter-spacing:-.02em}
+h2{font-size:22px;line-height:1.35;margin:40px 0 10px;font-weight:700}
+p,ul,ol{margin:0 0 16px}li{margin:0 0 6px}
+.lede{color:#AAB2C4;font-size:19px}
+pre{font:500 15px/1.6 "JetBrains Mono",monospace;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.note{margin-top:40px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--muted);font-size:15px}
+.more{margin-top:36px;border-top:1px solid var(--line);padding-top:20px}.more h3{font-size:16px;margin:0 0 10px}
+.list a{display:block;padding:18px 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.list a b{display:block;font-size:20px;line-height:1.35}.list a span{color:var(--muted);font-size:15.5px}.list a:hover b{color:var(--now)}</style></head><body><main><a class="back" href="./"><img src="../favicon.svg" width="24" height="24" alt="" style="vertical-align:-6px;margin-right:8px">Learn</a>
+<article><h1>Why most meme coins crash, and what a paid-for floor changes</h1><p class="lede">Most meme coins lose almost all their value within days. Here is the mechanism behind it, and how a reserve filled before anyone buys changes what late buyers can get back.</p>
+<p>Most meme coins follow the same arc. A coin launches, the first wallets buy cheap, a crowd notices the chart, the price runs, and then it falls. Not by a little: by 90% or more, often within days. The people who bought last hold coins that nobody will buy back.</p>
+<p>This is not bad luck, and it is usually not a single villain. It is built into how most launchpads work. Once you see the mechanism, you can see what has to change.</p>
+<h2>The pool only exists while people keep buying</h2>
+<p>On a typical bonding-curve launchpad, every buyer pays into a pool, and the price rises along a curve as more coins are sold. Selling works the other way: you sell coins back into the pool and the price moves down the same curve.</p>
+<p>That sounds fair. The problem is what sits under the price. The pool holds what buyers paid, but early buyers paid very little and late buyers paid a lot. When the early wallets sell, they take out far more than they put in, at prices that late buyers made possible. Each sale pushes the price further down the curve. The money that late buyers paid is spent on paying out the people who were there first.</p>
+<p>When the coin "graduates" to an exchange, the pool usually becomes liquidity in a trading pair. From then on the price is whatever the next buyer is willing to pay. If nobody wants to buy, there is no price at all, only a chart that stopped.</p>
+<h2>Three things make it worse</h2>
+<p><strong>Cheap early rounds.</strong> If the first coins sell for a fraction of what later coins cost, the first holders can sell at a large profit at almost any point. They are not doing anything wrong; the design pays them to leave.</p>
+<p><strong>Creator bags.</strong> Many launches give the creator, or wallets close to the creator, a large share of the supply for free or nearly free. That share can be sold at any time, into the same pool everyone else depends on.</p>
+<p><strong>Liquidity that someone controls.</strong> If the money backing a coin sits somewhere a person can withdraw it, or the contract can be changed, then the floor is only as good as that person's promise.</p>
+<p>Put these together and you get the familiar pattern: a fast rise, a fast exit by a few wallets, and a long tail of holders who bought the top.</p>
+<h2>What a paid-for floor changes</h2>
+<p>Landing Pad starts from a different question: what if the money that backs a coin were collected before the coins went out, and could never leave except to buy coins back?</p>
+<p>Here is how a coin works on Landing Pad:</p>
+<ul>
+<li><strong>One price for the first 800M coins.</strong> Every coin in a launch has a supply of 1 billion. The first 800 million sell at the same fixed price, $0.0001 each. There is no cheaper early round and no insider allocation.</li>
+<li><strong>The full price goes into a reserve.</strong> The value of every coin sold goes into that coin's own reserve. No person can withdraw from it. The only way money leaves the reserve is when a holder sells coins back.</li>
+<li><strong>Any holder can sell back at the floor, any time.</strong> The floor is the price the reserve pays per coin. Because the reserve was filled by the sales themselves, it can always pay every coin at that price.</li>
+<li><strong>The floor is never lowered.</strong> It starts at the sale price and rises as fees are added to the reserve.</li>
+</ul>
+<p>The last 200 million coins sell on a curve above the floor, so demand can still push the price up. But the floor under it does not depend on the next buyer.</p>
+<h2>What it does not change</h2>
+<p>A floor limits the loss. It does not make a coin a good buy.</p>
+<p>If you buy a coin and sell it straight back, you pay a 5% fee on the way in and 5% on the way out. Put in $1,000 and you get back $902.50. The page shows this number before you buy, so there is no surprise, but it is still a loss. If you buy above the floor, on the curve, the gap between your price and the floor is money you can lose.</p>
+<p>Meme coins are still meme coins. Most will not go anywhere. What changes is the shape of the worst case: instead of "nobody will buy my coins," it is "I can sell them back at the floor, less the fee."</p>
+<h2>Why fees lift the floor</h2>
+<p>Every trade pays a 5% fee. One percent goes to the coin's creator, 2% to the launchpad, and 2% stays in the coin's own reserve. That last 2% is money added to the reserve without new coins being created, so the amount the reserve can pay per coin goes up. A coin that trades a lot gets a higher floor over time.</p>
+<p>The creator's 1% matters too. On Landing Pad the creator gets zero coins at launch. Their only income is from trading fees, so they gain when people keep trading, not when they sell.</p>
+<h2>Try to break it</h2>
+<p>The best way to judge a design like this is to attack it. On <a href="../">landingpad.fun</a> you can run a stress test in your browser: 60 wallets trading at random, then everyone selling at once, or a single attacker splitting a position across 40 wallets. After every trade, the page checks that the reserve can still buy back every coin at the floor.</p>
+<p>In our runs, it always could, and the attacker lost money to the creator, the launchpad and the reserve. If you find a case where the check fails, tell us. That is exactly what the public test is for.</p>
+<h2>Where things stand</h2>
+<p>Landing Pad is a public test on Solana devnet and Ethereum Sepolia, using test money with no value. The contracts are not audited yet. Mainnet opens when testers have sent 100 pieces of feedback, or when $LPAD, the project's own meme coin on pump.fun, reaches a $1M market cap. $LPAD is an ordinary meme coin with no floor and no claim on the launchpad.</p>
+<p>Nothing here is a promise of profit. It is a different set of rules, open for anyone to test.</p></article><p class="note">Landing Pad is a public test on Solana devnet and Ethereum Sepolia, with test money that has no value. The contracts are not audited yet. Nothing here is financial advice or a promise of profit.</p><div class="more"><h3>More to read</h3><a href="how-the-floor-works.html">How the Landing Pad floor works, step by step</a><br><a href="where-the-fee-goes.html">The 5% fee: where it goes and why 2% stays in the coin</a><br><a href="rug-pull-checklist.html">A rug pull checklist: three questions before you buy any meme coin</a></div></main><script src="../visits.js"></script></body></html>
