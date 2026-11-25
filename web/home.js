@@ -492,7 +492,10 @@
         const got = await window.JISR_VISITS_READ(); total = got.total; today = got.today;
       }
     } catch (_) { /* shown as not available below */ }
+    // today's count is shown once it has something to say; on its first day it starts from nothing
     if (today != null) { LIVE.today = today; figure("#nToday", today, whole); }
+    const line = $("#tVisits .t-today");
+    if (line) line.hidden = !(LIVE.today > 0);
     if (total == null) { missing("#rVisits", "not available now"); return false; }
     LIVE.visits = total;
     figure("#rVisits", total, whole);
