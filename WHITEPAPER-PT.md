@@ -134,7 +134,7 @@ Leia esta seção antes de usar a plataforma com qualquer coisa de valor.
 
 Implantação de teste na Sepolia:
 
-- Fábrica da plataforma: `0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647`
+- Fábrica da plataforma: `0x4e34BD62B8245Fa7841061eeFa010fF054FA9d06`
 - Solana devnet: `5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8`
 - Site: https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
 - Código: https://github.com/w8nwzbf9h5-svg/jisr-launchpad

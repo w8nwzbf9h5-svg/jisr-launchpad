@@ -35,7 +35,7 @@ Worked example: $1,000 buys 9,500,000 coins; selling them straight back returns 
 | Network | Address | State |
 |---|---|---|
 | Solana devnet | program `5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8` | Final: its upgrade authority is removed |
-| Ethereum Sepolia | factory `0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647` | Earlier build, without automatic fee payouts |
+| Ethereum Sepolia | factory `0x4e34BD62B8245Fa7841061eeFa010fF054FA9d06` | Current build: fees are paid out with every trade |
 
 ## Status
 

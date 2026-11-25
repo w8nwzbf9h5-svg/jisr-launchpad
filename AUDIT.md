@@ -221,7 +221,7 @@ program is attached to each run.
 
 | Network | Address |
 |---|---|
-| Sepolia (Ethereum test network) | factory `0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647` |
+| Sepolia (Ethereum test network) | factory `0x4e34BD62B8245Fa7841061eeFa010fF054FA9d06` |
 | Solana devnet | program `5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8` (final; the current build, with the fix for S1 and wallet metadata) |
 
 ## 9. Questions we would like a reviewer to answer

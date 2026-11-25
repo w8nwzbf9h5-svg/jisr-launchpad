@@ -160,7 +160,7 @@ function waitFor(child, text, ms) {
     for (const code of ["zh", "es", "hi", "fr", "ru", "pt", "tr", "id"]) {
       await page.select("#langSel", code);
       assert.equal(await page.$eval("#paper-" + code, (el) => el.hidden), false);
-      assert((await text("#paper-" + code)).includes("0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647"), code + " carries the same facts");
+      assert((await text("#paper-" + code)).includes("0x4e34BD62B8245Fa7841061eeFa010fF054FA9d06"), code + " carries the same facts");
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true, code + " fits a phone screen");
     }
     await page.select("#langSel", "ar");

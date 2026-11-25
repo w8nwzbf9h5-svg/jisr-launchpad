@@ -134,7 +134,7 @@ Jisr 取消了早期的低价代币，并在每个代币下面放入真实资金
 
 Sepolia 上的测试部署：
 
-- 平台工厂合约：`0x5E603f7Fc12D8C2744c9117a43f5021c7dEb5647`
+- 平台工厂合约：`0x4e34BD62B8245Fa7841061eeFa010fF054FA9d06`
 - Solana devnet: `5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8`
 - 网站：https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
 - 代码：https://github.com/w8nwzbf9h5-svg/jisr-launchpad
