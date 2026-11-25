@@ -131,7 +131,7 @@ function waitFor(child, text, ms) {
       assert.equal(await page.$eval("#cSend", (b) => b.disabled), true, "nothing to send before a message is written");
       await page.type("#cMsg", "The sell button stays grey after I connect.");
       await page.type("#cEmail", "tester@example.org");
-      assert.equal(await page.$$eval('#contact a[href*="x.com"], #contact a[href*="github.com"]', (a) => a.length), 0, "the contact form does not send the visitor to another site");
+      assert.equal(await page.$$eval('#cForm a[href*="x.com"], #cForm a[href*="github.com"], #cForm a[href*="t.me"]', (a) => a.length), 0, "the contact form does not send the visitor to another site");
       await page.evaluate(() => { window.__sent = []; window.__realFetch = window.fetch; window.fetch = (url, opt) => { if (String(url).startsWith("https://formsubmit.co/")) { window.__sent.push({ url: String(url), body: JSON.parse(opt.body) }); return Promise.resolve(new Response(JSON.stringify({ success: window.__answer }), { status: 200, headers: { "content-type": "application/json" } })); } return window.__realFetch(url, opt); }; window.__answer = "false"; });
       await page.click("#cSend");
       await page.waitForFunction(() => document.querySelector("#cNote").textContent.includes("feedback@landingpad.fun"));
