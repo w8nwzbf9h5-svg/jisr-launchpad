@@ -1,0 +1,243 @@
+# code<TAB>English text. Written by: node scripts/i18n.js extract
+1nezp01	Landing Pad: coins with a floor that is paid for in advance
+1tnywiu	Landing Pad, home
+mlh3jc	Main
+1lmyixt	The model
+4psmej	Stress test
+1fcs3tg	Live checks
+1c7r8bb	Try it
+1wn7420	Charts
+1c7vye9	LPAD coin
+w3fq2r	Contact
+1xpeqv8	White paper
+1jrbxl2	<1>Public test.</1> Test networks only: the coins and the money here have no value. The contracts have not had an independent audit. <2>How to help test</2>
+i15ri8	Launch a coin whose floor is paid for in advance.
+bjllzs	Landing Pad sells every coin at one fixed price and keeps the money in a reserve that no person controls. Any holder can sell back to that reserve at the floor price, at any time. Move the handle on the chart and watch the reserve keep up.
+h950dk	Open on Solana devnet
+1ebp8h6	Open on Ethereum Sepolia
+dbuqfm	There is no cheap early round and the creator receives no coins. A wallet may hold 2.5% of a coin at most. The whole method is in the <1>white paper</1>, in ten languages.
+13lecv0	The model, running
+1no0do1	Drag across the chart. Every number below is worked out by the same arithmetic the contracts run.
+1xt5umv	Sale: one price for everyone
+106mcqg	<1/>Price of the next coin, in sale prices
+7b3t9i	<1/>Floor price
+1sz80el	Coins sold <1/>
+xjhcul	Money traded after the sale sold out <1/>
+pdx12a	Price of the next coin
+1khrzbf	Market value at that price
+mzrfpc	Floor price
+1w5nr54	Held in the floor reserve
+1r4jxj8	Needed to buy back every coin at the floor: <1/>
+1sf7u5m	Cover <1/>
+1frh2q6	Buy at this point with
+1h5fdvz	Amount in dollars
+1sxm3z3	A model of one coin priced in dollars, with every coin bought in order and none sold back. Real coins move both ways; the reserve rule is the same.
+gqtxov	The road to mainnet
+ndiilk	The launchpad opens with real money when the first of two marks is reached: 100 pieces of feedback from testers, or the project's meme coin LPAD at a $1M market cap.
+asgae1	Tester feedback
+1pu1p7q	counting…
+pifw0v	Counted by hand from the messages testers send us, so the number can be a day behind. <1>Send your feedback</1>
+1pkcn7g	LPAD market cap
+1azh5gn	reading…
+9kptdi	Read from DEX Screener, and read again every half minute while this page is open.
+e06ynj	LPAD, the project's meme coin on pump.fun
+qj7264	Copy address
+1labv8g	Chart on DEX Screener
+e75gez	Open on pump.fun
+1pdyg96	Price
+k24tvd	Market cap
+26ro0v	Volume, 24h
+qertfw	Trades, 24h
+t9d9b9	Network
+1oy2zwu	Supply
+edewnu	LPAD is a meme coin. It trades on pump.fun's curve, so it does not have the floor that coins launched on Landing Pad get, and it carries no claim on the launchpad or its fees. Other coins can copy the name: check the address above before you buy.
+so3jod	Try to break it
+pjd74	Start a crowd of traders, or an attacker. Every trade is priced by the launchpad's own arithmetic, in your browser, and after each one the page checks the rule that matters: the reserve can buy back every coin in circulation at the floor price.
+1hgw6tp	Run 60 traders
+yja9rq	Run an attacker with 40 wallets
+k6sj7i	Trades
+45f5ob	Coins in circulation
+5fn4ca	Rule checked
+1puurbg	Rule broken
+imejod	0 times
+rduqei	Price and floor price over the simulated trades
+1ysnulm	<1/>Held in the floor reserve
+19g7lzq	<1/>Needed to buy back every coin at the floor
+16axdya	The reserve and what it owes over the simulated trades
+1k8omp3	Trades, in the order they happened. After the vertical line, every holder sells everything.
+1fs9giw	A simulation in your browser, with a new random sequence each time. It uses the same pricing and rounding as the contracts; the contracts' own test suites run the same experiment on a real chain.
+2gux2o	Read the chain yourself
+11c9sn0	Your browser is asking the networks these questions as you read. The answers come from the chain, not from us: this site has no server and stores nothing.
+vom2sx	Live from the test networks
+z3vbly	Run again
+tgwvo0	The checks start when this box comes into view.
+ebbbvy	Each line links to the same fact on a public block explorer.
+1f7n2kc	How a coin lives
+5psrkc	The same four stages for every coin, on every network.
+fhbsli	Launch
+3d31at	The creator pays the network fee and receives no coins. All one billion go to the coin's own market.
+dnspni	Sale
+1im47yt	800 million coins at one fixed price. The value of every coin sold goes into the reserve.
+cdile9	Graduation
+isudbh	The sale sells out. The reserve holds about $81,684 for those 800 million coins.
+10txmiv	After graduation
+1ahh36a	The last 200 million sell above the floor, and fees from trading keep raising the floor.
+18tzba0	What exists today
+btutcn	A plain account, including what is not done.
+6ugiw2	Networks
+1ul1eay	Solana devnet and Ethereum Sepolia. Both are test networks.
+1o3quut	Solana program
+1w0q5lb	Deployed with its upgrade authority removed, so nobody can change it. The check above reads that from the network.
+8wk9df	Ethereum contracts
+1dnrzl0	47 automated contract tests and 26 browser test steps. Markets have no owner, no pause and no withdrawal.
+ej8700	Fees
+173t4gs	5% of each trade: 1% to the coin's creator, 2% to the launchpad, 2% into the coin's own reserve. Paid out automatically as the coin trades.
+135p1au	Independent audit
+1m7wk5e	Not done yet.
+jfevx	Real money
+k36olt	Not yet. Nothing is deployed on a real network.
+w0dybb	Try it with test money
+15d9io7	Launching, buying and selling all work today. Nothing here costs or earns real money.
+1swb595	Needs the Phantom wallet.
+r9gn7e	Open the page in Phantom's browser and connect.
+1rqa5qd	Press “Get SOL for fees”, then “Get 10,000 test dollars”.
+1i06kxw	Launch a coin, or buy one from the board.
+v5ca6e	Needs MetaMask and a little Sepolia ETH for fees, from any Sepolia faucet.
+nodno6	Open the page in MetaMask's browser and connect.
+bb242w	Take test dollars from the bar at the top.
+14k3kid	Contact us
+14nloz6	A problem, a question, an idea or a partnership: write it here and it goes straight to our inbox. You can also write to <1>feedback@landingpad.fun</1>.
+2vdtoo	What is it about?
+1ejui2p	Bug or problem
+6ikx1	Question
+14hitae	Idea or feedback
+4tzgib	Partnership
+1o8eyxp	Your message
+1sxge3r	Your email, if you want a reply
+1ocggf0	Send message
+1uhazdl	Write your message, then press Send message.
+x8oz9x	The message is delivered to our inbox by FormSubmit, a form-to-email service. This site does not store it.
+19ys3oz	The test so far
+7nb16z	Reading the networks…
+28r6qc	Refresh
+qnww2x	Coins launched
+96fcag	Counted on the test networks as you watch.
+h9s7tv	See every coin and its chart
+2c4dqk	Visits to the site
+byulnj	<1>0</1> today
+1fhwoc2	Once per browser per day (UTC), since 25 November 2026.
+1uzwklf	of 100
+wxw1f8	100 pieces of feedback open the launchpad.
+1duq2xv	Send yours
+j1v5xy	of $1M
+118qs7l	Read from DEX Screener.
+16igtiw	See the coin
+1ww4i5	© 2026 Landing Pad. All rights reserved. The code, the design and the documents are proprietary. Reading them is not permission to copy or reuse them.
+159ux8z	This is a public test and not an offer of any kind. A floor limits how far a price can fall inside the launchpad; it does not make a coin a good purchase. <1>White paper</1>. Follow <2>@landingpadfun on X</2>. <3>Contact us</3>.
+1l0xxoj	Close
+3l9czs	Public test, open now
+v3t9v2	Launch a coin and try to break its floor.
+9dq5uh	Landing Pad is being tested in public before any real money goes near it. The coins and the dollars here are free test tokens. Use it hard, then tell us what went wrong.
+13jhtnz	<1>Get free test money.</1> One button inside the launchpad gives you test dollars.
+1g7ib7g	<1>Launch a coin, or buy one.</1> Every coin starts at the same fixed price.
+txa49l	<1>Sell it back.</1> Check that the floor paid what the page promised.
+11b385a	Test on Solana
+1cpsun2	Test on Ethereum Sepolia
+1o9mihf	<1>Then give feedback.</1> A bug, a confusing step, a number that looks wrong: all of it helps. <2><3>Send us a message</3>, right here on the site.</2>
+n8y1ud	The project's meme coin, <1>LPAD, is live on pump.fun</1>. Mainnet opens after 100 pieces of feedback or a $1M market cap. <2>See the progress</2>
+186hb75	Look around first
+ptpecv	{n}M of 1,000M
+1v4bxes	2% of every trade stays in the reserve, and the floor is raised to match.
+stlzdj	This starts once the sale has sold out, at 800M coins.
+u6rtyg	No coins sold yet
+cv1xsp	Nothing is owed until a coin is sold.
+b73l3c	If every holder sold now, the reserve would pay {pay} and keep {keep}.
+fa2y4m	Enter an amount in dollars.
+1wj3dfl	That is too little to buy a coin.
+18lsc9d	No coins are left to buy at this point.
+w4qi33	You pay {pay} and receive {coins} coins. Sell them straight back and you receive {back}.
+1i9sh3s	One wallet may hold 25M coins at most, so the buy stops there.
+1jceg0x	Into the floor reserve, to buy these coins back
+1bnolev	Premium above the floor, held for when coins are sold back
+f7bdzp	Stays in the reserve (2%)
+nbyalh	Launchpad (2%)
+13qe0n8	Creator (1%)
+pilx8p	{n} times
+1ague9s	One attacker traded with himself through 40 wallets, because one wallet may hold only 2.5% of a coin: {buys} buys and {sells} sells, pushing {peak}M coins into circulation at the peak.
+1yzemmm	That pushed the price up the curve.
+oybbb8	He put in {start} and left with {end}: a loss of {loss}. That money went to the creator ({creator}), the launchpad ({platform}) and the coin's reserve ({reserve}).
+1p5ky6f	60 wallets made {buys} buys and {sells} sells.
+1lh7nw5	The sale sold out, and the floor finished {rise}% above the sale price.
+1p6av2h	The sale did not sell out this time, so the floor stayed at the sale price.
+1f3s2i2	Then all {n} holders sold everything, in a random order.
+db8t8l	Every one of those sales was paid in full.
+1aw8n8q	{n} of those sales could not be paid.
+1tg0gkg	{left} is left in the reserve, with no coins in circulation.
+1cq6qsc	After each of the {n} trades the page checked three things: the reserve covers every coin at the floor, the floor has not gone down, and no dollar appeared or vanished.
+1qxizvu	None failed.
+1rqe48i	{n} failed.
+1bfiewk	The launchpad program is on the network
+1t1w7m9	Program {id} is deployed and runs
+12ity7i	Program not found
+m956rz	Nobody can change the program
+1kl1v9	The program's data account was not found
+1n5vuhj	Upgrade authority: none. The code is final, for us too
+eyjbrf	An upgrade authority still exists
+1ieocdh	The launchpad is started
+1i4bl4d	Not started yet
+v7vqwr	Started. {n} coin launched; fees go to {to}
+uocc6k	Started. {n} coins launched; fees go to {to}
+joig6o	The newest coins are fully covered
+5ljs8q	No coins yet, so nothing is owed
+1vd48lw	${symbol}: holds {held}, owes holders {owed} at the floor
+1tp38vf	No more coins can ever be made
+n0xyme	No coins yet
+sq4a6e	${symbol}: supply fixed at 1,000,000,000; the right to mint is gone
+1xp0l3x	${symbol}: the mint is not locked
+hgnm7b	A coin's name cannot be edited
+7fewi	${symbol} was launched without wallet metadata
+1o1wk9u	“{name}” is written for wallets and locked
+qgucgl	The name of ${symbol} can still be changed
+1nue6xm	The launchpad contract is on the network
+cwtf1j	Factory {id} is deployed, {n} bytes of code
+1ua2vfi	No contract at that address
+qu9smb	Coins launched there
+1env7bh	{n} coin launched through this contract
+1vyz7zu	{n} coins launched through this contract
+1pjlbv6	Asking the networks…
+rh4qes	… asking
+316p4w	✓ ok
+qto8qt	✕ failed
+d88reh	– no answer
+u4q0xb	The public endpoint did not answer. It limits how often it can be asked.
+1lb3661	{n} of {all} checks failed.
+1m4clja	{n} of {all} checks answered as promised.
+m7ypch	{n} got no answer; press Run again in a moment.
+1xqpvjf	This page could not load its scripts. Reload to try again.
+154vynt	not available now
+19oymsf	{n} on {net}
+11eggdl	{n} of {goal}
+jmg2ym	{n} more piece opens the launchpad.
+1q9l570	{n} more pieces open the launchpad.
+1rxu0e9	The mark is reached.
+lwgjiy	{n} of $1M
+1mrck9n	Up {n}% in a day.
+um18gs	Down {n}% in a day.
+hgu0fz	Under 0.1% of the way to $1M.
+9b8ik8	{n}% of the way to $1M.
+1n457f9	not available
+xtdvq5	{buys} buys, {sells} sells
+68g027	see it on pump.fun
+ywi3nj	Reading again…
+oi2nno	The figures could not be read. Trying again shortly.
+1828kcl	Live. Read just now.
+1gblqs9	Live. Read {n} s ago.
+13bzcw5	Copied
+11lqlvd	Select the address to copy it
+1viwxr9	Ready to send.
+1yx9n7a	Add a few more words so we can understand it.
+1nfzawn	That email address does not look right. Fix it, or leave it empty.
+15r3dgd	Sending…
+jf732p	We could not send it from here. Please email it to {to}.
+19yndlq	Sent. Thank you, we will reply to {to}.
+v2sgny	Sent. Thank you.

@@ -25,6 +25,7 @@ Worked example: $1,000 buys 9,500,000 coins; selling them straight back returns 
 ## See it work
 
 - **[Home page](https://landingpad.fun/)**: operate the model yourself, and watch your browser read the proof from the chain.
+- **Ten languages.** The home page reads in English, Arabic, Chinese, Spanish, Hindi, French, Russian, Portuguese, Indonesian and Turkish; the menu in the top bar switches. The translations are plain text files in [`i18n/`](i18n), built into `web/lang/` by `node scripts/i18n.js build`. The launchpad and chart pages are still English only.
 - **[Charts](https://landingpad.fun/markets.html)**: every coin with its price chart, trades and holders, read from the chain.
 - **[Launchpad on Solana devnet](https://landingpad.fun/solana.html)** (Phantom).
 - **[Launchpad on Ethereum Sepolia](https://landingpad.fun/app.html)** (MetaMask).

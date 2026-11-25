@@ -5,6 +5,13 @@
   "use strict";
   const J = window.JisrSolana, web3 = window.solanaWeb3;
   const $ = (s) => document.querySelector(s);
+  /* tr: a sentence with {name} marks and their values, in the visitor's language (i18n.js); English when there is none. */
+  const tr = (window.JISR_I18N && window.JISR_I18N.t) || ((text, vars) => (vars ? text.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m)) : text));
+  /* A sentence with its figures in bold: every {name} in `text` becomes a <b> holding vars[name]. */
+  const rich = (into, text, vars) => text.split(/(\{\w+\})/).forEach((part) => {
+    const k = /^\{(\w+)\}$/.exec(part);
+    if (k && k[1] in vars) { const b = document.createElement("b"); b.textContent = vars[k[1]]; into.append(b); } else if (part) into.append(part);
+  });
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 
   /* ---------- money and coin formatting ---------- */
@@ -77,11 +84,11 @@
   function render() {
     const m = stateAt(S.sold, S.volume), f = Number(m.floorPrice) / Number(m.salePrice);
     drawLines(f);
-    $("#mSoldOut").textContent = S.sold + "M of 1,000M";
+    $("#mSoldOut").textContent = tr("{n}M of 1,000M", { n: S.sold });
     $("#mVolOut").textContent = "$" + (S.volume / 1e6).toFixed(1) + "M";
     const volOn = m.graduated;
     $("#mVol").disabled = !volOn; $("#mVolBox").classList.toggle("off", !volOn);
-    $("#mVolHint").textContent = volOn ? "2% of every trade stays in the reserve, and the floor is raised to match." : "This starts once the sale has sold out, at 800M coins.";
+    $("#mVolHint").textContent = volOn ? tr("2% of every trade stays in the reserve, and the floor is raised to match.") : tr("This starts once the sale has sold out, at 800M coins.");
     const p = J.currentPrice(m), need = liability(m);
     $("#rPrice").textContent = price(p);
     $("#rCap").textContent = "$" + Math.round(Number(p) / 1e18 * 1e9).toLocaleString("en-US");
@@ -89,27 +96,27 @@
     $("#rReserve").textContent = usd(m.floorReserve, 0);
     $("#rNeed").textContent = usd(need, 0);
     const cover = need > 0n ? Number(m.floorReserve * 10000n / need) / 100 : null;
-    $("#rCover").textContent = cover == null ? "No coins sold yet" : cover.toFixed(1) + "%";
+    $("#rCover").textContent = cover == null ? tr("No coins sold yet") : cover.toFixed(1) + "%";
     $("#rFill").style.width = cover == null ? "0%" : Math.min(100, 100 * 100 / cover).toFixed(2) + "%";
-    $("#rSpare").textContent = cover == null ? "Nothing is owed until a coin is sold." : "If every holder sold now, the reserve would pay " + usd(need, 0) + " and keep " + usd(m.floorReserve - need, 0) + ".";
+    $("#rSpare").textContent = cover == null ? tr("Nothing is owed until a coin is sold.") : tr("If every holder sold now, the reserve would pay {pay} and keep {keep}.", { pay: usd(need, 0), keep: usd(m.floorReserve - need, 0) });
     renderBuy(m);
   }
   function renderBuy(m) {
     const out = $("#bOut"), bar = $("#bBar"), key = $("#bKey");
     bar.textContent = ""; key.textContent = "";
     const n = Number(String(S.budget).replace(/,/g, ""));
-    if (!(n > 0) || n > 1e9) { out.textContent = "Enter an amount in dollars."; return; }
+    if (!(n > 0) || n > 1e9) { out.textContent = tr("Enter an amount in dollars."); return; }
     const budget = BigInt(Math.round(n * 100)) * USD / 100n;
     let coins = 0n;
     try { coins = J.coinsForBudget(m, budget, 0n); } catch (_) { coins = 0n; }
-    if (coins <= 0n) { out.textContent = n < 0.01 ? "That is too little to buy a coin." : "No coins are left to buy at this point."; return; }
+    if (coins <= 0n) { out.textContent = n < 0.01 ? tr("That is too little to buy a coin.") : tr("No coins are left to buy at this point."); return; }
     const q = J.quoteBuy(m, coins), after = applyBuy(m, q), back = J.quoteSell(after, coins);
     out.textContent = "";
-    out.append("You pay ", el("b", "", usd(q.total)), " and receive ", el("b", "", coinsTxt(coins) + " coins"), ". Sell them straight back and you receive ", el("b", "", usd(back.net)), ".");
-    if (coins === J.MAX_WALLET) out.append(" One wallet may hold 25M coins at most, so the buy stops there.");
-    const parts = [["sw-floor", "Into the floor reserve, to buy these coins back", q.floorPart]];
-    if (q.premiumPart > 0n) parts.push(["sw-prem", "Premium above the floor, held for when coins are sold back", q.premiumPart]);
-    parts.push(["sw-extra", "Stays in the reserve (2%)", q.communityFee], ["sw-plat", "Launchpad (2%)", q.platformFee], ["sw-crea", "Creator (1%)", q.creatorFee]);
+    rich(out, tr("You pay {pay} and receive {coins} coins. Sell them straight back and you receive {back}."), { pay: usd(q.total), coins: coinsTxt(coins), back: usd(back.net) });
+    if (coins === J.MAX_WALLET) out.append(" " + tr("One wallet may hold 25M coins at most, so the buy stops there."));
+    const parts = [["sw-floor", tr("Into the floor reserve, to buy these coins back"), q.floorPart]];
+    if (q.premiumPart > 0n) parts.push(["sw-prem", tr("Premium above the floor, held for when coins are sold back"), q.premiumPart]);
+    parts.push(["sw-extra", tr("Stays in the reserve (2%)"), q.communityFee], ["sw-plat", tr("Launchpad (2%)"), q.platformFee], ["sw-crea", tr("Creator (1%)"), q.creatorFee]);
     parts.forEach((p) => {
       const seg = el("i", p[0]); seg.style.flex = Number(p[2]) + " 0 0"; bar.append(seg);
       const li = el("li"); li.append(el("i", p[0]), el("span", "", p[1]), el("b", "", usd(p[2]))); key.append(li);
@@ -219,16 +226,16 @@
     $("#sBroken").textContent = "…"; $("#sBroken").parentNode.className = "";
     const finish = () => {
       drawStress(r, r.series.length);
-      $("#sBroken").textContent = r.broken === 0 ? "0 times" : r.broken + " times"; $("#sBroken").parentNode.className = r.broken === 0 ? "good" : "bad";
+      $("#sBroken").textContent = r.broken === 0 ? tr("0 times") : tr("{n} times", { n: r.broken }); $("#sBroken").parentNode.className = r.broken === 0 ? "good" : "bad";
       const lines = [];
       if (mode === "attacker") {
-        lines.push("One attacker traded with himself through 40 wallets, because one wallet may hold only 2.5% of a coin: " + r.buys + " buys and " + r.sells + " sells, pushing " + (r.peak / 1e6).toFixed(0) + "M coins into circulation at the peak" + (r.graduatedAt >= 0 ? " and the price up the curve." : "."));
-        lines.push("He put in " + usd(r.start, 0) + " and left with " + usd(r.end, 0) + ": a loss of " + usd(r.loss, 0) + ". That money went to the creator (" + usd(r.creator, 0) + "), the launchpad (" + usd(r.platform, 0) + ") and the coin's reserve (" + usd(r.reserveLeft, 0) + ").");
+        lines.push(tr("One attacker traded with himself through 40 wallets, because one wallet may hold only 2.5% of a coin: {buys} buys and {sells} sells, pushing {peak}M coins into circulation at the peak.", { buys: r.buys, sells: r.sells, peak: (r.peak / 1e6).toFixed(0) }) + (r.graduatedAt >= 0 ? " " + tr("That pushed the price up the curve.") : ""));
+        lines.push(tr("He put in {start} and left with {end}: a loss of {loss}. That money went to the creator ({creator}), the launchpad ({platform}) and the coin's reserve ({reserve}).", { start: usd(r.start, 0), end: usd(r.end, 0), loss: usd(r.loss, 0), creator: usd(r.creator, 0), platform: usd(r.platform, 0), reserve: usd(r.reserveLeft, 0) }));
       } else {
-        lines.push("60 wallets made " + r.buys + " buys and " + r.sells + " sells. " + (r.graduatedAt >= 0 ? "The sale sold out, and the floor finished " + r.floorRise.toFixed(1) + "% above the sale price." : "The sale did not sell out this time, so the floor stayed at the sale price."));
-        lines.push("Then all " + r.holders + " holders sold everything, in a random order. " + (r.exits === r.holders ? "Every one of those sales was paid in full." : (r.holders - r.exits) + " of those sales could not be paid.") + " " + usd(r.reserveLeft, 0) + " is left in the reserve, with no coins in circulation.");
+        lines.push(tr("60 wallets made {buys} buys and {sells} sells.", { buys: r.buys, sells: r.sells }) + " " + (r.graduatedAt >= 0 ? tr("The sale sold out, and the floor finished {rise}% above the sale price.", { rise: r.floorRise.toFixed(1) }) : tr("The sale did not sell out this time, so the floor stayed at the sale price.")));
+        lines.push(tr("Then all {n} holders sold everything, in a random order.", { n: r.holders }) + " " + (r.exits === r.holders ? tr("Every one of those sales was paid in full.") : tr("{n} of those sales could not be paid.", { n: r.holders - r.exits })) + " " + tr("{left} is left in the reserve, with no coins in circulation.", { left: usd(r.reserveLeft, 0) }));
       }
-      lines.push("After each of the " + r.checks.toLocaleString("en-US") + " trades the page checked three things: the reserve covers every coin at the floor, the floor has not gone down, and no dollar appeared or vanished. " + (r.broken === 0 ? "None failed." : r.broken + " failed."));
+      lines.push(tr("After each of the {n} trades the page checked three things: the reserve covers every coin at the floor, the floor has not gone down, and no dollar appeared or vanished.", { n: r.checks.toLocaleString("en-US") }) + " " + (r.broken === 0 ? tr("None failed.") : tr("{n} failed.", { n: r.broken })));
       lines.forEach((t) => out.append(el("p", "", t)));
       $("#stress").dataset.done = mode;
     };
@@ -264,27 +271,27 @@
     if (SOL.programId) {
       const conn = new web3.Connection(SOL.rpcUrl, { commitment: "confirmed", disableRetryOnRateLimit: true }), pid = new web3.PublicKey(SOL.programId);
       list.push({ head: SOL.name });
-      list.push({ label: "The launchpad program is on the network", run: async () => {
+      list.push({ label: tr("The launchpad program is on the network"), run: async () => {
         const info = await conn.getAccountInfo(pid);
-        return { ok: !!info && info.executable, text: info && info.executable ? "Program " + short(SOL.programId) + " is deployed and runs" : "Program not found", link: solLink(SOL.programId) };
+        return { ok: !!info && info.executable, text: info && info.executable ? tr("Program {id} is deployed and runs", { id: short(SOL.programId) }) : tr("Program not found"), link: solLink(SOL.programId) };
       } });
-      list.push({ label: "Nobody can change the program", run: async () => {
+      list.push({ label: tr("Nobody can change the program"), run: async () => {
         const loader = new web3.PublicKey("BPFLoaderUpgradeab1e11111111111111111111111");
         const data = web3.PublicKey.findProgramAddressSync([pid.toBytes()], loader)[0], info = await conn.getAccountInfo(data);
-        if (!info) return { ok: false, text: "The program's data account was not found" };
+        if (!info) return { ok: false, text: tr("The program's data account was not found") };
         // layout: 4 bytes kind, 8 bytes slot, then 1 byte that says whether an upgrade authority exists
         const none = info.data[12] === 0;
-        return { ok: none, text: none ? "Upgrade authority: none. The code is final, for us too" : "An upgrade authority still exists", link: solLink(data.toBase58()) };
+        return { ok: none, text: none ? tr("Upgrade authority: none. The code is final, for us too") : tr("An upgrade authority still exists"), link: solLink(data.toBase58()) };
       } });
-      list.push({ label: "The launchpad is started", run: async () => {
+      list.push({ label: tr("The launchpad is started"), run: async () => {
         const cfg = await J.getConfig(conn, pid);
         ctx.cfg = cfg;
-        if (!ctx.cfg) return { ok: false, text: "Not started yet" };
-        return { ok: true, text: "Started. " + ctx.cfg.coinCount + (ctx.cfg.coinCount === 1n ? " coin" : " coins") + " launched; fees go to " + short(ctx.cfg.platformWallet.toBase58()), link: solLink(J.configAddress(pid).toBase58()) };
+        if (!ctx.cfg) return { ok: false, text: tr("Not started yet") };
+        return { ok: true, text: (ctx.cfg.coinCount === 1n ? tr("Started. {n} coin launched; fees go to {to}") : tr("Started. {n} coins launched; fees go to {to}")).replace("{n}", String(ctx.cfg.coinCount)).replace("{to}", short(ctx.cfg.platformWallet.toBase58())), link: solLink(J.configAddress(pid).toBase58()) };
       } });
-      list.push({ label: "The newest coins are fully covered", run: async () => {
+      list.push({ label: tr("The newest coins are fully covered"), run: async () => {
         need("cfg");
-        if (!ctx.cfg || ctx.cfg.coinCount === 0n) { ctx.markets = []; return { ok: true, text: "No coins yet, so nothing is owed" }; }
+        if (!ctx.cfg || ctx.cfg.coinCount === 0n) { ctx.markets = []; return { ok: true, text: tr("No coins yet, so nothing is owed") }; }
         const found = await J.getMarkets(conn, pid, ctx.cfg.coinCount, 3);
         const vaults = await conn.getMultipleAccountsInfo(found.map((m) => J.ata(m.address, ctx.cfg.stableMint)));
         ctx.markets = found;
@@ -292,36 +299,36 @@
         ctx.markets.forEach((m, i) => {
           const held = J.tokenAmount(vaults[i]), owed = liability(m), set = m.floorReserve + m.premiumReserve + m.creatorFees + m.platformFees;
           const fine = held >= set && m.floorReserve >= owed; if (!fine) all = false;
-          lines.push("$" + m.symbol + ": holds " + usd(held) + ", owes holders " + usd(owed) + " at the floor");
+          lines.push(tr("${symbol}: holds {held}, owes holders {owed} at the floor", { symbol: m.symbol, held: usd(held), owed: usd(owed) }));
         });
         return { ok: all, text: lines[0], more: lines.slice(1), link: solLink(ctx.markets[0].address.toBase58()) };
       } });
-      list.push({ label: "No more coins can ever be made", run: async () => {
+      list.push({ label: tr("No more coins can ever be made"), run: async () => {
         need("markets");
-        if (!ctx.markets.length) return { ok: true, text: "No coins yet" };
+        if (!ctx.markets.length) return { ok: true, text: tr("No coins yet") };
         const m = ctx.markets[0], mint = J.decodeMint(await conn.getAccountInfo(m.coinMint));
         const fine = !!mint && mint.authority === null && mint.supply === J.TOTAL_SUPPLY;
-        return { ok: fine, text: fine ? "$" + m.symbol + ": supply fixed at 1,000,000,000; the right to mint is gone" : "$" + m.symbol + ": the mint is not locked", link: solLink(m.coinMint.toBase58()) };
+        return { ok: fine, text: fine ? tr("${symbol}: supply fixed at 1,000,000,000; the right to mint is gone", { symbol: m.symbol }) : tr("${symbol}: the mint is not locked", { symbol: m.symbol }), link: solLink(m.coinMint.toBase58()) };
       } });
-      list.push({ label: "A coin's name cannot be edited", run: async () => {
+      list.push({ label: tr("A coin's name cannot be edited"), run: async () => {
         need("markets");
-        if (!ctx.markets.length) return { ok: true, text: "No coins yet" };
+        if (!ctx.markets.length) return { ok: true, text: tr("No coins yet") };
         const m = ctx.markets[0], addr = J.metadataAddress(m.coinMint), md = J.decodeMetadata(await conn.getAccountInfo(addr));
-        if (!md) return { ok: true, text: "$" + m.symbol + " was launched without wallet metadata" };
+        if (!md) return { ok: true, text: tr("${symbol} was launched without wallet metadata", { symbol: m.symbol }) };
         const fine = md.isMutable === false && md.updateAuthority.equals(m.address);
-        return { ok: fine, text: fine ? "“" + md.name + "” is written for wallets and locked" : "The name of $" + m.symbol + " can still be changed", link: solLink(addr.toBase58()) };
+        return { ok: fine, text: fine ? tr("“{name}” is written for wallets and locked", { name: md.name }) : tr("The name of ${symbol} can still be changed", { symbol: m.symbol }), link: solLink(addr.toBase58()) };
       } });
     }
     if (evm.factory && evm.rpcUrl) {
       const scan = (evm.explorer || "https://sepolia.etherscan.io").replace(/\/+$/, "") + "/address/" + evm.factory;
       list.push({ head: evm.name || "Ethereum Sepolia" });
-      list.push({ label: "The launchpad contract is on the network", run: async () => {
+      list.push({ label: tr("The launchpad contract is on the network"), run: async () => {
         const code = await ethCall("eth_getCode", [evm.factory, "latest"]);
-        return { ok: !!code && code.length > 2, text: code && code.length > 2 ? "Factory " + short(evm.factory) + " is deployed, " + ((code.length - 2) / 2).toLocaleString("en-US") + " bytes of code" : "No contract at that address", link: scan };
+        return { ok: !!code && code.length > 2, text: code && code.length > 2 ? tr("Factory {id} is deployed, {n} bytes of code", { id: short(evm.factory), n: ((code.length - 2) / 2).toLocaleString("en-US") }) : tr("No contract at that address"), link: scan };
       } });
-      list.push({ label: "Coins launched there", run: async () => {
+      list.push({ label: tr("Coins launched there"), run: async () => {
         const n = parseInt(await ethCall("eth_call", [{ to: evm.factory, data: "0x678fd289" }, "latest"]), 16); // coinCount()
-        return { ok: Number.isFinite(n), text: n + (n === 1 ? " coin" : " coins") + " launched through this contract", link: scan };
+        return { ok: Number.isFinite(n), text: n === 1 ? tr("{n} coin launched through this contract", { n }) : tr("{n} coins launched through this contract", { n }), link: scan };
       } });
     }
     return list;
@@ -332,35 +339,36 @@
     if (running) return;
     running = true;
     const ol = $("#cList"), btn = $("#cRun"), sum = $("#cSum"), items = plan();
-    btn.disabled = true; ol.textContent = ""; sum.textContent = "Asking the networks…";
+    btn.disabled = true; ol.textContent = ""; sum.textContent = tr("Asking the networks…");
     let ok = 0, bad = 0, silent = 0;
     for (const it of items) {
       if (it.head) { ol.append(el("li", "head", it.head)); continue; }
-      const li = el("li", "run"), st = el("span", "st", "… asking"), ms = el("span", "ms", ""), tx = el("span", "tx", it.label);
+      const li = el("li", "run"), st = el("span", "st", tr("… asking")), ms = el("span", "ms", ""), tx = el("span", "tx", it.label);
       li.append(st, ms, tx); ol.append(li);
       const t0 = performance.now();
       try {
         const r = await it.run();
         ms.textContent = Math.round(performance.now() - t0) + " ms";
-        li.className = r.ok ? "ok" : "bad"; st.textContent = r.ok ? "✓ ok" : "✕ failed"; if (r.ok) ok++; else bad++;
+        li.className = r.ok ? "ok" : "bad"; st.textContent = r.ok ? tr("✓ ok") : tr("✕ failed"); if (r.ok) ok++; else bad++;
         tx.textContent = "";
         if (r.link) { const a = el("a", "", r.text); a.href = r.link; a.target = "_blank"; a.rel = "noopener"; tx.append(a); } else tx.append(r.text);
         (r.more || []).forEach((line) => tx.append(el("small", "", line)));
         tx.append(el("small", "", it.label));
       } catch (e) {
         ms.textContent = Math.round(performance.now() - t0) + " ms";
-        li.className = "na"; st.textContent = "– no answer"; silent++;
-        tx.append(el("small", "", "The public endpoint did not answer. It limits how often it can be asked."));
+        li.className = "na"; st.textContent = tr("– no answer"); silent++;
+        tx.append(el("small", "", tr("The public endpoint did not answer. It limits how often it can be asked.")));
       }
       await new Promise((r) => setTimeout(r, 180)); // public endpoints are shared; ask one question at a time
     }
-    sum.textContent = (bad ? bad + " of " + (ok + bad + silent) + " checks failed. " : ok + " of " + (ok + bad + silent) + " checks answered as promised. ") +
-      (silent ? silent + " got no answer; press Run again in a moment. " : "") + "Each line links to the same fact on a public block explorer.";
+    const all = ok + bad + silent;
+    sum.textContent = (bad ? tr("{n} of {all} checks failed.", { n: bad, all }) : tr("{n} of {all} checks answered as promised.", { n: ok, all })) + " " +
+      (silent ? tr("{n} got no answer; press Run again in a moment.", { n: silent }) + " " : "") + tr("Each line links to the same fact on a public block explorer.");
     btn.disabled = false; running = false;
   }
 
   function start() {
-    if (!J || !web3) { $("#bOut").textContent = "This page could not load its scripts. Reload to try again."; return; }
+    if (!J || !web3) { $("#bOut").textContent = tr("This page could not load its scripts. Reload to try again."); return; }
     wireMachine();
     $("#cRun").addEventListener("click", runChecks);
     $("#sCrowd").addEventListener("click", () => runStress("crowd"));
@@ -425,7 +433,7 @@
     const el = $(id);
     if (!el) return;
     const first = el._to == null, was = first ? 0 : el._to;
-    el._to = to; el._fmt = fmt;
+    el._to = to; el._fmt = fmt; el.classList.remove("is-words");
     if (first && eye && !inView.has(el)) { el._now = to; el.textContent = fmt(to); eye.observe(el); return; }
     if (!first && was === to) return;
     const tile = el.closest(".tile");
@@ -436,7 +444,7 @@
     run(el, first ? 0 : (el._now != null ? el._now : was), to);
   }
   /* A figure that could not be read: say so, unless a good value is already showing. */
-  function missing(id, words) { const el = $(id); if (el && el._to == null) el.textContent = words; }
+  function missing(id, words) { const el = $(id); if (el && el._to == null) { el.textContent = words; el.classList.add("is-words"); } }
   const fill = (id, part) => { const el = $(id); if (el) el.style.width = Math.max(part > 0 ? 1.5 : 0, Math.min(100, part * 100)).toFixed(1) + "%"; };
   const say = (id, words) => { const el = $(id); if (el && el.textContent !== words) el.textContent = words; };
   const within = (ms, work) => Promise.race([work, new Promise((_, no) => setTimeout(() => no(new Error("too slow")), ms))]);
@@ -466,12 +474,12 @@
         if (Number.isFinite(n)) { eth = n; total += n; known = true; }
       } catch (_) { /* this network is left out of the count */ }
     }
-    if (!known) { missing("#rCoins", "not available now"); return false; }
+    if (!known) { missing("#rCoins", tr("not available now")); return false; }
     LIVE.coins = total;
     figure("#rCoins", total, whole);
     const parts = [];
-    if (sol != null) parts.push(sol + " on " + SOL.name);
-    if (eth != null) parts.push(eth + " on " + (evm.name || "Ethereum Sepolia"));
+    if (sol != null) parts.push(tr("{n} on {net}", { n: sol, net: SOL.name }));
+    if (eth != null) parts.push(tr("{n} on {net}", { n: eth, net: evm.name || "Ethereum Sepolia" }));
     say("#rCoinsBy", parts.join(", ") + ".");
     const solBar = $("#nSolBar"), ethBar = $("#nEvmBar");
     if (solBar && ethBar) { solBar.style.flexGrow = String(sol || 0); ethBar.style.flexGrow = String(eth || 0); solBar.hidden = !sol; ethBar.hidden = !eth; }
@@ -496,7 +504,7 @@
     if (today != null) { LIVE.today = today; figure("#nToday", today, whole); }
     const line = $("#tVisits .t-today");
     if (line) line.hidden = !(LIVE.today > 0);
-    if (total == null) { missing("#rVisits", "not available now"); return false; }
+    if (total == null) { missing("#rVisits", tr("not available now")); return false; }
     LIVE.visits = total;
     figure("#rVisits", total, whole);
     return true;
@@ -510,10 +518,10 @@
     const hand = Number(L.feedbackOnX) || 0, goal = L.feedbackGoal;
     const show = (n) => {
       LIVE.fb = n;
-      figure("#rFb", n, (v) => whole(v) + " of " + goal); figure("#nFb", n, whole);
+      figure("#rFb", n, (v) => tr("{n} of {goal}", { n: whole(v), goal })); figure("#nFb", n, whole);
       fill("#rFbBar", n / goal); fill("#nFbBar", n / goal);
       const left = Math.max(0, goal - n);
-      say("#nFbNote", left ? whole(left) + " more " + (left === 1 ? "piece opens" : "pieces open") + " the launchpad." : "The mark is reached.");
+      say("#nFbNote", left ? (left === 1 ? tr("{n} more piece opens the launchpad.", { n: 1 }) : tr("{n} more pieces open the launchpad.", { n: whole(left) })) : tr("The mark is reached."));
     };
     try {
       const list = await getJson("https://api.github.com/repos/" + L.repo + "/issues?state=all&per_page=100", { headers: { accept: "application/vnd.github+json" } });
@@ -521,7 +529,7 @@
       return true;
     } catch (_) {
       if (LIVE.fb == null && hand) show(hand);
-      missing("#rFb", "not available now"); missing("#nFb", "not available now");
+      missing("#rFb", tr("not available now")); missing("#nFb", tr("not available now"));
       return false;
     }
   }
@@ -535,23 +543,24 @@
       const cap = best ? Number(best.marketCap) || 0 : 0;
       if (!(cap > 0)) throw new Error("no figure");
       LIVE.cap = cap;
-      figure("#rCap", cap, (v) => "$" + whole(v) + " of $1M"); figure("#nCap", cap, money);
+      figure("#rMc", cap, (v) => tr("{n} of $1M", { n: "$" + whole(v) })); figure("#nCap", cap, money);
       fill("#rCapBar", cap / L.capGoal); fill("#nCapBar", cap / L.capGoal);
       const part = cap / L.capGoal * 100, day = best.priceChange && Number(best.priceChange.h24);
-      const moved = Number.isFinite(day) && day !== 0 ? (day > 0 ? "Up " : "Down ") + Math.abs(day).toLocaleString("en-US", { maximumFractionDigits: 1 }) + "% in a day. " : "";
-      say("#nCapNote", moved + (part >= 100 ? "The mark is reached." : (part < 0.1 ? "Under 0.1" : part.toFixed(part < 10 ? 1 : 0)) + "% of the way to $1M."));
+      const by = { n: Math.abs(day).toLocaleString("en-US", { maximumFractionDigits: 1 }) };
+      const moved = Number.isFinite(day) && day !== 0 ? (day > 0 ? tr("Up {n}% in a day.", by) : tr("Down {n}% in a day.", by)) + " " : "";
+      say("#nCapNote", moved + (part >= 100 ? tr("The mark is reached.") : part < 0.1 ? tr("Under 0.1% of the way to $1M.") : tr("{n}% of the way to $1M.", { n: part.toFixed(part < 10 ? 1 : 0) })));
       const usd = (n) => "$" + Number(n).toLocaleString("en-US", { maximumFractionDigits: n >= 100 ? 0 : 2 }), tx = best.txns && best.txns.h24;
       if ($("#lpPrice")) {
         say("#lpPrice", "$" + String(best.priceUsd));
         say("#lpCap", usd(cap));
-        say("#lpVol", best.volume && best.volume.h24 != null ? usd(best.volume.h24) : "not available");
-        say("#lpTx", tx ? tx.buys + " buys, " + tx.sells + " sells" : "not available");
+        say("#lpVol", best.volume && best.volume.h24 != null ? usd(best.volume.h24) : tr("not available"));
+        say("#lpTx", tx ? tr("{buys} buys, {sells} sells", { buys: tx.buys, sells: tx.sells }) : tr("not available"));
         if (best.url && /^https:\/\/dexscreener\.com\//.test(best.url)) $("#rDex").href = best.url;
       }
       return true;
     } catch (_) {
-      missing("#rCap", "see it on pump.fun"); missing("#nCap", "not available now");
-      if (LIVE.cap == null) ["#lpPrice", "#lpCap", "#lpVol", "#lpTx"].forEach((id) => { if ($(id)) $(id).textContent = "see it on pump.fun"; });
+      missing("#rMc", tr("see it on pump.fun")); missing("#nCap", tr("not available now"));
+      if (LIVE.cap == null) ["#lpPrice", "#lpCap", "#lpVol", "#lpTx"].forEach((id) => { if ($(id)) $(id).textContent = tr("see it on pump.fun"); });
       return false;
     }
   }
@@ -573,17 +582,17 @@
     const age = Math.max(0, Math.round((Date.now() - LIVE.at) / 1000));
     box.dataset.state = LIVE.busy ? "busy" : LIVE.ok ? "ok" : "off";
     $("#nRefresh").disabled = LIVE.busy;
-    say("#nAgo", LIVE.busy ? (LIVE.at ? "Reading again…" : "Reading the networks…")
-      : !LIVE.ok ? "The figures could not be read. Trying again shortly."
-      : age < 2 ? "Live. Read just now." : "Live. Read " + age + " s ago.");
+    say("#nAgo", LIVE.busy ? (LIVE.at ? tr("Reading again…") : tr("Reading the networks…"))
+      : !LIVE.ok ? tr("The figures could not be read. Trying again shortly.")
+      : age < 2 ? tr("Live. Read just now.") : tr("Live. Read {n} s ago.", { n: age }));
   }
   function road() {
     const L = window.JISR_LAUNCH;
     if (!L) return;
     const copy = $("#rCopy");
     if (copy) copy.addEventListener("click", async () => {
-      try { await navigator.clipboard.writeText(L.coin); copy.textContent = "Copied"; } catch (_) { copy.textContent = "Select the address to copy it"; }
-      setTimeout(() => { copy.textContent = "Copy address"; }, 2500);
+      try { await navigator.clipboard.writeText(L.coin); copy.textContent = tr("Copied"); } catch (_) { copy.textContent = tr("Select the address to copy it"); }
+      setTimeout(() => { copy.textContent = tr("Copy address"); }, 2500);
     });
     const tiles = $("#nTiles");
     if (tiles) { if (eye) eye.observe(tiles); else tiles.classList.add("is-in"); }
@@ -611,7 +620,7 @@
       const text = msg.value.trim();
       send.disabled = busy || text.length < 10;
       if (busy || note.dataset.kept === "1") return;
-      say(text.length >= 10 ? "Ready to send." : text ? "Add a few more words so we can understand it." : "Write your message, then press Send message.");
+      say(text.length >= 10 ? tr("Ready to send.") : text ? tr("Add a few more words so we can understand it.") : tr("Write your message, then press Send message."));
     }
     [msg, email].forEach((e) => e.addEventListener("input", () => { note.dataset.kept = ""; update(); }));
     topic.addEventListener("change", update);
@@ -620,15 +629,15 @@
       const text = msg.value.trim(), from = email.value.trim();
       if (busy || text.length < 10) return;
       if ($("#cTrap").value) return;                                   // filled in only by a robot
-      if (from && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(from)) { say("That email address does not look right. Fix it, or leave it empty.", "bad"); note.dataset.kept = "1"; return; }
-      busy = true; update(); say("Sending…");
-      const fallback = () => { say("We could not send it from here. Please email it to " + to + ".", "bad"); note.dataset.kept = "1"; };
+      if (from && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(from)) { say(tr("That email address does not look right. Fix it, or leave it empty."), "bad"); note.dataset.kept = "1"; return; }
+      busy = true; update(); say(tr("Sending…"));
+      const fallback = () => { say(tr("We could not send it from here. Please email it to {to}.", { to }), "bad"); note.dataset.kept = "1"; };
       try {
         const body = { _subject: "Landing Pad contact: " + topic.value, _template: "table", _captcha: "false", topic: topic.value, message: text, page: location.href };
         if (from) { body.email = from; body._replyto = from; }
         const r = await fetch("https://formsubmit.co/ajax/" + encodeURIComponent(L.contactKey || to), { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(body) });
         const j = await r.json().catch(() => ({}));
-        if (r.ok && String(j.success) === "true") { msg.value = ""; say("Sent. Thank you" + (from ? ", we will reply to " + from + "." : "."), "good"); note.dataset.kept = "1"; }
+        if (r.ok && String(j.success) === "true") { msg.value = ""; say(from ? tr("Sent. Thank you, we will reply to {to}.", { to: from }) : tr("Sent. Thank you."), "good"); note.dataset.kept = "1"; }
         else fallback();
       } catch (_) { fallback(); }
       busy = false; update();

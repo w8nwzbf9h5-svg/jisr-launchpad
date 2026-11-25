@@ -267,3 +267,13 @@ a.tile:hover .t-go{text-decoration:underline}
   .n-live[data-state="ok"] .n-dot,.tile.went-up .t-fig b,.tile.went-down .t-fig b{animation:none}
   .t-bar i,.t-split i{transition:none}
 }
+.t-fig b.is-words{font:500 15px/1.4 var(--body);letter-spacing:0;color:var(--muted)}
+/* on a phone the top bar holds the name and the language menu; the two doors are in the first screen below */
+@media (max-width:519px){.home .top .right .btn{display:none}}
+/* right to left: charts, sliders and the name keep their left-to-right direction */
+[dir="rtl"] .brand,[dir="rtl"] .m-chart,[dir="rtl"] svg,[dir="rtl"] input[type="range"],[dir="rtl"] .amt{direction:ltr}
+[dir="rtl"] b[id],[dir="rtl"] output,[dir="rtl"] #bKey b,[dir="rtl"] #bOut b{unicode-bidi:plaintext}
+[dir="rtl"] .c-trap{left:auto;right:-9999px}
+[dir="rtl"] .strip .linkbtn{margin-left:0;margin-right:6px}
+[dir="rtl"] .n-again{margin-left:0;margin-right:4px}
+[dir="rtl"] .welcome .w-x{right:auto;left:12px}

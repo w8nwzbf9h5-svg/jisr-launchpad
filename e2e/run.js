@@ -191,6 +191,38 @@ function waitFor(child, text, ms) {
       step("home page: the model matches the contracts, the stress test holds over " + stress.trades + " simulated trades, old links still open the launchpad");
     }
 
+    // 1a2. The home page in the nine other languages: every text is translated, the page still works and fits a phone.
+    {
+      const out = execFileSync("node", [path.join(ROOT, "scripts", "i18n.js"), "build"], { encoding: "utf8" });
+      assert(!/not translated|marks differ|unknown code|appears twice/.test(out), "the translation files are complete and well formed:\n" + out);
+      const english = "Launch a coin whose floor is paid for in advance.";
+      for (const lang of ["ar", "zh", "es", "hi", "fr", "ru", "pt", "id", "tr"]) {
+        const thrown = [], onErr = (e) => thrown.push(String(e));
+        page.on("pageerror", onErr);
+        await page.goto(WEB + "/?lang=" + lang, { waitUntil: "domcontentloaded" });
+        await page.waitForFunction(() => window.JISR_HOME && document.querySelector("#bOut").textContent.length > 0);
+        await page.evaluate(() => window.JISR_HOME.runStress("attacker", { seed: 3, animate: false }));
+        const seen = await page.evaluate(() => ({ missing: window.JISR_I18N.missing, lang: document.documentElement.lang, dir: document.documentElement.dir, h1: document.querySelector("h1").textContent,
+          pick: document.querySelector(".lang-pick").value, fits: document.documentElement.scrollWidth <= document.documentElement.clientWidth, buy: document.querySelector("#bOut").textContent, hidden: getComputedStyle(document.body).visibility }));
+        assert.deepEqual(seen.missing, [], lang + ": texts with no translation: " + seen.missing.join(" | "));
+        assert(seen.lang === lang && seen.pick === lang && seen.h1 !== english && seen.h1.length > 5, lang + ": the page is shown in that language: " + JSON.stringify(seen));
+        assert.equal(seen.dir, lang === "ar" ? "rtl" : "", lang + ": text direction");
+        assert(seen.buy.includes("$1,000.00") && seen.buy.includes("$902.50") && seen.hidden === "visible", lang + ": the model still gives the same figures: " + seen.buy);
+        assert.equal(seen.fits, true, lang + ": the home page fits a phone screen");
+        assert.deepEqual(thrown, [], lang + ": the home page threw errors: " + thrown.join(" | "));
+        page.off("pageerror", onErr);
+      }
+      // choosing a language from the menu reloads the page in it and remembers the choice; English brings it back
+      await page.select(".lang-pick", "es");
+      await page.waitForFunction(() => document.documentElement.lang === "es" && window.JISR_HOME && !/[?&]lang=/.test(location.search));
+      assert.equal(await text("h1"), "Lanza una moneda cuyo mínimo está pagado por adelantado.");
+      await page.goto(WEB + "/", { waitUntil: "domcontentloaded" });
+      await page.waitForFunction(() => window.JISR_HOME && document.documentElement.lang === "es");
+      await page.select(".lang-pick", "en");
+      await page.waitForFunction((t) => window.JISR_HOME && document.querySelector("h1").textContent === t, {}, english);
+      await page.goto(APP, { waitUntil: "networkidle0" });
+    }
+
     // 1b. The white paper is linked from the site and reads in English and Arabic.
     assert.equal(await page.$eval("#nav-paper", (el) => el.getAttribute("href")), "whitepaper.html");
     await page.goto(WEB + "/whitepaper.html?lang=en", { waitUntil: "networkidle0" });
