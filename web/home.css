@@ -298,3 +298,15 @@ a.tile:hover .t-go{text-decoration:underline}
 .v-end input[type="text"]{width:100%;min-height:46px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
 .v-go{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
 @media (min-width:900px){.vote{grid-template-columns:repeat(3,minmax(0,1fr))}.v-end{grid-column:1/-1;max-width:640px}}
+
+/* the top bar of the home page: it has more links than fit beside the name, so they take a row of their own.
+   On a wide screen they wrap rather than hide; on a phone they stay on one line that slides sideways, with a
+   fading edge to show there is more. */
+.home .top .wrap{flex-wrap:wrap;padding-top:10px}
+.home .top nav{order:3;width:100%;scrollbar-width:none;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 44px),transparent)}
+.home .top nav::-webkit-scrollbar{display:none}
+[dir="rtl"].home .top nav,[dir="rtl"] .home .top nav{-webkit-mask-image:linear-gradient(to left,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(to left,#000 calc(100% - 44px),transparent)}
+.home .top nav a{padding:9px 12px 10px}
+@media (min-width:820px){
+  .home .top nav,[dir="rtl"] .home .top nav{flex-wrap:wrap;overflow:visible;-webkit-mask-image:none;mask-image:none;margin:0 -12px;width:calc(100% + 24px)}
+}
