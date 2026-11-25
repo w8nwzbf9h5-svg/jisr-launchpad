@@ -215,3 +215,9 @@
 .c-note.bad{color:#F08A76}
 .say a{color:var(--accent)}
 .c-note{margin:6px 0 0;font-size:13.5px;line-height:1.5;color:var(--muted)}
+
+.r-stats{flex:1 1 100%;margin:4px 0 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.r-stats div{background:var(--raise);padding:10px 12px;min-width:0}
+.r-stats dt{font-size:12.5px;color:var(--muted)}
+.r-stats dd{margin:2px 0 0;font-size:15px;font-weight:600;overflow-wrap:anywhere}
+@media (min-width:760px){.r-stats{grid-template-columns:repeat(6,minmax(0,1fr))}}

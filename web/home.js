@@ -386,6 +386,8 @@
     if (again) again.addEventListener("click", open);
     const toRoad = $("#wRoad");
     if (toRoad) toRoad.addEventListener("click", () => box.close());
+    const toContact = $("#wContact");
+    if (toContact) toContact.addEventListener("click", () => box.close());
     if (!seen() && !/^#(board|launch|how|coin-)/.test(location.hash)) setTimeout(open, 700);
   }
   /* The road to mainnet: how much tester feedback has come in, and the market cap of the project's coin.
@@ -409,10 +411,20 @@
     try {
       const r = await fetch("https://api.dexscreener.com/tokens/v1/solana/" + L.coin);
       if (!r.ok) throw new Error("no answer");
-      const pairs = await r.json(), cap = Math.max(0, ...(Array.isArray(pairs) ? pairs : []).map((p) => Number(p.marketCap) || 0));
+      const pairs = await r.json(), best = (Array.isArray(pairs) ? pairs : []).slice().sort((a, b) => (Number(b.marketCap) || 0) - (Number(a.marketCap) || 0))[0];
+      const cap = best ? Number(best.marketCap) || 0 : 0;
       if (!(cap > 0)) throw new Error("no figure");
       $("#rCap").textContent = "$" + Math.round(cap).toLocaleString("en-US") + " of $1M"; bar("#rCapBar", cap / L.capGoal);
-    } catch (_) { $("#rCap").textContent = "see it on pump.fun"; }
+      const usd = (n) => "$" + Number(n).toLocaleString("en-US", { maximumFractionDigits: n >= 100 ? 0 : 2 }), tx = best.txns && best.txns.h24;
+      $("#lpPrice").textContent = "$" + String(best.priceUsd);
+      $("#lpCap").textContent = usd(cap);
+      $("#lpVol").textContent = best.volume && best.volume.h24 != null ? usd(best.volume.h24) : "not available";
+      $("#lpTx").textContent = tx ? tx.buys + " buys, " + tx.sells + " sells" : "not available";
+      if (best.url && /^https:\/\/dexscreener\.com\//.test(best.url)) $("#rDex").href = best.url;
+    } catch (_) {
+      $("#rCap").textContent = "see it on pump.fun";
+      ["#lpPrice", "#lpCap", "#lpVol", "#lpTx"].forEach((id) => { $(id).textContent = "see it on pump.fun"; });
+    }
   }
   /* Two plain counts for the road section: coins launched on the test networks, read from the chain, and
      visits to the site, from the counter in visits.js. Each says so when it could not be read. */
@@ -438,25 +450,20 @@
     const v = await (window.JISR_VISITS || Promise.resolve(null));
     $("#rVisits").textContent = v == null ? "not available now" : Number(v).toLocaleString("en-US");
   }
-  /* Contact: Send message posts the message to FormSubmit, which emails it to the project's inbox. If that
-     fails for any reason the visitor is given the address to write to, so a message is never lost silently.
-     The two links underneath open X or GitHub with the message filled in, for those who prefer it public. */
+  /* Contact: Send message posts the message to FormSubmit, which emails it to the project's inbox. The visitor
+     stays on this page. If sending fails for any reason they are given the address to write to, so a message
+     is never lost silently. */
   function contact() {
     const msg = $("#cMsg"), L = window.JISR_LAUNCH || {};
     if (!msg) return;
-    const topic = $("#cTopic"), email = $("#cEmail"), x = $("#cX"), gh = $("#cGh"), note = $("#cNote"), send = $("#cSend"), to = L.contactEmail || "";
-    const set = (a, href) => { if (href) { a.href = href; a.setAttribute("aria-disabled", "false"); } else { a.removeAttribute("href"); a.setAttribute("aria-disabled", "true"); } };
+    const topic = $("#cTopic"), email = $("#cEmail"), note = $("#cNote"), send = $("#cSend"), to = L.contactEmail || "";
     const say = (text, cls) => { note.textContent = text; note.className = "c-note" + (cls ? " " + cls : ""); };
     let busy = false;
     function update() {
       const text = msg.value.trim();
       send.disabled = busy || text.length < 10;
-      if (text.length < 10) { set(x, ""); set(gh, ""); if (!busy && note.dataset.kept !== "1") say(text ? "Add a few more words so we can understand it." : "Write your message, then press Send message."); return; }
-      const post = "@landingpadfun " + topic.value + ": " + text;
-      set(x, post.length <= 280 ? "https://x.com/intent/post?text=" + encodeURIComponent(post) : "");
-      set(gh, "https://github.com/" + (L.repo || "w8nwzbf9h5-svg/jisr-launchpad") + "/issues/new?title=" + encodeURIComponent(topic.value + ": " + text.slice(0, 70)) +
-        "&body=" + encodeURIComponent(text + "\n\nSent from the contact form on landingpad.fun"));
-      if (!busy && note.dataset.kept !== "1") say("Ready to send.");
+      if (busy || note.dataset.kept === "1") return;
+      say(text.length >= 10 ? "Ready to send." : text ? "Add a few more words so we can understand it." : "Write your message, then press Send message.");
     }
     [msg, email].forEach((e) => e.addEventListener("input", () => { note.dataset.kept = ""; update(); }));
     topic.addEventListener("change", update);

@@ -113,8 +113,8 @@ function waitFor(child, text, ms) {
       // a new visitor is welcomed once, and invited to test and to give feedback
       await page.waitForFunction(() => document.querySelector("#welcome").open);
       const invites = await page.$$eval("#welcome a", (as) => as.map((x) => x.getAttribute("href")));
-      assert(invites.includes("solana.html") && invites.includes("app.html") && invites.some((h) => h.startsWith("https://x.com/intent/post")) && invites.some((h) => h.endsWith("/issues/new")),
-        "the welcome window offers both launchpads and two ways to give feedback: " + invites.join(" "));
+      assert(invites.includes("solana.html") && invites.includes("app.html") && invites.includes("#contact"),
+        "the welcome window offers both launchpads and the way to give feedback: " + invites.join(" "));
       await page.keyboard.press("Escape");
       assert.equal(await page.$eval("#welcome", (d) => d.open), false, "the welcome window closes");
       await page.waitForFunction(() => localStorage.getItem("jisr.welcomed") === "1", { timeout: 5000 });   // and is not shown to the same visitor again
@@ -126,13 +126,12 @@ function waitFor(child, text, ms) {
       assert(roadText.includes("GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump") && roadText.includes("100 pieces of feedback") && roadText.includes("$1M market cap") && roadText.includes("does not have the floor"),
         "the road to mainnet shows the coin's address, the two marks and the warning");
       assert.equal(await page.$eval("#road a.btn.primary", (a) => a.href), "https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump");
+      assert((await text("#lpad")).includes("Market cap") && (await text("#lpad")).includes("Volume, 24h"), "the coin's figures have their place on the page");
       // the contact form sends a message to the project's inbox through the form service, and says so when it cannot
       assert.equal(await page.$eval("#cSend", (b) => b.disabled), true, "nothing to send before a message is written");
       await page.type("#cMsg", "The sell button stays grey after I connect.");
       await page.type("#cEmail", "tester@example.org");
-      const sendX = await page.$eval("#cX", (a) => a.href), sendGh = await page.$eval("#cGh", (a) => a.href);
-      assert(sendX.startsWith("https://x.com/intent/post?text=") && decodeURIComponent(sendX).includes("@landingpadfun Bug or problem: The sell button stays grey"), "the message can also go to X: " + sendX);
-      assert(sendGh.includes("/issues/new?title=") && decodeURIComponent(sendGh).includes("The sell button stays grey after I connect."), "or to GitHub as a report: " + sendGh);
+      assert.equal(await page.$$eval('#contact a[href*="x.com"], #contact a[href*="github.com"]', (a) => a.length), 0, "the contact form does not send the visitor to another site");
       await page.evaluate(() => { window.__sent = []; window.__realFetch = window.fetch; window.fetch = (url, opt) => { if (String(url).startsWith("https://formsubmit.co/")) { window.__sent.push({ url: String(url), body: JSON.parse(opt.body) }); return Promise.resolve(new Response(JSON.stringify({ success: window.__answer }), { status: 200, headers: { "content-type": "application/json" } })); } return window.__realFetch(url, opt); }; window.__answer = "false"; });
       await page.click("#cSend");
       await page.waitForFunction(() => document.querySelector("#cNote").textContent.includes("feedback@landingpad.fun"));

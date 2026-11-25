@@ -421,7 +421,7 @@
     $("#walletTxt").textContent = S.account ? short(S.account) + (S.bal ? " · " + fUsd(S.bal.stable) : "") : "Connect wallet";
     const faucet = S.cfg && S.cfg.faucet && S.account ? ' <button class="linkbtn" data-act="faucet">Get 10,000 test ' + esc(S.stable ? S.stable.symbol : "USD") + "</button>" : "";
     $("#foot").innerHTML = (S.cfg ? "Network: " + esc(S.cfg.name) + ". Factory <span class=\"addr\">" + esc(S.cfg.factory) + "</span>." : "No network configured.") + faucet +
-      " Not audited. Use at your own risk. <a class=\"linkbtn\" href=\"whitepaper.html\">White paper</a> <a class=\"linkbtn\" href=\"https://x.com/landingpadfun\" rel=\"noopener\">X</a> <a class=\"linkbtn\" href=\"https://github.com/w8nwzbf9h5-svg/jisr-launchpad/issues/new\" rel=\"noopener\">Give feedback</a>";
+      " Not audited. Use at your own risk. <a class=\"linkbtn\" href=\"whitepaper.html\">White paper</a> <a class=\"linkbtn\" href=\"https://x.com/landingpadfun\" rel=\"noopener\">X</a> <a class=\"linkbtn\" href=\"./#contact\">Contact us</a>";
     renderXfers();
     // on a test network, offer the test money at the top of the page too, where a new visitor sees it
     const oldFaucet = $("#stripFaucet"); if (oldFaucet) oldFaucet.remove();

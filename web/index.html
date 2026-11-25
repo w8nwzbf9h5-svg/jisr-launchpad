@@ -22,7 +22,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=fa305785">
-<link rel="stylesheet" href="home.css?v=fb4d693c">
+<link rel="stylesheet" href="home.css?v=a9f98edd">
 </head>
 <body class="home">
 
@@ -35,6 +35,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
       <a href="#proof">Live checks</a>
       <a href="#try">Try it</a>
       <a href="markets.html">Charts</a>
+      <a href="#lpad">LPAD coin</a>
       <a href="#contact">Contact</a>
       <a href="whitepaper.html">White paper</a>
     </nav>
@@ -106,7 +107,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
       <div class="r-card">
         <div class="r-top"><span>Tester feedback</span><b class="num" id="rFb">counting…</b></div>
         <div class="r-bar" aria-hidden="true"><i id="rFbBar"></i></div>
-        <p>Reports on GitHub are counted as you open this page, and reports on X are added by hand. <a href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad/issues/new" rel="noopener">Report a problem</a></p>
+        <p>Counted by hand from the messages testers send us, so the number can be a day behind. <a href="#contact">Send your feedback</a></p>
       </div>
       <div class="r-card">
         <div class="r-top"><span>LPAD market cap</span><b class="num" id="rCap">reading…</b></div>
@@ -124,12 +125,21 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
         <p>Counted once per browser per day, since 25 November 2026.</p>
       </div>
     </div>
-    <div class="r-coin">
-      <div class="r-ca"><b>LPAD on pump.fun</b><code id="rCa">GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump</code></div>
+    <div class="r-coin" id="lpad">
+      <div class="r-ca"><b>LPAD, the project's meme coin on pump.fun</b><code id="rCa">GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump</code></div>
       <div class="r-acts">
         <button type="button" class="btn" id="rCopy">Copy address</button>
+        <a class="btn" id="rDex" href="https://dexscreener.com/solana/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump" target="_blank" rel="noopener">Chart on DEX Screener</a>
         <a class="btn primary" href="https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump" target="_blank" rel="noopener">Open on pump.fun</a>
       </div>
+      <dl class="r-stats">
+        <div><dt>Price</dt><dd class="num" id="lpPrice">reading…</dd></div>
+        <div><dt>Market cap</dt><dd class="num" id="lpCap">reading…</dd></div>
+        <div><dt>Volume, 24h</dt><dd class="num" id="lpVol">reading…</dd></div>
+        <div><dt>Trades, 24h</dt><dd class="num" id="lpTx">reading…</dd></div>
+        <div><dt>Network</dt><dd>Solana</dd></div>
+        <div><dt>Supply</dt><dd class="num">1,000,000,000</dd></div>
+      </dl>
     </div>
     <p class="fine r-warn">LPAD is a meme coin. It trades on pump.fun's curve, so it does not have the floor that coins launched on Landing Pad get, and it carries no claim on the launchpad or its fees. Other coins can copy the name: check the address above before you buy.</p>
   </section>
@@ -246,14 +256,13 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
         <button type="submit" class="btn primary" id="cSend" disabled>Send message</button>
       </div>
       <p class="c-note" id="cNote" role="status">Write your message, then press Send message.</p>
-      <p class="c-alt">Prefer to post it in public? <a id="cX" target="_blank" rel="noopener" aria-disabled="true">Send it on X</a> or <a id="cGh" target="_blank" rel="noopener" aria-disabled="true">open it on GitHub</a>.</p>
       <p class="c-fine">The message is delivered to our inbox by FormSubmit, a form-to-email service. This site does not store it.</p>
     </form>
   </section>
 
   <footer class="end">
     <p>© 2026 Landing Pad. All rights reserved. The code, the design and the documents are proprietary. Reading them is not permission to copy or reuse them.</p>
-    <p>This is a public test and not an offer of any kind. A floor limits how far a price can fall inside the launchpad; it does not make a coin a good purchase. <a href="whitepaper.html">White paper</a>. Follow <a href="https://x.com/landingpadfun" rel="noopener">@landingpadfun on X</a>. <a href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad/issues/new" rel="noopener">Give feedback</a>.</p>
+    <p>This is a public test and not an offer of any kind. A floor limits how far a price can fall inside the launchpad; it does not make a coin a good purchase. <a href="whitepaper.html">White paper</a>. Follow <a href="https://x.com/landingpadfun" rel="noopener">@landingpadfun on X</a>. <a href="#contact">Contact us</a>.</p>
   </footer>
 </main>
 
@@ -275,7 +284,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
   </div>
   <div class="w-fb">
     <b>Then give feedback.</b> A bug, a confusing step, a number that looks wrong: all of it helps.
-    <span><a href="https://x.com/intent/post?text=%40landingpadfun%20" rel="noopener" target="_blank">Tell us on X</a> or <a href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad/issues/new" rel="noopener" target="_blank">report it on GitHub</a></span>
+    <span><a href="#contact" id="wContact">Send us a message</a>, right here on the site.</span>
   </div>
   <p class="w-coin">The project's meme coin, <a href="https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump" target="_blank" rel="noopener">LPAD, is live on pump.fun</a>. Mainnet opens after 100 pieces of feedback or a $1M market cap. <a href="#road" id="wRoad">See the progress</a></p>
   <form method="dialog"><button class="linkbtn w-later">Look around first</button></form>
@@ -285,7 +294,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <script>
 /* Load the scripts in order. */
 (function () {
-  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=1a0b97dd", "solana/config.js?v=06202dc5", "visits.js?v=babde925", "launch.js?v=6e883357", "home.js?v=49ca78ed"];
+  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=1a0b97dd", "solana/config.js?v=06202dc5", "visits.js?v=babde925", "launch.js?v=6e883357", "home.js?v=1f004eb5"];
   (function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");
