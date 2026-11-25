@@ -414,8 +414,54 @@
       $("#rCap").textContent = "$" + Math.round(cap).toLocaleString("en-US") + " of $1M"; bar("#rCapBar", cap / L.capGoal);
     } catch (_) { $("#rCap").textContent = "see it on pump.fun"; }
   }
-  window.JISR_HOME = { stateAt, applyBuy, liability, state: S, render, runChecks, simulate, runStress, road };
+  /* Two plain counts for the road section: coins launched on the test networks, read from the chain, and
+     visits to the site, from the counter in visits.js. Each says so when it could not be read. */
+  async function counts() {
+    if (!$("#rCoins")) return;
+    const parts = [];
+    let total = 0, known = false;
+    if (SOL.programId) {
+      try {
+        const conn = new web3.Connection(SOL.rpcUrl, { commitment: "confirmed", disableRetryOnRateLimit: true });
+        const cfg = await J.getConfig(conn, new web3.PublicKey(SOL.programId)), n = cfg ? Number(cfg.coinCount) : 0;
+        total += n; known = true; parts.push(n + " on " + SOL.name);
+      } catch (_) { /* this network is left out of the count */ }
+    }
+    if (evm.factory && evm.rpcUrl) {
+      try {
+        const n = parseInt(await ethCall("eth_call", [{ to: evm.factory, data: "0x678fd289" }, "latest"]), 16); // coinCount()
+        if (Number.isFinite(n)) { total += n; known = true; parts.push(n + " on " + (evm.name || "Ethereum Sepolia")); }
+      } catch (_) { /* this network is left out of the count */ }
+    }
+    $("#rCoins").textContent = known ? String(total) : "not available now";
+    if (known) $("#rCoinsBy").firstChild.textContent = parts.join(", ") + ". ";
+    const v = await (window.JISR_VISITS || Promise.resolve(null));
+    $("#rVisits").textContent = v == null ? "not available now" : Number(v).toLocaleString("en-US");
+  }
+  /* Contact: the message is never sent by this site. The two buttons open X or GitHub with it filled in. */
+  function contact() {
+    const msg = $("#cMsg"), L = window.JISR_LAUNCH || {};
+    if (!msg) return;
+    const topic = $("#cTopic"), reach = $("#cReach"), x = $("#cX"), gh = $("#cGh"), note = $("#cNote");
+    const set = (a, href) => { if (href) { a.href = href; a.setAttribute("aria-disabled", "false"); } else { a.removeAttribute("href"); a.setAttribute("aria-disabled", "true"); } };
+    function update() {
+      const text = msg.value.trim(), who = reach.value.trim();
+      if (text.length < 10) { set(x, ""); set(gh, ""); note.textContent = text ? "Add a few more words so we can understand it." : "Write your message, then choose where to send it."; return; }
+      const post = "@landingpadfun " + topic.value + ": " + text + (who ? " (reach me: " + who + ")" : "");
+      set(x, post.length <= 280 ? "https://x.com/intent/post?text=" + encodeURIComponent(post) : "");
+      set(gh, "https://github.com/" + (L.repo || "w8nwzbf9h5-svg/jisr-launchpad") + "/issues/new?title=" + encodeURIComponent(topic.value + ": " + text.slice(0, 70)) +
+        "&body=" + encodeURIComponent(text + (who ? "\n\nReach me: " + who : "") + "\n\nSent from the contact form on landingpad.fun"));
+      note.textContent = post.length <= 280 ? "Both open in a new tab with your message filled in. You press send there." : "This is " + (post.length - 280) + " characters too long for one post on X. Send it on GitHub, or shorten it.";
+    }
+    [msg, reach].forEach((e) => e.addEventListener("input", update));
+    topic.addEventListener("change", update);
+    $("#cForm").addEventListener("submit", (e) => e.preventDefault());
+    update();
+  }
+  window.JISR_HOME = { stateAt, applyBuy, liability, state: S, render, runChecks, simulate, runStress, road, counts };
   start();
   welcome();
   road();
+  counts();
+  contact();
 })();

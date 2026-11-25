@@ -126,6 +126,17 @@ function waitFor(child, text, ms) {
       assert(roadText.includes("GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump") && roadText.includes("100 pieces of feedback") && roadText.includes("$1M market cap") && roadText.includes("does not have the floor"),
         "the road to mainnet shows the coin's address, the two marks and the warning");
       assert.equal(await page.$eval("#road a.btn.primary", (a) => a.href), "https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump");
+      // the contact form hands a message to X or GitHub and sends nothing itself
+      assert.equal(await page.$eval("#cX", (a) => a.getAttribute("aria-disabled")), "true", "nothing to send before a message is written");
+      await page.type("#cMsg", "The sell button stays grey after I connect.");
+      await page.type("#cReach", "@tester");
+      const sendX = await page.$eval("#cX", (a) => a.href), sendGh = await page.$eval("#cGh", (a) => a.href);
+      assert(sendX.startsWith("https://x.com/intent/post?text=") && decodeURIComponent(sendX).includes("@landingpadfun Bug or problem: The sell button stays grey") && decodeURIComponent(sendX).includes("@tester"), "the message goes to X addressed to the project: " + sendX);
+      assert(sendGh.includes("/issues/new?title=") && decodeURIComponent(sendGh).includes("The sell button stays grey after I connect."), "or to GitHub as a report: " + sendGh);
+      await page.type("#cMsg", " ".concat("More detail. ".repeat(30)));
+      assert.equal(await page.$eval("#cX", (a) => a.getAttribute("aria-disabled")), "true", "a message too long for X is offered to GitHub only");
+      assert.equal(await page.$eval("#cGh", (a) => a.getAttribute("aria-disabled")), "false");
+      assert((await text("#rCoins")).length > 0 && (await text("#rVisits")).length > 0, "the counts of coins and visits are shown, or say they are not available");
       const setIn = (id, v) => page.evaluate((id, v) => { const e = document.querySelector(id); e.value = v; e.dispatchEvent(new Event("input", { bubbles: true })); }, id, v);
       await setIn("#mSoldIn", 0); await setIn("#bAmt", "1000");
       const buyLine = await text("#bOut");

@@ -8,7 +8,7 @@ const crypto = require("crypto");
 const web = path.join(__dirname, "..", "web");
 const assets = ["styles.css", "home.css", "home.js", "app.js", "admin.js", "wallet.js", "config.js", "contracts.js", "vendor/ethers.umd.min.js",
   "solana/app.js", "solana/jisr-solana.js", "solana/config.js", "vendor/solana-web3.iife.min.js",
-  "markets.css", "markets.js", "launch.js", "vendor/lightweight-charts.standalone.production.js"];
+  "markets.css", "markets.js", "launch.js", "visits.js", "vendor/lightweight-charts.standalone.production.js"];
 const hash = (f) => crypto.createHash("sha256").update(fs.readFileSync(path.join(web, f))).digest("hex").slice(0, 8);
 
 for (const page of ["index.html", "app.html", "admin.html", "whitepaper.html", "solana.html", "markets.html"]) {

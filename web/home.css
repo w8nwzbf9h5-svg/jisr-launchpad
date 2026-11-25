@@ -197,3 +197,15 @@
 .welcome .w-coin{margin:12px 0 0;font-size:14px;line-height:1.55;color:var(--muted)}
 @media (min-width:760px){.road{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (prefers-reduced-motion:reduce){.r-bar i{transition:none}}
+
+/* contact: a message written here is handed to X or to GitHub; nothing is stored by this site */
+.contact{display:grid;gap:8px;max-width:640px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.contact label{font-size:14px;font-weight:600;color:var(--muted);margin-top:6px}
+.contact label:first-child{margin-top:0}
+.contact select,.contact textarea,.contact input{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:11px 12px;font-size:15.5px;line-height:1.5}
+.contact textarea{resize:vertical;min-height:120px}
+.contact select:focus,.contact textarea:focus,.contact input:focus{border-color:var(--accent);outline:none}
+.c-go{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.c-go .btn{flex:1 1 180px;text-align:center;padding:13px 16px}
+.c-go .btn[aria-disabled="true"]{opacity:.42;pointer-events:none}
+.c-note{margin:6px 0 0;font-size:13.5px;line-height:1.5;color:var(--muted)}

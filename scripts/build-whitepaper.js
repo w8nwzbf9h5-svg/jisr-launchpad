@@ -122,6 +122,7 @@ ${articles}
   sel.addEventListener("change", function () { show(sel.value); window.scrollTo(0, 0); });
 })();
 ${FIG.JS}</script>
+<script src="visits.js" defer></script>
 </body>
 </html>
 `;

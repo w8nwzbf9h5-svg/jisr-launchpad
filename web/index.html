@@ -22,7 +22,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=fa305785">
-<link rel="stylesheet" href="home.css?v=1589d78b">
+<link rel="stylesheet" href="home.css?v=c7518664">
 </head>
 <body class="home">
 
@@ -35,6 +35,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
       <a href="#proof">Live checks</a>
       <a href="#try">Try it</a>
       <a href="markets.html">Charts</a>
+      <a href="#contact">Contact</a>
       <a href="whitepaper.html">White paper</a>
     </nav>
     <div class="right">
@@ -111,6 +112,16 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
         <div class="r-top"><span>LPAD market cap</span><b class="num" id="rCap">reading…</b></div>
         <div class="r-bar" aria-hidden="true"><i id="rCapBar"></i></div>
         <p>Read from DEX Screener as you open this page.</p>
+      </div>
+    </div>
+    <div class="road">
+      <div class="r-card">
+        <div class="r-top"><span>Coins launched in the test</span><b class="num" id="rCoins">counting…</b></div>
+        <p id="rCoinsBy">Counted on the networks as you open this page. <a href="markets.html">See every coin and its chart</a></p>
+      </div>
+      <div class="r-card">
+        <div class="r-top"><span>Visits to the site</span><b class="num" id="rVisits">counting…</b></div>
+        <p>Counted once per browser per day, since 25 November 2026.</p>
       </div>
     </div>
     <div class="r-coin">
@@ -215,6 +226,29 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
     </div>
   </section>
 
+  <section class="sec" id="contact">
+    <h2>Contact us</h2>
+    <p class="say">A problem, a question, an idea or a partnership: write it here and send it to us on X or on GitHub. Both are public, so leave out anything private.</p>
+    <form class="contact" id="cForm">
+      <label for="cTopic">What is it about?</label>
+      <select id="cTopic">
+        <option>Bug or problem</option>
+        <option>Question</option>
+        <option>Idea or feedback</option>
+        <option>Partnership</option>
+      </select>
+      <label for="cMsg">Your message</label>
+      <textarea id="cMsg" rows="5" maxlength="2000"></textarea>
+      <label for="cReach">How can we reach you? Optional, and it will be public</label>
+      <input id="cReach" type="text" maxlength="120" autocomplete="off">
+      <div class="c-go">
+        <a class="btn primary" id="cX" target="_blank" rel="noopener" aria-disabled="true">Send on X</a>
+        <a class="btn" id="cGh" target="_blank" rel="noopener" aria-disabled="true">Send on GitHub</a>
+      </div>
+      <p class="c-note" id="cNote" role="status">Write your message, then choose where to send it.</p>
+    </form>
+  </section>
+
   <footer class="end">
     <p>© 2026 Landing Pad. All rights reserved. The code, the design and the documents are proprietary. Reading them is not permission to copy or reuse them.</p>
     <p>This is a public test and not an offer of any kind. A floor limits how far a price can fall inside the launchpad; it does not make a coin a good purchase. <a href="whitepaper.html">White paper</a>. Follow <a href="https://x.com/landingpadfun" rel="noopener">@landingpadfun on X</a>. <a href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad/issues/new" rel="noopener">Give feedback</a>.</p>
@@ -249,7 +283,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <script>
 /* Load the scripts in order. */
 (function () {
-  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=1a0b97dd", "solana/config.js?v=06202dc5", "launch.js?v=d25e9505", "home.js?v=241dc87c"];
+  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=1a0b97dd", "solana/config.js?v=06202dc5", "visits.js?v=babde925", "launch.js?v=d25e9505", "home.js?v=6fb917bd"];
   (function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");
