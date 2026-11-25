@@ -307,6 +307,6 @@ a.tile:hover .t-go{text-decoration:underline}
 .home .top nav::-webkit-scrollbar{display:none}
 [dir="rtl"].home .top nav,[dir="rtl"] .home .top nav{-webkit-mask-image:linear-gradient(to left,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(to left,#000 calc(100% - 44px),transparent)}
 .home .top nav a{padding:9px 12px 10px}
-@media (min-width:820px){
+@media (min-width:560px){
   .home .top nav,[dir="rtl"] .home .top nav{flex-wrap:wrap;overflow:visible;-webkit-mask-image:none;mask-image:none;margin:0 -12px;width:calc(100% + 24px)}
 }
