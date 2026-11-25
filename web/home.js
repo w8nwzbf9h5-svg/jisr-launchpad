@@ -372,6 +372,21 @@
       io.observe(box);
     } else runChecks();
   }
+  /* The welcome window. A new visitor sees it once, shortly after the page appears; "How to help test" opens it
+     again. Whether it has been seen is kept in this browser only, and the page works the same if that fails. */
+  function welcome() {
+    const box = $("#welcome"), again = $("#wOpen");
+    if (!box || typeof box.showModal !== "function") { if (again) again.hidden = true; return; }
+    const KEY = "jisr.welcomed";
+    const seen = () => { try { return localStorage.getItem(KEY) === "1"; } catch (_) { return false; } };
+    const open = () => { if (!box.open) box.showModal(); };
+    box.addEventListener("close", () => { try { localStorage.setItem(KEY, "1"); } catch (_) {} });
+    // a click on the dimmed page around the window closes it
+    box.addEventListener("click", (e) => { const r = box.getBoundingClientRect(); if (e.target === box && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) box.close(); });
+    if (again) again.addEventListener("click", open);
+    if (!seen() && !/^#(board|launch|how|coin-)/.test(location.hash)) setTimeout(open, 700);
+  }
   window.JISR_HOME = { stateAt, applyBuy, liability, state: S, render, runChecks, simulate, runStress };
   start();
+  welcome();
 })();

@@ -157,3 +157,24 @@
 .s-cols{display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
 @media (min-width:980px){.s-cols{grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:30px;align-items:start}.s-say{padding-top:26px}}
 .s-say p{font-size:15px;line-height:1.6;margin:0 0 8px;max-width:60em}
+
+/* the welcome window: shown once to a new visitor, and again from "How to help test" */
+.welcome{width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:26px 26px 20px;border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--ink);box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.welcome::backdrop{background:rgba(5,7,12,.72)}
+.welcome .w-x{position:absolute;top:12px;right:12px;width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:10px;background:none;color:var(--muted);cursor:pointer}
+.welcome .w-x:hover{color:var(--ink);background:var(--raise)}
+.welcome .w-tag{margin:0 0 10px;font:600 13px var(--mono);color:var(--floor)}
+.welcome h2{margin:0 44px 12px 0;font-size:27px;line-height:1.15;font-weight:800;letter-spacing:-.02em}
+.welcome .w-say{margin:0 0 16px;font-size:15.5px;line-height:1.6;color:var(--ink);opacity:.86}
+.welcome .w-steps{margin:0 0 18px;padding:0 0 0 22px;display:grid;gap:8px;font-size:15px;line-height:1.5;color:var(--muted)}
+.welcome .w-steps b{color:var(--ink);font-weight:700}
+.welcome .w-go{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 16px}
+.welcome .w-go .btn{flex:1 1 200px;text-align:center;padding:13px 16px}
+.welcome .w-fb{border:1px solid var(--line);border-radius:12px;background:var(--raise);padding:12px 14px;font-size:14.5px;line-height:1.55;color:var(--muted)}
+.welcome .w-fb b{color:var(--ink)}
+.welcome .w-fb span{display:block;margin-top:4px}
+.welcome .w-fb a{color:var(--accent);font-weight:700;text-decoration:none}
+.welcome .w-fb a:hover{text-decoration:underline}
+.welcome .w-later{display:block;margin:14px auto 0;padding:10px 12px;min-height:44px}
+.strip .linkbtn{margin-left:6px}
+@media (max-width:480px){.welcome{padding:22px 18px 16px}.welcome h2{font-size:23px}}

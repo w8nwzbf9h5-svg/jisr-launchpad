@@ -152,7 +152,7 @@
     else if (S.view === "coin") renderCoin();
     else renderLaunch();
     $("#foot").innerHTML = "Network: " + esc(C.name) + ". Program " + (S.programId ? '<span class="num">' + esc(S.programId.toBase58()) + "</span>" : "not deployed") +
-      '. Not audited. Use at your own risk. <a class="linkbtn" href="whitepaper.html">White paper</a> <a class="linkbtn" href="https://x.com/landingpadfun" rel="noopener">X</a>' +
+      '. Not audited. Use at your own risk. <a class="linkbtn" href="whitepaper.html">White paper</a> <a class="linkbtn" href="https://x.com/landingpadfun" rel="noopener">X</a> <a class="linkbtn" href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad/issues/new" rel="noopener">Give feedback</a>' +
       (C.other ? ' · <a class="linkbtn" href="solana.html?net=' + esc(C.other.key) + '">Switch to ' + esc(C.other.name) + "</a>" : "");
   }
   /* The setup card replaces every view until the program is deployed and initialized. */

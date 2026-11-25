@@ -110,6 +110,17 @@ function waitFor(child, text, ms) {
       page.on("pageerror", onErr);
       await page.goto(WEB + "/", { waitUntil: "domcontentloaded" });
       await page.waitForFunction(() => window.JISR_HOME && document.querySelector("#bOut").textContent.length > 0);
+      // a new visitor is welcomed once, and invited to test and to give feedback
+      await page.waitForFunction(() => document.querySelector("#welcome").open);
+      const invites = await page.$$eval("#welcome a", (as) => as.map((x) => x.getAttribute("href")));
+      assert(invites.includes("solana.html") && invites.includes("app.html") && invites.some((h) => h.startsWith("https://x.com/intent/post")) && invites.some((h) => h.endsWith("/issues/new")),
+        "the welcome window offers both launchpads and two ways to give feedback: " + invites.join(" "));
+      await page.keyboard.press("Escape");
+      assert.equal(await page.$eval("#welcome", (d) => d.open), false, "the welcome window closes");
+      assert.equal(await page.evaluate(() => localStorage.getItem("jisr.welcomed")), "1", "and is not shown to the same visitor again");
+      await page.click("#wOpen");
+      assert.equal(await page.$eval("#welcome", (d) => d.open), true, "it opens again from the test notice");
+      await page.keyboard.press("Escape");
       const setIn = (id, v) => page.evaluate((id, v) => { const e = document.querySelector(id); e.value = v; e.dispatchEvent(new Event("input", { bubbles: true })); }, id, v);
       await setIn("#mSoldIn", 0); await setIn("#bAmt", "1000");
       const buyLine = await text("#bOut");

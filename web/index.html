@@ -22,7 +22,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=fa305785">
-<link rel="stylesheet" href="home.css?v=f36832f2">
+<link rel="stylesheet" href="home.css?v=df522dfe">
 </head>
 <body class="home">
 
@@ -42,7 +42,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
     </div>
   </div>
 </header>
-<div class="strip"><div class="wrap"><b>Public test.</b> Test networks only: the coins and the money here have no value. The contracts have not had an independent audit.</div></div>
+<div class="strip"><div class="wrap"><b>Public test.</b> Test networks only: the coins and the money here have no value. The contracts have not had an independent audit. <button type="button" class="linkbtn" id="wOpen">How to help test</button></div></div>
 
 <main class="wrap">
 
@@ -191,14 +191,38 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 
   <footer class="end">
     <p>© 2026 Landing Pad. All rights reserved. The code, the design and the documents are proprietary. Reading them is not permission to copy or reuse them.</p>
-    <p>This is a public test and not an offer of any kind. A floor limits how far a price can fall inside the launchpad; it does not make a coin a good purchase. <a href="whitepaper.html">White paper</a>. Follow <a href="https://x.com/landingpadfun" rel="noopener">@landingpadfun on X</a>.</p>
+    <p>This is a public test and not an offer of any kind. A floor limits how far a price can fall inside the launchpad; it does not make a coin a good purchase. <a href="whitepaper.html">White paper</a>. Follow <a href="https://x.com/landingpadfun" rel="noopener">@landingpadfun on X</a>. <a href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad/issues/new" rel="noopener">Give feedback</a>.</p>
   </footer>
 </main>
+
+<dialog id="welcome" class="welcome" aria-labelledby="wTitle">
+  <form method="dialog"><button class="w-x" aria-label="Close">
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button></form>
+  <p class="w-tag">Public test, open now</p>
+  <h2 id="wTitle">Launch a coin and try to break its floor.</h2>
+  <p class="w-say">Landing Pad is being tested in public before any real money goes near it. The coins and the dollars here are free test tokens. Use it hard, then tell us what went wrong.</p>
+  <ol class="w-steps">
+    <li><b>Get free test money.</b> One button inside the launchpad gives you test dollars.</li>
+    <li><b>Launch a coin, or buy one.</b> Every coin starts at the same fixed price.</li>
+    <li><b>Sell it back.</b> Check that the floor paid what the page promised.</li>
+  </ol>
+  <div class="w-go">
+    <a class="btn primary" href="solana.html" autofocus>Test on Solana</a>
+    <a class="btn" href="app.html">Test on Ethereum Sepolia</a>
+  </div>
+  <div class="w-fb">
+    <b>Then give feedback.</b> A bug, a confusing step, a number that looks wrong: all of it helps.
+    <span><a href="https://x.com/intent/post?text=%40landingpadfun%20" rel="noopener" target="_blank">Tell us on X</a> or <a href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad/issues/new" rel="noopener" target="_blank">report it on GitHub</a></span>
+  </div>
+  <form method="dialog"><button class="linkbtn w-later">Look around first</button></form>
+</dialog>
+
 
 <script>
 /* Load the scripts in order. */
 (function () {
-  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=1a0b97dd", "solana/config.js?v=06202dc5", "home.js?v=54f21605"];
+  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=1a0b97dd", "solana/config.js?v=06202dc5", "home.js?v=3224522a"];
   (function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");
