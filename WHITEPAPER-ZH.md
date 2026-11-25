@@ -136,7 +136,7 @@ Sepolia 上的测试部署：
 
 - 平台工厂合约：`0x4e34BD62B8245Fa7841061eeFa010fF054FA9d06`
 - Solana devnet: `5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8`
-- 网站：https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
+- 网站：https://landingpad.fun/
 - 代码：https://github.com/w8nwzbf9h5-svg/jisr-launchpad
 
 ## 8. 声明

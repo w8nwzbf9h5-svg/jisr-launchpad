@@ -4,7 +4,7 @@ A launchpad for meme coins where every coin is sold at one fixed price, and ever
 floor price into a reserve that nobody can withdraw. Any holder can sell back to that reserve at the
 floor price at any time.
 
-**Public test:** https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
+**Public test:** https://landingpad.fun/
 
 > Test networks only. The coins and the money there have no value. The contracts have not had an
 > independent security audit, and nothing is deployed on a real network.
@@ -24,10 +24,10 @@ Worked example: $1,000 buys 9,500,000 coins; selling them straight back returns 
 
 ## See it work
 
-- **[Home page](https://w8nwzbf9h5-svg.github.io/jisr-launchpad/)**: operate the model yourself, and watch your browser read the proof from the chain.
-- **[Launchpad on Solana devnet](https://w8nwzbf9h5-svg.github.io/jisr-launchpad/solana.html)** (Phantom).
-- **[Launchpad on Ethereum Sepolia](https://w8nwzbf9h5-svg.github.io/jisr-launchpad/app.html)** (MetaMask).
-- **[White paper](https://w8nwzbf9h5-svg.github.io/jisr-launchpad/whitepaper.html)**, with figures, in ten languages:
+- **[Home page](https://landingpad.fun/)**: operate the model yourself, and watch your browser read the proof from the chain.
+- **[Launchpad on Solana devnet](https://landingpad.fun/solana.html)** (Phantom).
+- **[Launchpad on Ethereum Sepolia](https://landingpad.fun/app.html)** (MetaMask).
+- **[White paper](https://landingpad.fun/whitepaper.html)**, with figures, in ten languages:
   [English](WHITEPAPER.md) · [العربية](WHITEPAPER-AR.md) · [中文](WHITEPAPER-ZH.md) · [Español](WHITEPAPER-ES.md) · [हिन्दी](WHITEPAPER-HI.md) · [Français](WHITEPAPER-FR.md) · [Русский](WHITEPAPER-RU.md) · [Português](WHITEPAPER-PT.md) · [Türkçe](WHITEPAPER-TR.md) · [Bahasa Indonesia](WHITEPAPER-ID.md)
 
 ## Where it runs today

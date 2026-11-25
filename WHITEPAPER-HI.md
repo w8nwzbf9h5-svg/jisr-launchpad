@@ -136,7 +136,7 @@ Sepolia पर टेस्ट डिप्लॉयमेंट:
 
 - प्लेटफ़ॉर्म फ़ैक्टरी: `0x4e34BD62B8245Fa7841061eeFa010fF054FA9d06`
 - Solana devnet: `5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8`
-- साइट: https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
+- साइट: https://landingpad.fun/
 - कोड: https://github.com/w8nwzbf9h5-svg/jisr-launchpad
 
 ## 8. सूचना

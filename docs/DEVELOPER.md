@@ -5,10 +5,10 @@ Paths below are from the repository root.
 
 A launchpad for meme coins where every coin is sold at one fixed price and has a floor covered 100% by a reserve nobody can withdraw. This repository holds the smart contracts and the web app that talks to them. The same contracts deploy on any EVM network.
 
-- **White paper:** [English](../WHITEPAPER.md) · [العربية](../WHITEPAPER-AR.md) · [中文](../WHITEPAPER-ZH.md) · [Español](../WHITEPAPER-ES.md) · [हिन्दी](../WHITEPAPER-HI.md) · [Français](../WHITEPAPER-FR.md) · [Русский](../WHITEPAPER-RU.md) · [Português](../WHITEPAPER-PT.md) · [Türkçe](../WHITEPAPER-TR.md) · [Bahasa Indonesia](../WHITEPAPER-ID.md) · [on the site](https://w8nwzbf9h5-svg.github.io/jisr-launchpad/whitepaper.html). English is the reference text.
-- **Site:** https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
+- **White paper:** [English](../WHITEPAPER.md) · [العربية](../WHITEPAPER-AR.md) · [中文](../WHITEPAPER-ZH.md) · [Español](../WHITEPAPER-ES.md) · [हिन्दी](../WHITEPAPER-HI.md) · [Français](../WHITEPAPER-FR.md) · [Русский](../WHITEPAPER-RU.md) · [Português](../WHITEPAPER-PT.md) · [Türkçe](../WHITEPAPER-TR.md) · [Bahasa Indonesia](../WHITEPAPER-ID.md) · [on the site](https://landingpad.fun/whitepaper.html). English is the reference text.
+- **Site:** https://landingpad.fun/
 - **Test deployment:** Sepolia test network, factory `0x4e34BD62B8245Fa7841061eeFa010fF054FA9d06`. Test money only, no value.
-- **Solana test deployment:** devnet, program `5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8`, deployed as final. [Solana page](https://w8nwzbf9h5-svg.github.io/jisr-launchpad/solana.html). Test money only, no value.
+- **Solana test deployment:** devnet, program `5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8`, deployed as final. [Solana page](https://landingpad.fun/solana.html). Test money only, no value.
 - **For a security reviewer:** [AUDIT.md](../AUDIT.md). **Before real money:** [GO-LIVE.md](../GO-LIVE.md).
 
 Status: tested locally end to end and deployed on two test networks. **Not audited and not deployed on any real network.** Do not put real money in before an independent security audit.

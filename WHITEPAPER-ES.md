@@ -136,7 +136,7 @@ Despliegue de prueba en Sepolia:
 
 - Fábrica de la plataforma: `0x4e34BD62B8245Fa7841061eeFa010fF054FA9d06`
 - Solana devnet: `5cbX2QdxMq948ySWxF6yHruKFtpp5Kf8WGA1wb3BaKC8`
-- Sitio: https://w8nwzbf9h5-svg.github.io/jisr-launchpad/
+- Sitio: https://landingpad.fun/
 - Código: https://github.com/w8nwzbf9h5-svg/jisr-launchpad
 
 ## 8. Aviso
