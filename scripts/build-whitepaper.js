@@ -53,6 +53,7 @@ const page = `<!DOCTYPE html>
 <meta property="og:description" content="One fixed price for everyone, and a reserve nobody can withdraw. Operate the model and read the proof live from the chain. Public test.">
 <meta property="og:image" content="https://landingpad.fun/og.png">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@landingpadfun">
 <title>Landing Pad: White Paper</title>
 <meta name="description" content="How Landing Pad works: a fixed sale price, a floor covered 100% by a reserve nobody can withdraw, and the risks.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
