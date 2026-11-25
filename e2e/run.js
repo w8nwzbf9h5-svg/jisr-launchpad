@@ -141,7 +141,7 @@ function waitFor(child, text, ms) {
       await page.waitForFunction(() => document.querySelector("#cNote").textContent.startsWith("Sent."));
       const posted = await page.evaluate(() => window.__sent);
       assert.equal(posted.length, 2);
-      assert.equal(posted[1].url, "https://formsubmit.co/ajax/feedback%40landingpad.fun");
+      assert(/^https:\/\/formsubmit\.co\/ajax\/[0-9a-f]{32}$/.test(posted[1].url), "the form posts to the private code, not to an address: " + posted[1].url);
       assert(posted[1].body.message === "The sell button stays grey after I connect." && posted[1].body.topic === "Bug or problem" && posted[1].body._replyto === "tester@example.org", "the message, its topic and the reply address are sent: " + JSON.stringify(posted[1].body));
       assert.equal(await page.$eval("#cMsg", (m) => m.value), "", "the box is cleared once the message is sent");
       await page.evaluate(() => { window.fetch = window.__realFetch; });

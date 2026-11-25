@@ -8,9 +8,9 @@ window.JISR_LAUNCH = {
   capGoal: 1000000,
   feedbackOnX: 0,
   repo: "w8nwzbf9h5-svg/jisr-launchpad",
-  // Contact form: the address the messages go to. The form posts to FormSubmit (formsubmit.co), which emails
-  // them on. `contactKey` may be the address itself or the random string FormSubmit gives after the address
-  // is confirmed, which keeps the address out of the request.
+  // Contact form. `contactEmail` is the address shown on the page for people who prefer to write directly.
+  // `contactKey` is where the form posts: the random string FormSubmit (formsubmit.co) gave when the owner
+  // confirmed the inbox that receives the messages. That inbox's address is not written anywhere on the site.
   contactEmail: "feedback@landingpad.fun",
-  contactKey: "feedback@landingpad.fun"
+  contactKey: "9e4c401d3b1cec653d92aea500df0128"
 };
