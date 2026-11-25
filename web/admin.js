@@ -86,7 +86,9 @@
 
   /* Gas to offer when neither the wallet nor the public endpoint can estimate it (measured use plus a margin). */
   const GAS = { MockStable: 800000n, MockRouter: 1200000n, LaunchpadFactory: 4800000n, BridgeSeller: 1500000n };
-  async function deployContract(name, args, label) {
+  /* `onAddress` is told the new contract's address as soon as it is known (before the network confirms), so a
+     caller can remember it and not pay for the same contract twice if this page stops waiting too early. */
+  async function deployContract(name, args, label, onAddress) {
     const data = (await new ethers.ContractFactory(ART[name].abi, ART[name].bytecode).getDeployTransaction(...args)).data;
     let addr = null, hash;
     status(label + ": وقّع من المحفظة…");
@@ -94,6 +96,7 @@
       // Through the standard CREATE2 deployer: an ordinary transaction with a recipient, which every wallet accepts.
       const salt = ethers.hexlify(ethers.randomBytes(32));
       addr = ethers.getCreate2Address(W.PROXY, salt, ethers.keccak256(data));
+      if (onAddress) onAddress(addr);
       hash = await W.rawSend(S.chainId, S.account, { to: W.PROXY, data: ethers.concat([salt, data]) }, GAS[name] + 150000n, 3);
     } else {
       hash = await W.rawSend(S.chainId, S.account, { data }, GAS[name], 3);
@@ -103,7 +106,16 @@
     if (!rc) throw new Error(label + ": لم تؤكد الشبكة العملية خلال 10 دقائق. تحقق من سجل المحفظة ثم أعد المحاولة.");
     if (Number(rc.status) !== 1) throw new Error(label + ": رفضت الشبكة العملية.");
     if (!addr) addr = rc.contractAddress;
-    if (!addr || !(await W.hasCode(S.chainId, addr))) throw new Error(label + ": لم يظهر العقد على الشبكة.");
+    if (!addr) throw new Error(label + ": لم يظهر العقد على الشبكة.");
+    if (onAddress) onAddress(addr);
+    // Public endpoints answer from several servers, and one of them can be a few blocks behind the one that
+    // returned the receipt. So the code is looked for over a minute before this is called a failure.
+    let seen = false;
+    for (let i = 0; i < 30 && !(seen = await W.hasCode(S.chainId, addr)); i++) {
+      status(label + ": بانتظار ظهور العقد على الشبكة…");
+      await new Promise((r) => setTimeout(r, 2000));
+    }
+    if (!seen) throw new Error(label + ": لم يظهر العقد على الشبكة. انتظر دقيقة ثم اضغط الزر مرة أخرى: ما نُشر لن يُدفع ثمنه مرتين.");
     return { target: ethers.getAddress(addr) };
   }
   function showResult(factory, testKit) {
@@ -179,14 +191,23 @@
       try { done = JSON.parse(localStorage.getItem(key) || "{}") || {}; } catch (_) {}
       const keep = () => { try { localStorage.setItem(key, JSON.stringify(done)); } catch (_) {} };
       const have = async (a) => ethers.isAddress(a || "") && (await W.hasCode(S.chainId, a));
-      if (!(await have(done.token))) {
-        done = { token: (await deployContract("MockStable", stock ? ["Mock Tesla Stock", "mTSLA", dec] : ["Mock USD", "mUSD", dec], "1 من 3: عملة الاحتياط التجريبية")).target }; keep();
+      // The first of these addresses that holds a contract. A "Try" address is one that was sent but that this
+      // page did not see confirmed (see deployContract): if it did arrive after all, it is used, not paid for again.
+      const pick = async (...list) => { for (const a of list) if (await have(a)) return ethers.getAddress(a); return null; };
+      let token = await pick(done.token, done.tokenTry);
+      if (!token) {
+        done = {}; keep();
+        token = (await deployContract("MockStable", stock ? ["Mock Tesla Stock", "mTSLA", dec] : ["Mock USD", "mUSD", dec], "1 من 3: عملة الاحتياط التجريبية", (a) => { done.tokenTry = a; keep(); })).target;
       }
+      done.token = token; keep();
       const perNative = (net().native === "BNB" ? 650n : 3200n) * unit;
-      if (!(await have(done.router))) {
-        done.router = (await deployContract("MockRouter", [ethers.Wallet.createRandom().address, done.token, perNative], "2 من 3: محوّل العملات التجريبي")).target; keep();
+      let router = await pick(done.router, done.routerTry);
+      if (!router) {
+        delete done.factoryTry;
+        router = (await deployContract("MockRouter", [ethers.Wallet.createRandom().address, token, perNative], "2 من 3: محوّل العملات التجريبي", (a) => { done.routerTry = a; keep(); })).target;
       }
-      const factory = await deployContract("LaunchpadFactory", [done.token, done.router, S.account, S.account, cap], "3 من 3: المصنع");
+      done.router = router; keep();
+      const factory = { target: (await pick(done.factoryTry)) || (await deployContract("LaunchpadFactory", [token, router, S.account, S.account, cap], "3 من 3: المصنع", (a) => { done.factoryTry = a; keep(); })).target };
       try { localStorage.removeItem(key); } catch (_) {}
       showResult(factory.target, true);
       status("تم نشر العدّة التجريبية. انسخ النص من الخطوة 4 إلى الملف deployments.js.", "good");
