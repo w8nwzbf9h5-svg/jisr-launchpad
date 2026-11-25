@@ -390,70 +390,210 @@
     if (toContact) toContact.addEventListener("click", () => box.close());
     if (!seen() && !/^#(board|launch|how|coin-)/.test(location.hash)) setTimeout(open, 700);
   }
-  /* The road to mainnet: how much tester feedback has come in, and the market cap of the project's coin.
-     Both are read from public services as the page opens; if one does not answer, its figure says so. */
-  async function road() {
-    const L = window.JISR_LAUNCH;
-    if (!L || !$("#road")) return;
-    const bar = (id, part) => { $(id).style.width = Math.max(part > 0 ? 1.5 : 0, Math.min(100, part * 100)).toFixed(1) + "%"; };
-    const copy = $("#rCopy");
-    copy.addEventListener("click", async () => {
-      try { await navigator.clipboard.writeText(L.coin); copy.textContent = "Copied"; } catch (_) { copy.textContent = "Select the address to copy it"; }
-      setTimeout(() => { copy.textContent = "Copy address"; }, 2500);
+  /* ---------- live figures ----------
+     The road to mainnet (tester feedback, the market cap of the project's coin) and the scoreboard at the
+     foot of the page (coins launched, visits, and the same two marks) are read from public services and from
+     the networks, then read again every half minute while the page is open and in view. A figure counts up
+     to its value when it first comes on screen and moves to the new value when it changes. If a source does
+     not answer, its figure says so and the last good value stays. */
+  const LIVE = { at: 0, busy: false, ok: false, fbAt: 0, visitsAt: 0, coins: null, visits: null, today: null, fb: null, cap: null };
+  const EVERY = 30000, calm = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const whole = (n) => Math.round(n).toLocaleString("en-US");
+  const money = (n) => (n >= 1e6 ? "$" + (n / 1e6).toFixed(2) + "M" : n >= 1e5 ? "$" + (n / 1e3).toFixed(1) + "K" : "$" + whole(n));
+  const inView = new WeakSet();
+  const eye = typeof IntersectionObserver === "function" ? new IntersectionObserver((seen) => {
+    seen.forEach((e) => {
+      if (!e.isIntersecting || inView.has(e.target)) return;
+      inView.add(e.target); eye.unobserve(e.target);
+      if (e.target.id === "nTiles") { e.target.classList.add("is-in"); return; }
+      if (e.target._to != null) run(e.target, 0, e.target._to);
     });
-    const hand = Number(L.feedbackOnX) || 0;
-    try {
-      const r = await fetch("https://api.github.com/repos/" + L.repo + "/issues?state=all&per_page=100", { headers: { accept: "application/vnd.github+json" } });
-      if (!r.ok) throw new Error("no answer");
-      const n = (await r.json()).filter((i) => !i.pull_request).length + hand;
-      $("#rFb").textContent = n + " of " + L.feedbackGoal; bar("#rFbBar", n / L.feedbackGoal);
-    } catch (_) { $("#rFb").textContent = hand ? hand + "+ of " + L.feedbackGoal : "not available now"; bar("#rFbBar", hand / L.feedbackGoal); }
-    try {
-      const r = await fetch("https://api.dexscreener.com/tokens/v1/solana/" + L.coin);
-      if (!r.ok) throw new Error("no answer");
-      const pairs = await r.json(), best = (Array.isArray(pairs) ? pairs : []).slice().sort((a, b) => (Number(b.marketCap) || 0) - (Number(a.marketCap) || 0))[0];
-      const cap = best ? Number(best.marketCap) || 0 : 0;
-      if (!(cap > 0)) throw new Error("no figure");
-      $("#rCap").textContent = "$" + Math.round(cap).toLocaleString("en-US") + " of $1M"; bar("#rCapBar", cap / L.capGoal);
-      const usd = (n) => "$" + Number(n).toLocaleString("en-US", { maximumFractionDigits: n >= 100 ? 0 : 2 }), tx = best.txns && best.txns.h24;
-      $("#lpPrice").textContent = "$" + String(best.priceUsd);
-      $("#lpCap").textContent = usd(cap);
-      $("#lpVol").textContent = best.volume && best.volume.h24 != null ? usd(best.volume.h24) : "not available";
-      $("#lpTx").textContent = tx ? tx.buys + " buys, " + tx.sells + " sells" : "not available";
-      if (best.url && /^https:\/\/dexscreener\.com\//.test(best.url)) $("#rDex").href = best.url;
-    } catch (_) {
-      $("#rCap").textContent = "see it on pump.fun";
-      ["#lpPrice", "#lpCap", "#lpVol", "#lpTx"].forEach((id) => { $(id).textContent = "see it on pump.fun"; });
-    }
+  }, { threshold: 0.25 }) : null;
+  function run(el, from, to) {
+    cancelAnimationFrame(el._raf);
+    if (calm || from === to) { el._now = to; el.textContent = el._fmt(to); return; }
+    const t0 = performance.now();
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / 900), v = k === 1 ? to : from + (to - from) * (1 - Math.pow(1 - k, 3));
+      el._now = v; el.textContent = el._fmt(v);
+      if (k < 1) el._raf = requestAnimationFrame(step);
+    };
+    el._raf = requestAnimationFrame(step);
   }
-  /* Two plain counts for the road section: coins launched on the test networks, read from the chain, and
-     visits to the site, from the counter in visits.js. Each says so when it could not be read. */
-  async function counts() {
-    if (!$("#rCoins")) return;
-    const parts = [];
-    let total = 0, known = false;
+  /* Show a number in an element. `fmt` turns the number into the words on the page. */
+  function figure(id, to, fmt) {
+    const el = $(id);
+    if (!el) return;
+    const first = el._to == null, was = first ? 0 : el._to;
+    el._to = to; el._fmt = fmt;
+    if (first && eye && !inView.has(el)) { el._now = to; el.textContent = fmt(to); eye.observe(el); return; }
+    if (!first && was === to) return;
+    const tile = el.closest(".tile");
+    if (!first && tile) {
+      tile.classList.remove("went-up", "went-down"); void tile.offsetWidth;
+      tile.classList.add(to > was ? "went-up" : "went-down");
+    }
+    run(el, first ? 0 : (el._now != null ? el._now : was), to);
+  }
+  /* A figure that could not be read: say so, unless a good value is already showing. */
+  function missing(id, words) { const el = $(id); if (el && el._to == null) el.textContent = words; }
+  const fill = (id, part) => { const el = $(id); if (el) el.style.width = Math.max(part > 0 ? 1.5 : 0, Math.min(100, part * 100)).toFixed(1) + "%"; };
+  const say = (id, words) => { const el = $(id); if (el && el.textContent !== words) el.textContent = words; };
+  const within = (ms, work) => Promise.race([work, new Promise((_, no) => setTimeout(() => no(new Error("too slow")), ms))]);
+  async function getJson(url, opts) {
+    const stop = typeof AbortController === "function" ? new AbortController() : null, timer = setTimeout(() => { if (stop) stop.abort(); }, 10000);
+    try {
+      const r = await fetch(url, Object.assign({}, opts, stop ? { signal: stop.signal } : {}));
+      if (!r.ok) throw new Error("no answer");
+      return await r.json();
+    } finally { clearTimeout(timer); }
+  }
+
+  /* Coins launched on the test networks, read from each launchpad's own count. */
+  async function readCoins() {
+    if (!$("#rCoins")) return false;
+    let total = 0, known = false, sol = null, eth = null;
     if (SOL.programId) {
       try {
         const conn = new web3.Connection(SOL.rpcUrl, { commitment: "confirmed", disableRetryOnRateLimit: true });
-        const cfg = await J.getConfig(conn, new web3.PublicKey(SOL.programId)), n = cfg ? Number(cfg.coinCount) : 0;
-        total += n; known = true; parts.push(n + " on " + SOL.name);
+        const cfg = await within(12000, J.getConfig(conn, new web3.PublicKey(SOL.programId)));
+        sol = cfg ? Number(cfg.coinCount) : 0; total += sol; known = true;
       } catch (_) { /* this network is left out of the count */ }
     }
     if (evm.factory && evm.rpcUrl) {
       try {
-        const n = parseInt(await ethCall("eth_call", [{ to: evm.factory, data: "0x678fd289" }, "latest"]), 16); // coinCount()
-        if (Number.isFinite(n)) { total += n; known = true; parts.push(n + " on " + (evm.name || "Ethereum Sepolia")); }
+        const n = parseInt(await within(12000, ethCall("eth_call", [{ to: evm.factory, data: "0x678fd289" }, "latest"])), 16); // coinCount()
+        if (Number.isFinite(n)) { eth = n; total += n; known = true; }
       } catch (_) { /* this network is left out of the count */ }
     }
-    $("#rCoins").textContent = known ? String(total) : "not available now";
-    if (known) $("#rCoinsBy").firstChild.textContent = parts.join(", ") + ". ";
-    const v = await (window.JISR_VISITS || Promise.resolve(null));
-    $("#rVisits").textContent = v == null ? "not available now" : Number(v).toLocaleString("en-US");
+    if (!known) { missing("#rCoins", "not available now"); return false; }
+    LIVE.coins = total;
+    figure("#rCoins", total, whole);
+    const parts = [];
+    if (sol != null) parts.push(sol + " on " + SOL.name);
+    if (eth != null) parts.push(eth + " on " + (evm.name || "Ethereum Sepolia"));
+    say("#rCoinsBy", parts.join(", ") + ".");
+    const solBar = $("#nSolBar"), ethBar = $("#nEvmBar");
+    if (solBar && ethBar) { solBar.style.flexGrow = String(sol || 0); ethBar.style.flexGrow = String(eth || 0); solBar.hidden = !sol; ethBar.hidden = !eth; }
+    return true;
   }
-  /* The visits figure this browser saw last time is shown at once; counts() replaces it when the counter answers. */
-  function visitsNow() {
-    const last = window.JISR_VISITS_LAST;
-    if ($("#rVisits") && last) $("#rVisits").textContent = Number(last).toLocaleString("en-US");
+  /* Visits: the running total and today's count, from the counter in visits.js. The first reading is the
+     one that counted this visit; later readings only look. */
+  async function readVisits() {
+    if (!$("#rVisits")) return false;
+    LIVE.visitsAt = Date.now();
+    let total = null, today = null;
+    try {
+      if (!readVisits.began) {
+        readVisits.began = true;
+        total = await (window.JISR_VISITS || Promise.resolve(null));
+        today = await (window.JISR_VISITS_TODAY || Promise.resolve(null));
+      } else if (window.JISR_VISITS_READ) {
+        const got = await window.JISR_VISITS_READ(); total = got.total; today = got.today;
+      }
+    } catch (_) { /* shown as not available below */ }
+    if (today != null) { LIVE.today = today; figure("#nToday", today, whole); }
+    if (total == null) { missing("#rVisits", "not available now"); return false; }
+    LIVE.visits = total;
+    figure("#rVisits", total, whole);
+    return true;
+  }
+  /* Tester feedback: the reports on the public tracker plus the ones counted by hand from messages. The
+     tracker allows sixty questions an hour from one address, so it is asked at most once a minute. */
+  async function readFeedback() {
+    const L = window.JISR_LAUNCH;
+    if (!L) return false;
+    LIVE.fbAt = Date.now();
+    const hand = Number(L.feedbackOnX) || 0, goal = L.feedbackGoal;
+    const show = (n) => {
+      LIVE.fb = n;
+      figure("#rFb", n, (v) => whole(v) + " of " + goal); figure("#nFb", n, whole);
+      fill("#rFbBar", n / goal); fill("#nFbBar", n / goal);
+      const left = Math.max(0, goal - n);
+      say("#nFbNote", left ? whole(left) + " more " + (left === 1 ? "piece opens" : "pieces open") + " the launchpad." : "The mark is reached.");
+    };
+    try {
+      const list = await getJson("https://api.github.com/repos/" + L.repo + "/issues?state=all&per_page=100", { headers: { accept: "application/vnd.github+json" } });
+      show(list.filter((i) => !i.pull_request).length + hand);
+      return true;
+    } catch (_) {
+      if (LIVE.fb == null && hand) show(hand);
+      missing("#rFb", "not available now"); missing("#nFb", "not available now");
+      return false;
+    }
+  }
+  /* The project's coin: market cap, price, volume and trades, from DEX Screener. */
+  async function readCap() {
+    const L = window.JISR_LAUNCH;
+    if (!L) return false;
+    try {
+      const pairs = await getJson("https://api.dexscreener.com/tokens/v1/solana/" + L.coin);
+      const best = (Array.isArray(pairs) ? pairs : []).slice().sort((a, b) => (Number(b.marketCap) || 0) - (Number(a.marketCap) || 0))[0];
+      const cap = best ? Number(best.marketCap) || 0 : 0;
+      if (!(cap > 0)) throw new Error("no figure");
+      LIVE.cap = cap;
+      figure("#rCap", cap, (v) => "$" + whole(v) + " of $1M"); figure("#nCap", cap, money);
+      fill("#rCapBar", cap / L.capGoal); fill("#nCapBar", cap / L.capGoal);
+      const part = cap / L.capGoal * 100, day = best.priceChange && Number(best.priceChange.h24);
+      const moved = Number.isFinite(day) && day !== 0 ? (day > 0 ? "Up " : "Down ") + Math.abs(day).toLocaleString("en-US", { maximumFractionDigits: 1 }) + "% in a day. " : "";
+      say("#nCapNote", moved + (part >= 100 ? "The mark is reached." : (part < 0.1 ? "Under 0.1" : part.toFixed(part < 10 ? 1 : 0)) + "% of the way to $1M."));
+      const usd = (n) => "$" + Number(n).toLocaleString("en-US", { maximumFractionDigits: n >= 100 ? 0 : 2 }), tx = best.txns && best.txns.h24;
+      if ($("#lpPrice")) {
+        say("#lpPrice", "$" + String(best.priceUsd));
+        say("#lpCap", usd(cap));
+        say("#lpVol", best.volume && best.volume.h24 != null ? usd(best.volume.h24) : "not available");
+        say("#lpTx", tx ? tx.buys + " buys, " + tx.sells + " sells" : "not available");
+        if (best.url && /^https:\/\/dexscreener\.com\//.test(best.url)) $("#rDex").href = best.url;
+      }
+      return true;
+    } catch (_) {
+      missing("#rCap", "see it on pump.fun"); missing("#nCap", "not available now");
+      if (LIVE.cap == null) ["#lpPrice", "#lpCap", "#lpVol", "#lpTx"].forEach((id) => { if ($(id)) $(id).textContent = "see it on pump.fun"; });
+      return false;
+    }
+  }
+  /* Read everything that is due. `asked` is true when the visitor pressed Refresh. */
+  async function refresh(asked) {
+    if (LIVE.busy) return;
+    LIVE.busy = true; status();
+    const now = Date.now(), jobs = [readCoins(), readCap()];
+    if (now - LIVE.fbAt > (asked ? 60000 : 300000)) jobs.push(readFeedback());
+    if (now - LIVE.visitsAt > (asked ? 10000 : 55000)) jobs.push(readVisits());
+    const got = await Promise.all(jobs.map((j) => j.catch(() => false)));
+    LIVE.ok = got.some(Boolean) || (LIVE.ok && !got.length);
+    LIVE.at = Date.now(); LIVE.busy = false; status();
+  }
+  /* The line above the scoreboard: whether the figures are live and how old they are. */
+  function status() {
+    const box = $("#nLive");
+    if (!box) return;
+    const age = Math.max(0, Math.round((Date.now() - LIVE.at) / 1000));
+    box.dataset.state = LIVE.busy ? "busy" : LIVE.ok ? "ok" : "off";
+    $("#nRefresh").disabled = LIVE.busy;
+    say("#nAgo", LIVE.busy ? (LIVE.at ? "Reading again…" : "Reading the networks…")
+      : !LIVE.ok ? "The figures could not be read. Trying again shortly."
+      : age < 2 ? "Live. Read just now." : "Live. Read " + age + " s ago.");
+  }
+  function road() {
+    const L = window.JISR_LAUNCH;
+    if (!L) return;
+    const copy = $("#rCopy");
+    if (copy) copy.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(L.coin); copy.textContent = "Copied"; } catch (_) { copy.textContent = "Select the address to copy it"; }
+      setTimeout(() => { copy.textContent = "Copy address"; }, 2500);
+    });
+    const tiles = $("#nTiles");
+    if (tiles) { if (eye) eye.observe(tiles); else tiles.classList.add("is-in"); }
+    // the total this browser saw last time is shown at once, until the counter answers
+    if (window.JISR_VISITS_LAST && $("#rVisits")) $("#rVisits").textContent = whole(window.JISR_VISITS_LAST);
+    const again = $("#nRefresh");
+    if (again) again.addEventListener("click", () => refresh(true));
+    refresh(false);
+    setInterval(() => {
+      if (document.visibilityState === "hidden") return;
+      if (!LIVE.busy && LIVE.at && Date.now() - LIVE.at >= EVERY) refresh(false); else status();
+    }, 1000);
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && LIVE.at && Date.now() - LIVE.at >= EVERY) refresh(false); });
   }
   /* Contact: Send message posts the message to FormSubmit, which emails it to the project's inbox. The visitor
      stays on this page. If sending fails for any reason they are given the address to write to, so a message
@@ -492,11 +632,9 @@
     });
     update();
   }
-  window.JISR_HOME = { stateAt, applyBuy, liability, state: S, render, runChecks, simulate, runStress, road, counts };
+  window.JISR_HOME = { stateAt, applyBuy, liability, state: S, render, runChecks, simulate, runStress, road, refresh, live: LIVE };
   start();
   welcome();
   road();
-  visitsNow();
-  counts();
   contact();
 })();

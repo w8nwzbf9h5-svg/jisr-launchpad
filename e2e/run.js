@@ -146,6 +146,14 @@ function waitFor(child, text, ms) {
       assert.equal(await page.$eval("#cMsg", (m) => m.value), "", "the box is cleared once the message is sent");
       await page.evaluate(() => { window.fetch = window.__realFetch; });
       assert((await text("#rCoins")).length > 0 && (await text("#rVisits")).length > 0, "the counts of coins and visits are shown, or say they are not available");
+      // the scoreboard at the foot of the page: four figures, a line saying how fresh they are, and a button to read again
+      assert.equal(await page.$$eval("#nTiles .tile", (t) => t.length), 4, "the scoreboard has four figures");
+      assert.deepEqual(await page.$$eval("#nTiles a.tile", (t) => t.map((a) => a.getAttribute("href"))), ["markets.html", "#contact", "#lpad"], "three of the figures lead to the charts, the contact form and the coin");
+      await page.waitForFunction(() => !window.JISR_HOME.live.busy && window.JISR_HOME.live.at > 0, { timeout: 30000 });
+      const readAt = await page.evaluate(() => window.JISR_HOME.live.at);
+      assert(/^(Live\. Read|The figures could not be read)/.test(await text("#nAgo")), "the line above the scoreboard says how fresh the figures are: " + (await text("#nAgo")));
+      await page.click("#nRefresh");
+      await page.waitForFunction((t) => !window.JISR_HOME.live.busy && window.JISR_HOME.live.at > t, { timeout: 30000 }, readAt);
       const setIn = (id, v) => page.evaluate((id, v) => { const e = document.querySelector(id); e.value = v; e.dispatchEvent(new Event("input", { bubbles: true })); }, id, v);
       await setIn("#mSoldIn", 0); await setIn("#bAmt", "1000");
       const buyLine = await text("#bOut");

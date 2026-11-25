@@ -22,7 +22,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=fa305785">
-<link rel="stylesheet" href="home.css?v=a9f98edd">
+<link rel="stylesheet" href="home.css?v=27698bdd">
 </head>
 <body class="home">
 
@@ -112,7 +112,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
       <div class="r-card">
         <div class="r-top"><span>LPAD market cap</span><b class="num" id="rCap">reading…</b></div>
         <div class="r-bar" aria-hidden="true"><i id="rCapBar"></i></div>
-        <p>Read from DEX Screener as you open this page.</p>
+        <p>Read from DEX Screener, and read again every half minute while this page is open.</p>
       </div>
     </div>
     <div class="r-coin" id="lpad">
@@ -251,16 +251,42 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
   </section>
 
   <section class="sec" id="numbers">
-    <h2>The test so far</h2>
-    <div class="road">
-      <div class="r-card">
-        <div class="r-top"><span>Coins launched in the test</span><b class="num" id="rCoins">counting…</b></div>
-        <p id="rCoinsBy">Counted on the networks as you open this page. <a href="markets.html">See every coin and its chart</a></p>
+    <div class="n-head">
+      <h2>The test so far</h2>
+      <p class="n-live" id="nLive" data-state="busy">
+        <span class="n-dot" aria-hidden="true"></span>
+        <span id="nAgo" role="status">Reading the networks…</span>
+        <button class="n-again" id="nRefresh" type="button">Refresh</button>
+      </p>
+    </div>
+    <div class="tiles" id="nTiles">
+      <a class="tile" href="markets.html" id="tCoins">
+        <span class="t-name">Coins launched</span>
+        <span class="t-fig"><b class="num" id="rCoins">counting…</b></span>
+        <span class="t-split" aria-hidden="true"><i id="nSolBar"></i><i id="nEvmBar"></i></span>
+        <span class="t-note" id="rCoinsBy">Counted on the test networks as you watch.</span>
+        <span class="t-go">See every coin and its chart</span>
+      </a>
+      <div class="tile" id="tVisits">
+        <span class="t-name">Visits to the site</span>
+        <span class="t-fig"><b class="num" id="rVisits">counting…</b></span>
+        <span class="t-today"><b class="num" id="nToday">0</b> today</span>
+        <span class="t-note">Once per browser per day (UTC), since 25 November 2026.</span>
       </div>
-      <div class="r-card">
-        <div class="r-top"><span>Visits to the site</span><b class="num" id="rVisits">counting…</b></div>
-        <p>Counted once per browser per day, since 25 November 2026.</p>
-      </div>
+      <a class="tile" href="#contact" id="tFb">
+        <span class="t-name">Tester feedback</span>
+        <span class="t-fig"><b class="num" id="nFb">counting…</b><i id="nFbOf">of 100</i></span>
+        <span class="t-bar" aria-hidden="true"><i id="nFbBar"></i></span>
+        <span class="t-note" id="nFbNote">100 pieces of feedback open the launchpad.</span>
+        <span class="t-go">Send yours</span>
+      </a>
+      <a class="tile" href="#lpad" id="tCap">
+        <span class="t-name">LPAD market cap</span>
+        <span class="t-fig"><b class="num" id="nCap">reading…</b><i id="nCapOf">of $1M</i></span>
+        <span class="t-bar" aria-hidden="true"><i id="nCapBar"></i></span>
+        <span class="t-note" id="nCapNote">Read from DEX Screener.</span>
+        <span class="t-go">See the coin</span>
+      </a>
     </div>
   </section>
 
@@ -298,7 +324,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <script>
 /* Load the scripts in order. */
 (function () {
-  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=1a0b97dd", "solana/config.js?v=06202dc5", "visits.js?v=da7b0796", "launch.js?v=42d6bcf1", "home.js?v=0e2fe9e3"];
+  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=1a0b97dd", "solana/config.js?v=06202dc5", "visits.js?v=04b65a9c", "launch.js?v=42d6bcf1", "home.js?v=50248c25"];
   (function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");

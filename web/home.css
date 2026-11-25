@@ -221,3 +221,49 @@
 .r-stats dt{font-size:12.5px;color:var(--muted)}
 .r-stats dd{margin:2px 0 0;font-size:15px;font-weight:600;overflow-wrap:anywhere}
 @media (min-width:760px){.r-stats{grid-template-columns:repeat(6,minmax(0,1fr))}}
+
+/* the test so far: one board of four live figures. Each figure counts up when it comes on screen and
+   moves when a new reading differs. Three of the four lead somewhere. */
+.n-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 18px;margin:0 0 14px}
+.n-head h2{font-weight:800;font-size:clamp(24px,4.2vw,34px);line-height:1.15;letter-spacing:-.02em;margin:0}
+.n-live{display:flex;align-items:center;gap:8px;margin:0;font-size:13.5px;color:var(--muted)}
+.n-dot{flex:none;width:8px;height:8px;margin:0 3px 0 5px;border-radius:50%;background:var(--muted)}
+.n-live[data-state="ok"] .n-dot{background:var(--good);animation:n-beat 2s ease-out infinite}
+.n-live[data-state="busy"] .n-dot{background:var(--accent)}
+.n-live[data-state="off"] .n-dot{background:var(--floor)}
+.n-again{min-height:36px;margin-left:4px;padding:6px 12px;border:1px solid var(--line);border-radius:9px;background:var(--raise);color:var(--ink);font-weight:700;font-size:13px}
+.n-again:hover{border-color:var(--accent)}
+.n-again:disabled{opacity:.55;cursor:default}
+@keyframes n-beat{0%{box-shadow:0 0 0 0 rgba(46,189,133,.55)}70%,100%{box-shadow:0 0 0 9px rgba(46,189,133,0)}}
+
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.tile{display:flex;flex-direction:column;gap:6px;min-width:0;padding:16px 14px 14px;background:var(--surface);color:var(--ink);text-decoration:none;transition:background .15s ease}
+a.tile:hover,a.tile:focus-visible{background:var(--raise)}
+a.tile:focus-visible{outline-offset:-2px}
+.t-name{font-size:13.5px;color:var(--muted)}
+.t-fig{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;min-height:38px}
+.t-fig b{font:600 clamp(24px,7vw,34px)/1.1 var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em;transition:color .5s ease}
+.t-fig i{font-style:normal;font-size:13.5px;color:var(--muted)}
+.t-today{font-size:13.5px;color:var(--muted)}
+.t-today b{font:600 14px var(--mono);color:var(--ink)}
+.t-bar,.t-split{display:flex;gap:2px;height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin:4px 0 2px}
+.t-bar i{display:block;height:100%;width:0;border-radius:3px;background:var(--accent);transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.t-split{background:none}
+.t-split i{display:block;height:100%;flex:0 0 0;border-radius:3px;transition:flex-grow .9s cubic-bezier(.2,.7,.2,1)}
+.t-split i:first-child{background:var(--sol)}
+.t-split i:last-child{background:var(--eth)}
+.tiles:not(.is-in) .t-bar i{width:0 !important}
+.tiles:not(.is-in) .t-split i{flex-grow:0 !important}
+.t-note{font-size:13px;line-height:1.5;color:var(--muted)}
+.t-go{margin-top:auto;padding-top:6px;font-size:13.5px;font-weight:700;color:var(--accent)}
+a.tile:hover .t-go{text-decoration:underline}
+/* a reading that moved: the figure takes the colour of its direction for a moment */
+.tile.went-up .t-fig b{animation:n-up 1.4s ease-out}
+.tile.went-down .t-fig b{animation:n-down 1.4s ease-out}
+@keyframes n-up{0%,35%{color:var(--good)}100%{color:var(--ink)}}
+@keyframes n-down{0%,35%{color:var(--bad)}100%{color:var(--ink)}}
+@media (min-width:900px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}.tile{padding:20px 18px 16px}.t-fig b{font-size:34px}}
+@media (prefers-reduced-motion:reduce){
+  .n-live[data-state="ok"] .n-dot,.tile.went-up .t-fig b,.tile.went-down .t-fig b{animation:none}
+  .t-bar i,.t-split i{transition:none}
+}
