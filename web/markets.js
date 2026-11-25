@@ -13,7 +13,7 @@
   const SOL = window.JISR_SOLANA, J = window.JisrSolana, web3 = window.solanaWeb3, LC = window.LightweightCharts;
 
   const SUPPLY = 1e9, SALE = 8e8, CURVE = 2e8;           // whole coins
-  const LOOKBACK = 200000, LOG_STEP = 45000;             // EVM: blocks of history read, and the most asked for at once
+  const LOOKBACK = 200000, LOG_STEP = 9500;              // EVM: blocks searched for a coin's launch, and the most asked for at once
   const SOL_LIMIT = 150;                                 // Solana: the newest transactions read for one coin
   const LIST_SIZE = 40;                                  // coins listed per launchpad, newest first
   const UP = "#35C29A", DOWN = "#E0654F", FLOOR = "#F5A524", VOL = "#33415E";
@@ -107,20 +107,31 @@
       trades.push({ t: tx.blockTime || 0, buy, coins, value: paid, price: priceAt(SUPPLY - Number(post) / coin, c.sale), who: whoKey, tx: tx.transaction.signatures[0] });
     }
     trades.sort((x, y) => x.t - y.t);
-    let holders = [], more = false;
-    try {
-      const big = (await sol.conn.getTokenLargestAccounts(new web3.PublicKey(c.coinAddr))).value.filter((h) => Number(h.amount) > 0);
-      const owners = (await sol.conn.getMultipleParsedAccounts(big.map((h) => h.address))).value;
-      holders = big.map((h, i) => { const o = owners[i] && owners[i].data && owners[i].data.parsed && owners[i].data.parsed.info.owner; return { who: o || h.address.toBase58(), coins: Number(h.amount) / coin }; });
-      more = big.length >= 20;
-    } catch (_) { holders = null; }
+    // Holders: the network's own list of the largest accounts. The public endpoint often refuses that call, so
+    // it is tried twice, and failing that the list is built from the balances seen in the trades read above
+    // (complete for wallets that traded here, blind to coins sent wallet to wallet).
+    let holders = null, more = false, approx = false;
+    for (let k = 0; k < 2 && !holders; k++) {
+      try {
+        const big = (await sol.conn.getTokenLargestAccounts(new web3.PublicKey(c.coinAddr))).value.filter((h) => Number(h.amount) > 0);
+        const owners = (await sol.conn.getMultipleParsedAccounts(big.map((h) => h.address))).value;
+        holders = big.map((h, i) => { const o = owners[i] && owners[i].data && owners[i].data.parsed && owners[i].data.parsed.info.owner; return { who: o || h.address.toBase58(), coins: Number(h.amount) / coin }; });
+        more = big.length >= 20;
+      } catch (_) { if (k === 0) await new Promise((r) => setTimeout(r, 1500)); }
+    }
+    if (!holders) {
+      const bal = {};
+      txs.slice().reverse().forEach((tx) => { if (tx && tx.meta && !tx.meta.err) (tx.meta.postTokenBalances || []).forEach((b) => { if (b.mint === c.coinAddr && b.owner) bal[b.owner] = Number(b.uiTokenAmount.amount) / coin; }); });
+      const list = Object.keys(bal).filter((o) => bal[o] > 0).map((o) => ({ who: o, coins: bal[o] })).sort((x, y) => y.coins - x.coins);
+      if (list.length) { holders = list; approx = true; }
+    }
     let locked = null;
     try {
       const infos = await sol.conn.getMultipleAccountsInfo([new web3.PublicKey(c.coinAddr), J.metadataAddress(new web3.PublicKey(c.coinAddr))]);
       const mint = J.decodeMint(infos[0]), md = infos[1] ? J.decodeMetadata(infos[1]) : null;
-      locked = { mint: mint.authority && mint.authority.toBase58() === c.marketAddr, name: md ? md.isMutable === false : null };
+      locked = { mint: !mint.authority || mint.authority.toBase58() === c.marketAddr, name: md ? md.isMutable === false : null };
     } catch (_) { locked = null; }
-    return { trades, holders, more, created, cut: sigs.length >= SOL_LIMIT, locked };
+    return { trades, holders, more, approx, created, cut: sigs.length >= SOL_LIMIT, locked };
   }
 
   /* ---------- EVM networks ---------- */
@@ -134,17 +145,37 @@
     "event Transfer(address indexed from, address indexed to, uint256 value)"];
   const TOKEN = ["function symbol() view returns (string)", "function decimals() view returns (uint8)"];
   const evm = {};       // chain id -> { p, times: {block: seconds} }
-  /* Logs over the last LOOKBACK blocks. Public endpoints refuse wide ranges, so the range is asked for in
-     pieces, and a piece that is refused is halved. */
-  async function logs(p, filter) {
+  /* Logs from block `from` to the newest block. Public endpoints refuse wide ranges, so the range is asked
+     for in pieces, and a piece that is refused is halved. */
+  async function logs(p, filter, from) {
     const head = await p.getBlockNumber(), out = [];
-    let from = Math.max(0, head - LOOKBACK), step = LOG_STEP;
+    let step = LOG_STEP;
     while (from <= head) {
       const to = Math.min(head, from + step - 1);
       try { out.push(...await p.getLogs(Object.assign({}, filter, { fromBlock: from, toBlock: to }))); from = to + 1; }
       catch (e) { if (step <= 500) throw e; step = Math.floor(step / 2); }
     }
     return out;
+  }
+  /* The block a coin was launched in, found by looking back from the newest block for the factory's record
+     of it. Nothing about a coin is older than this, so its trades are read from here on. Remembered in this
+     browser, because the answer never changes. */
+  async function bornAt(c) {
+    const key = "jisr.mk.born:" + c.id;
+    try { const v = JSON.parse(localStorage.getItem(key) || "null"); if (v && v.block >= 0) return v; } catch (_) {}
+    const p = evm[c.chain].p, head = await p.getBlockNumber(), FI = new ethers.Interface(FACTORY);
+    const filter = { address: c.factory, topics: [FI.getEvent("CoinCreated").topicHash, null, ethers.zeroPadValue(c.coinAddr, 32)] };
+    let to = head, step = LOG_STEP;
+    while (to >= 0 && head - to < LOOKBACK) {
+      const from = Math.max(0, to - step + 1);
+      let found;
+      try { found = await p.getLogs(Object.assign({}, filter, { fromBlock: from, toBlock: to })); }
+      catch (e) { if (step <= 500) throw e; step = Math.floor(step / 2); continue; }
+      if (found.length) { const v = { block: found[0].blockNumber }; try { localStorage.setItem(key, JSON.stringify(v)); } catch (_) {} return v; }
+      if (from === 0) break;
+      to = from - 1;
+    }
+    return { block: Math.max(0, head - LOOKBACK), old: true };       // launched before the range searched
   }
   async function blockTimes(id, blocks) {
     const e = evm[id], need = [...new Set(blocks)].filter((b) => !(b in e.times));
@@ -190,13 +221,11 @@
     return out;
   }
   async function evmDetail(c) {
-    const e = evm[c.chain], p = e.p, M = new ethers.Interface(MARKET), CI = new ethers.Interface(COIN), FI = new ethers.Interface(FACTORY);
-    const [tl, hl, cl] = await Promise.all([
-      logs(p, { address: c.marketAddr, topics: [[M.getEvent("Bought").topicHash, M.getEvent("Sold").topicHash]] }),
-      logs(p, { address: c.coinAddr, topics: [CI.getEvent("Transfer").topicHash] }).catch(() => null),
-      logs(p, { address: c.factory, topics: [FI.getEvent("CoinCreated").topicHash, null, ethers.zeroPadValue(c.coinAddr, 32)] }).catch(() => [])
-    ]);
-    const times = await blockTimes(c.chain, tl.map((l) => l.blockNumber).concat(cl.map((l) => l.blockNumber)));
+    const e = evm[c.chain], p = e.p, M = new ethers.Interface(MARKET), CI = new ethers.Interface(COIN);
+    const born = await bornAt(c);
+    const tl = await logs(p, { address: c.marketAddr, topics: [[M.getEvent("Bought").topicHash, M.getEvent("Sold").topicHash]] }, born.block);
+    const hl = await logs(p, { address: c.coinAddr, topics: [CI.getEvent("Transfer").topicHash] }, born.block).catch(() => null);
+    const times = await blockTimes(c.chain, tl.map((l) => l.blockNumber).concat(born.old ? [] : [born.block]));
     tl.sort((a, b) => a.blockNumber - b.blockNumber || a.index - b.index);
     const trades = tl.map((l) => {
       const ev = M.parseLog(l), buy = ev.name === "Bought";
@@ -213,7 +242,7 @@
     }
     let supply = null;
     try { supply = Number(await new ethers.Contract(c.coinAddr, COIN, p).totalSupply()) / 1e18; } catch (_) { supply = null; }
-    return { trades, holders, more: false, created: cl.length ? times[cl[0].blockNumber] || null : null, cut: false, supply };
+    return { trades, holders, more: false, created: born.old ? null : times[born.block] || null, cut: !!born.old, supply };
   }
 
   /* ---------- the chart ---------- */
@@ -339,7 +368,7 @@
       const rows = d.holders.slice(0, 50).map((h, i) => "<tr><td class=\"r\">" + (i + 1) + "</td><td>" + (h.who === c.marketAddr ? esc(short(h.who)) + '<span class="tag">not sold yet, held by the launchpad</span>' : who(c, h.who)) +
         '</td><td class="r">' + esc(num(h.coins)) + '</td><td class="r">' + (h.coins / SUPPLY * 100).toFixed(2) + '%</td><td class="r">' + esc(money(h.coins * c.floor, c)) + "</td></tr>").join("");
       pane.innerHTML = '<div class="mk-tablewrap"><table class="mk-table"><thead><tr><th class="r">#</th><th>Wallet</th><th class="r">Coins</th><th class="r">Share of supply</th><th class="r">Worth at the floor</th></tr></thead><tbody>' + rows + "</tbody></table></div>" +
-        (d.more ? '<p class="mk-note">The 20 largest accounts are listed.</p>' : "");
+        (d.more ? '<p class="mk-note">The 20 largest accounts are listed.</p>' : "") + (d.approx ? '<p class="mk-note">The network would not list the holders, so this list is built from the trades above. Coins sent from wallet to wallet outside the launchpad are not counted.</p>' : "");
     } else {
       const hs = d.holders ? d.holders.filter((h) => h.who !== c.marketAddr) : null, top = hs && hs.length ? hs[0].coins / SUPPLY * 100 : null;
       const mine = hs ? (hs.find((h) => h.who === c.creator) || { coins: 0 }).coins / SUPPLY * 100 : null;
@@ -349,7 +378,7 @@
         li(c.floor >= c.sale, "The floor has never gone down", "The floor is " + money(c.floor, c) + ". The sale price was " + money(c.sale, c) + ".") +
         li(top == null ? null : top <= 2.5001, "No wallet holds more than 2.5%", top == null ? "The holders could not be read." : "The largest wallet holds " + top.toFixed(2) + "% of the supply.") +
         li(null, "What the creator holds", mine == null ? "The holders could not be read." : "The creator's wallet holds " + mine.toFixed(2) + "% of the supply, bought at the same price as everyone.") +
-        (c.kind === "sol" ? li(d.locked ? d.locked.mint : null, "Nobody can make more coins", d.locked ? (d.locked.mint ? "Only the coin's own market can mint, and it has no instruction that does." : "The mint is controlled by another address.") : "Could not be read.") +
+        (c.kind === "sol" ? li(d.locked ? d.locked.mint : null, "Nobody can make more coins", d.locked ? (d.locked.mint ? "No wallet holds the right to mint this coin." : "The mint is controlled by another address.") : "Could not be read.") +
           li(d.locked ? d.locked.name : null, "The name and picture link cannot be changed", d.locked && d.locked.name === false ? "The wallet details can still be edited." : d.locked && d.locked.name ? "The wallet details are locked." : "This coin has no wallet details.")
           : li(d.supply == null ? null : Math.abs(d.supply - SUPPLY) < 1, "The supply is fixed at 1 billion", d.supply == null ? "Could not be read." : "The coin's contract reports " + num(d.supply) + " coins.")) +
         "</ul>";

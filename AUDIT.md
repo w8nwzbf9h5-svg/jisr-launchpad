@@ -207,7 +207,7 @@ recipient come from the seller. A wrong recipient on the other network cannot be
 | Suite | Count | Command |
 |---|---|---|
 | EVM contracts (Hardhat) | 47 | `npm test` |
-| EVM pages in a real browser against a local chain | 25 steps | `npm run e2e` |
+| EVM pages in a real browser against a local chain | 26 steps | `npm run e2e` |
 | Solana pricing (`jisr-math`) | 7 | `cd solana && cargo test -p jisr-math` |
 | Solana program, in-process | 3 | `cd solana && cargo test -p jisr --release` |
 | Solana program through the page's client file, local node | 7 steps | `.github/workflows/solana.yml` |

@@ -125,7 +125,7 @@ Platformu değeri olan herhangi bir şeyle kullanmadan önce bu bölümü okuyun
 | Bölüm | Durum |
 |---|---|
 | EVM sözleşmeleri | Yazıldı ve test edildi (47 sözleşme testi) |
-| Web uygulaması ve kurulum sayfası | Yazıldı ve test edildi (25 tarayıcı testi), yayında |
+| Web uygulaması ve kurulum sayfası | Yazıldı ve test edildi (26 tarayıcı testi), yayında |
 | Test kurulumu | Sepolia test ağında yayında, değeri olmayan test parasıyla |
 | Bağımsız güvenlik denetimi | Yapılmadı |
 | Gerçek ağlarda kurulum | Yapılmadı. Denetimden sonra gelir |
