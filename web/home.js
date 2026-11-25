@@ -544,6 +544,7 @@
       if (!(cap > 0)) throw new Error("no figure");
       LIVE.cap = cap;
       figure("#rMc", cap, (v) => tr("{n} of $1M", { n: "$" + whole(v) })); figure("#nCap", cap, money);
+      figure("#pCap", cap, (v) => tr("{n} of $1M", { n: "$" + whole(v) })); figure("#wCap", cap, (v) => tr("{n} of $1M", { n: "$" + whole(v) })); fill("#pCapBar", cap / L.capGoal);
       fill("#rCapBar", cap / L.capGoal); fill("#nCapBar", cap / L.capGoal);
       const part = cap / L.capGoal * 100, day = best.priceChange && Number(best.priceChange.h24);
       const by = { n: Math.abs(day).toLocaleString("en-US", { maximumFractionDigits: 1 }) };
@@ -560,6 +561,7 @@
       return true;
     } catch (_) {
       missing("#rMc", tr("see it on pump.fun")); missing("#nCap", tr("not available now"));
+      missing("#pCap", tr("see it on pump.fun")); missing("#wCap", tr("see it on pump.fun"));
       if (LIVE.cap == null) ["#lpPrice", "#lpCap", "#lpVol", "#lpTx"].forEach((id) => { if ($(id)) $(id).textContent = tr("see it on pump.fun"); });
       return false;
     }
@@ -589,10 +591,12 @@
   function road() {
     const L = window.JISR_LAUNCH;
     if (!L) return;
-    const copy = $("#rCopy");
-    if (copy) copy.addEventListener("click", async () => {
-      try { await navigator.clipboard.writeText(L.coin); copy.textContent = tr("Copied"); } catch (_) { copy.textContent = tr("Select the address to copy it"); }
-      setTimeout(() => { copy.textContent = tr("Copy address"); }, 2500);
+    ["#rCopy", "#pCopy"].forEach((id) => {
+      const copy = $(id);
+      if (copy) copy.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(L.coin); copy.textContent = tr("Copied"); } catch (_) { copy.textContent = tr("Select the address to copy it"); }
+        setTimeout(() => { copy.textContent = tr("Copy address"); }, 2500);
+      });
     });
     const tiles = $("#nTiles");
     if (tiles) { if (eye) eye.observe(tiles); else tiles.classList.add("is-in"); }

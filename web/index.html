@@ -18,12 +18,12 @@
 /* Addresses of the launchpad that used to live here (#board, #coin-0x…, #launch) now belong to app.html. */
 if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html" + location.hash);
 </script>
-<script src="i18n.js?v=90df8f93"></script>
+<script src="i18n.js?v=c61f177d"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=56bfd4eb">
-<link rel="stylesheet" href="home.css?v=97a1bfff">
+<link rel="stylesheet" href="home.css?v=23c96447">
 </head>
 <body class="home">
 
@@ -51,6 +51,24 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <div class="strip"><div class="wrap"><b>Public test.</b> Test networks only: the coins and the money here have no value. The contracts have not had an independent audit. <button type="button" class="linkbtn" id="wOpen">How to help test</button></div></div>
 
 <main class="wrap">
+
+  <section class="promo" id="promo" aria-labelledby="pTitle">
+    <img class="p-coin" src="icon-180.png" width="60" height="60" alt="">
+    <div class="p-say">
+      <h2 id="pTitle">LPAD is live on pump.fun</h2>
+      <p>The project's meme coin. Mainnet opens at a $1M market cap or 100 pieces of feedback, whichever comes first.</p>
+    </div>
+    <div class="p-cap">
+      <span>Market cap</span><b class="num is-words" id="pCap">reading…</b>
+      <span class="r-bar" aria-hidden="true"><i id="pCapBar"></i></span>
+    </div>
+    <div class="p-acts">
+      <a class="btn primary" href="https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump" target="_blank" rel="noopener">Buy on pump.fun</a>
+      <a class="btn" href="https://dexscreener.com/solana/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump" target="_blank" rel="noopener">Chart on DEX Screener</a>
+    </div>
+    <div class="p-ca"><code translate="no">GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump</code><button type="button" class="linkbtn" id="pCopy">Copy address</button></div>
+    <p class="p-warn">A meme coin with no floor and no claim on the launchpad. Check the address before you buy.</p>
+  </section>
 
   <section class="open">
     <div>
@@ -340,6 +358,13 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
   <p class="w-tag">Public test, open now</p>
   <h2 id="wTitle">Launch a coin and try to break its floor.</h2>
   <p class="w-say">Landing Pad is being tested in public before any real money goes near it. The coins and the dollars here are free test tokens. Use it hard, then tell us what went wrong.</p>
+  <div class="w-lpad">
+    <img src="icon-180.png" width="46" height="46" alt="">
+    <div class="w-lpad-say"><b>LPAD is live on pump.fun</b><span><span>Market cap</span> <b class="num is-words" id="wCap">reading…</b></span></div>
+    <a class="btn primary" href="https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump" target="_blank" rel="noopener">Buy on pump.fun</a>
+    <p>A meme coin with no floor and no claim on the launchpad. Check the address before you buy.</p>
+    <a href="#road" id="wRoad">See the progress</a>
+  </div>
   <ol class="w-steps">
     <li><b>Get free test money.</b> One button inside the launchpad gives you test dollars.</li>
     <li><b>Launch a coin, or buy one.</b> Every coin starts at the same fixed price.</li>
@@ -353,7 +378,6 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
     <b>Then give feedback.</b> A bug, a confusing step, a number that looks wrong: all of it helps.
     <span><a href="#contact" id="wContact">Send us a message</a>, right here on the site.</span>
   </div>
-  <p class="w-coin">The project's meme coin, <a href="https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump" target="_blank" rel="noopener">LPAD, is live on pump.fun</a>. Mainnet opens after 100 pieces of feedback or a $1M market cap. <a href="#road" id="wRoad">See the progress</a></p>
   <form method="dialog"><button class="linkbtn w-later">Look around first</button></form>
 </dialog>
 
@@ -361,7 +385,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <script>
 /* Load the scripts in order. */
 (function () {
-  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=1a0b97dd", "solana/config.js?v=06202dc5", "visits.js?v=04b65a9c", "launch.js?v=42d6bcf1", "home.js?v=7dc4323f"];
+  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=1a0b97dd", "solana/config.js?v=06202dc5", "visits.js?v=04b65a9c", "launch.js?v=42d6bcf1", "home.js?v=ece302d2"];
   function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");
