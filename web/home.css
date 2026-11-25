@@ -342,3 +342,19 @@ a.tile:hover .t-go{text-decoration:underline}
 .w-lpad .btn{grid-column:1/-1;text-align:center}
 .w-lpad p{grid-column:1/-1;margin:0;font-size:12.5px;line-height:1.5;color:var(--muted)}
 .w-lpad>a:not(.btn){grid-column:1/-1;font-size:13.5px;font-weight:600;color:var(--accent)}
+
+/* links to the community: Telegram, X and GitHub, with their logos */
+.social{display:flex;flex-wrap:wrap;gap:8px}
+.social a{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:9px 14px;border:1px solid var(--line);border-radius:10px;background:var(--raise);color:var(--ink);font-weight:700;font-size:14.5px;text-decoration:none;transition:border-color .15s ease}
+.social a:hover{border-color:currentColor}
+.social svg{flex:none;width:20px;height:20px}
+.social .s-tg svg{color:#26A5E4}
+.social .s-tg:hover{border-color:#26A5E4}
+.social .s-x:hover,.social .s-gh:hover{border-color:var(--ink)}
+.p-social{grid-column:1/-1}
+.w-social{grid-column:1/-1}
+.w-social{gap:6px}
+.w-social a{min-height:40px;padding:7px 10px;gap:6px;font-size:13.5px}
+#contact .social{margin:0 0 14px}
+.f-social{margin:14px 0 0}
+@media (min-width:900px){.p-social{grid-column:1/3}}
