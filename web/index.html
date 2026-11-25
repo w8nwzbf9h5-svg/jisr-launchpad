@@ -22,7 +22,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=fa305785">
-<link rel="stylesheet" href="home.css?v=df522dfe">
+<link rel="stylesheet" href="home.css?v=1589d78b">
 </head>
 <body class="home">
 
@@ -96,6 +96,31 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
       </div>
       <p class="m-foot">A model of one coin priced in dollars, with every coin bought in order and none sold back. Real coins move both ways; the reserve rule is the same.</p>
     </div>
+  </section>
+
+  <section class="sec" id="road">
+    <h2>The road to mainnet</h2>
+    <p class="say">The launchpad opens with real money when the first of two marks is reached: 100 pieces of feedback from testers, or the project's meme coin LPAD at a $1M market cap.</p>
+    <div class="road">
+      <div class="r-card">
+        <div class="r-top"><span>Tester feedback</span><b class="num" id="rFb">counting…</b></div>
+        <div class="r-bar" aria-hidden="true"><i id="rFbBar"></i></div>
+        <p>Reports on GitHub are counted as you open this page, and reports on X are added by hand. <a href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad/issues/new" rel="noopener">Report a problem</a></p>
+      </div>
+      <div class="r-card">
+        <div class="r-top"><span>LPAD market cap</span><b class="num" id="rCap">reading…</b></div>
+        <div class="r-bar" aria-hidden="true"><i id="rCapBar"></i></div>
+        <p>Read from DEX Screener as you open this page.</p>
+      </div>
+    </div>
+    <div class="r-coin">
+      <div class="r-ca"><b>LPAD on pump.fun</b><code id="rCa">GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump</code></div>
+      <div class="r-acts">
+        <button type="button" class="btn" id="rCopy">Copy address</button>
+        <a class="btn primary" href="https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump" target="_blank" rel="noopener">Open on pump.fun</a>
+      </div>
+    </div>
+    <p class="fine r-warn">LPAD is a meme coin. It trades on pump.fun's curve, so it does not have the floor that coins launched on Landing Pad get, and it carries no claim on the launchpad or its fees. Other coins can copy the name: check the address above before you buy.</p>
   </section>
 
   <section class="sec" id="stress">
@@ -216,6 +241,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
     <b>Then give feedback.</b> A bug, a confusing step, a number that looks wrong: all of it helps.
     <span><a href="https://x.com/intent/post?text=%40landingpadfun%20" rel="noopener" target="_blank">Tell us on X</a> or <a href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad/issues/new" rel="noopener" target="_blank">report it on GitHub</a></span>
   </div>
+  <p class="w-coin">The project's meme coin, <a href="https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump" target="_blank" rel="noopener">LPAD, is live on pump.fun</a>. Mainnet opens after 100 pieces of feedback or a $1M market cap. <a href="#road" id="wRoad">See the progress</a></p>
   <form method="dialog"><button class="linkbtn w-later">Look around first</button></form>
 </dialog>
 
@@ -223,7 +249,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <script>
 /* Load the scripts in order. */
 (function () {
-  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=1a0b97dd", "solana/config.js?v=06202dc5", "home.js?v=3224522a"];
+  var files = ["deployments.js?t=" + Date.now(), "config.js?v=fe53870c", "vendor/solana-web3.iife.min.js?v=ecfdbe55", "solana/jisr-solana.js?v=1a0b97dd", "solana/config.js?v=06202dc5", "launch.js?v=d25e9505", "home.js?v=241dc87c"];
   (function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");

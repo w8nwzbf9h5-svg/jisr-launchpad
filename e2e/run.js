@@ -117,10 +117,15 @@ function waitFor(child, text, ms) {
         "the welcome window offers both launchpads and two ways to give feedback: " + invites.join(" "));
       await page.keyboard.press("Escape");
       assert.equal(await page.$eval("#welcome", (d) => d.open), false, "the welcome window closes");
-      assert.equal(await page.evaluate(() => localStorage.getItem("jisr.welcomed")), "1", "and is not shown to the same visitor again");
+      await page.waitForFunction(() => localStorage.getItem("jisr.welcomed") === "1", { timeout: 5000 });   // and is not shown to the same visitor again
       await page.click("#wOpen");
       assert.equal(await page.$eval("#welcome", (d) => d.open), true, "it opens again from the test notice");
       await page.keyboard.press("Escape");
+      // the road to mainnet names the project's coin by its address and both marks
+      const roadText = await text("#road");
+      assert(roadText.includes("GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump") && roadText.includes("100 pieces of feedback") && roadText.includes("$1M market cap") && roadText.includes("does not have the floor"),
+        "the road to mainnet shows the coin's address, the two marks and the warning");
+      assert.equal(await page.$eval("#road a.btn.primary", (a) => a.href), "https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump");
       const setIn = (id, v) => page.evaluate((id, v) => { const e = document.querySelector(id); e.value = v; e.dispatchEvent(new Event("input", { bubbles: true })); }, id, v);
       await setIn("#mSoldIn", 0); await setIn("#bAmt", "1000");
       const buyLine = await text("#bOut");

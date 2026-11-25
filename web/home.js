@@ -384,9 +384,38 @@
     // a click on the dimmed page around the window closes it
     box.addEventListener("click", (e) => { const r = box.getBoundingClientRect(); if (e.target === box && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) box.close(); });
     if (again) again.addEventListener("click", open);
+    const toRoad = $("#wRoad");
+    if (toRoad) toRoad.addEventListener("click", () => box.close());
     if (!seen() && !/^#(board|launch|how|coin-)/.test(location.hash)) setTimeout(open, 700);
   }
-  window.JISR_HOME = { stateAt, applyBuy, liability, state: S, render, runChecks, simulate, runStress };
+  /* The road to mainnet: how much tester feedback has come in, and the market cap of the project's coin.
+     Both are read from public services as the page opens; if one does not answer, its figure says so. */
+  async function road() {
+    const L = window.JISR_LAUNCH;
+    if (!L || !$("#road")) return;
+    const bar = (id, part) => { $(id).style.width = Math.max(part > 0 ? 1.5 : 0, Math.min(100, part * 100)).toFixed(1) + "%"; };
+    const copy = $("#rCopy");
+    copy.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(L.coin); copy.textContent = "Copied"; } catch (_) { copy.textContent = "Select the address to copy it"; }
+      setTimeout(() => { copy.textContent = "Copy address"; }, 2500);
+    });
+    const hand = Number(L.feedbackOnX) || 0;
+    try {
+      const r = await fetch("https://api.github.com/repos/" + L.repo + "/issues?state=all&per_page=100", { headers: { accept: "application/vnd.github+json" } });
+      if (!r.ok) throw new Error("no answer");
+      const n = (await r.json()).filter((i) => !i.pull_request).length + hand;
+      $("#rFb").textContent = n + " of " + L.feedbackGoal; bar("#rFbBar", n / L.feedbackGoal);
+    } catch (_) { $("#rFb").textContent = hand ? hand + "+ of " + L.feedbackGoal : "not available now"; bar("#rFbBar", hand / L.feedbackGoal); }
+    try {
+      const r = await fetch("https://api.dexscreener.com/tokens/v1/solana/" + L.coin);
+      if (!r.ok) throw new Error("no answer");
+      const pairs = await r.json(), cap = Math.max(0, ...(Array.isArray(pairs) ? pairs : []).map((p) => Number(p.marketCap) || 0));
+      if (!(cap > 0)) throw new Error("no figure");
+      $("#rCap").textContent = "$" + Math.round(cap).toLocaleString("en-US") + " of $1M"; bar("#rCapBar", cap / L.capGoal);
+    } catch (_) { $("#rCap").textContent = "see it on pump.fun"; }
+  }
+  window.JISR_HOME = { stateAt, applyBuy, liability, state: S, render, runChecks, simulate, runStress, road };
   start();
   welcome();
+  road();
 })();
