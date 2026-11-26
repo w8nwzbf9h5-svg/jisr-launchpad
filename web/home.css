@@ -397,3 +397,15 @@ a.tile:hover .t-go{text-decoration:underline}
 .open .doors{justify-content:center}
 .open .fine{margin:0 auto}
 .open .machine{max-width:1100px;width:100%;margin:0 auto}
+
+/* the runway's sound switch, under the two doors */
+.sound-btn{display:flex;width:fit-content;align-items:center;gap:7px;margin:0 auto 16px;padding:6px 12px 6px 10px;border-radius:999px;border:1px solid rgba(140,160,220,.28);background:rgba(10,13,20,.45);color:var(--muted);font-family:inherit;font-size:13px;font-weight:500;line-height:1;cursor:pointer;backdrop-filter:blur(6px)}
+.sound-btn:hover{color:var(--ink);border-color:rgba(140,160,220,.5)}
+.sound-btn:focus-visible{outline:2px solid #4c7dff;outline-offset:2px}
+.sound-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sound-btn svg path:first-child{fill:currentColor;stroke:none}
+.sound-btn .wave{display:none}
+.sound-btn[aria-pressed="true"]{color:#f5a524;border-color:rgba(245,165,36,.55)}
+.sound-btn[aria-pressed="true"] .wave{display:inline}
+.sound-btn[aria-pressed="true"] .mute{display:none}
+.sound-btn[hidden]{display:none}

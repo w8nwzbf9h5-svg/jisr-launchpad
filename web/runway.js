@@ -1,7 +1,10 @@
 /* Landing Pad hero: a runway seen from the approach, drawn on a canvas behind the opening section.
    Purely decorative (aria-hidden). Lights stream toward the viewer, coins land on the runway and
    turn into the amber floor line. Pauses off-screen and when the tab is hidden; still frame for
-   prefers-reduced-motion. */
+   prefers-reduced-motion.
+   Sound is off until the visitor presses the "Runway sound" button: a low engine hum that opens up as the
+   floor line rises and follows the pointer, and a soft chime when a coin lands (louder when it lands near).
+   Everything is synthesised with Web Audio, so there are no sound files to download. */
 (function () {
   const cv = document.getElementById("runway");
   if (!cv || !cv.getContext) return;
@@ -11,6 +14,7 @@
   let W = 0, H = 0, DPR = 1, vpX = 0, vpY = 0, t0 = performance.now(), running = false, visible = true;
   let mx = 0, my = 0, tx = 0, ty = 0; // pointer parallax, eased
   const coins = [];
+  const sound = makeSound();
   const rgba = (c, a) => "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + a + ")";
 
   function size() {
@@ -93,7 +97,7 @@
     if (!still && coins.length < 26 && Math.random() < 0.08) spawn(now);
     for (let i = coins.length - 1; i >= 0; i--) {
       const c = coins[i];
-      if (!c.landed) { c.h -= c.v * 0.016; if (c.h <= 0) { c.h = 0; c.landed = now; } }
+      if (!c.landed) { c.h -= c.v * 0.016; if (c.h <= 0) { c.h = 0; c.landed = now; sound.land(c.x, c.z); } }
       const [gx, gy] = P(c.x, c.z);
       const y = gy - c.h * (H * 0.5) / Math.sqrt(c.z);
       const r = Math.max(1, 4 / Math.sqrt(c.z));
@@ -110,11 +114,79 @@
       }
     }
 
+    sound.tick(lift, tx);
     if (running) requestAnimationFrame(frame);
   }
 
-  function start() { if (running || still || !visible || document.hidden) return; running = true; requestAnimationFrame(frame); }
-  function stop() { running = false; }
+  function start() { if (running || still || !visible || document.hidden) return; running = true; sound.resume(); requestAnimationFrame(frame); }
+  function stop() { running = false; sound.pause(); }
+
+  /* The runway's sound. Nothing is created until the visitor turns it on (browsers only allow sound after a
+     click), and it goes quiet whenever the animation pauses. */
+  function makeSound() {
+    const btn = document.getElementById("runwaySound");
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    const none = { land() {}, tick() {}, pause() {}, resume() {} };
+    if (!btn) return none;
+    if (!Ctx || still) { btn.hidden = true; return none; }
+    btn.hidden = false;
+    let ac = null, master, hum, humLow, lastChime = 0, on = false;
+    const NOTES = [0, 3, 5, 7, 10, 12]; // a minor pentatonic run, so overlapping chimes never clash
+
+    function build() {
+      ac = new Ctx();
+      master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+      // the hum: brown noise through a low-pass filter, plus a quiet low tone
+      const len = ac.sampleRate * 2, buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
+      let last = 0;
+      for (let i = 0; i < len; i++) { last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02; d[i] = last * 3.5; }
+      const noise = ac.createBufferSource(); noise.buffer = buf; noise.loop = true;
+      hum = ac.createBiquadFilter(); hum.type = "lowpass"; hum.frequency.value = 220; hum.Q.value = 0.7;
+      const humGain = ac.createGain(); humGain.gain.value = 0.55;
+      noise.connect(hum); hum.connect(humGain); humGain.connect(master); noise.start();
+      humLow = ac.createOscillator(); humLow.type = "sine"; humLow.frequency.value = 55;
+      const lowGain = ac.createGain(); lowGain.gain.value = 0.06;
+      humLow.connect(lowGain); lowGain.connect(master); humLow.start();
+    }
+    function set(v) {
+      on = v;
+      btn.setAttribute("aria-pressed", String(on));
+      if (on && !ac) build();
+      if (!ac) return;
+      if (on) ac.resume();
+      const now = ac.currentTime;
+      master.gain.cancelScheduledValues(now);
+      master.gain.setTargetAtTime(on ? 0.5 : 0, now, 0.25);
+      if (!on) setTimeout(() => { if (!on && ac) ac.suspend(); }, 1200);
+    }
+    btn.addEventListener("click", () => set(!on));
+    return {
+      land(x, z) {
+        if (!on || !ac || ac.state !== "running") return;
+        const now = ac.currentTime, near = 1 - Math.min(1, z / 36);
+        if (now - lastChime < 0.18 || Math.random() > 0.35 + 0.5 * near) return; // keep it sparse
+        lastChime = now;
+        const o = ac.createOscillator(), g = ac.createGain(), pan = ac.createStereoPanner ? ac.createStereoPanner() : null;
+        o.type = "triangle";
+        o.frequency.value = 440 * Math.pow(2, (NOTES[(Math.random() * NOTES.length) | 0] + (near > 0.6 ? -12 : 0)) / 12);
+        const peak = 0.05 + 0.12 * near;
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.exponentialRampToValueAtTime(peak, now + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+        o.connect(g);
+        if (pan) { pan.pan.value = Math.max(-1, Math.min(1, x * 0.8)); g.connect(pan); pan.connect(master); } else g.connect(master);
+        o.start(now); o.stop(now + 1);
+      },
+      tick(lift, px) {
+        if (!on || !ac) return;
+        const now = ac.currentTime;
+        hum.frequency.setTargetAtTime(160 + lift * 260 + px * 60, now, 0.3);
+        humLow.frequency.setTargetAtTime(52 + lift * 8, now, 0.5);
+      },
+      pause() { if (ac && ac.state === "running") ac.suspend(); },
+      resume() { if (on && ac) ac.resume(); },
+    };
+  }
   size();
   if (still) { for (let i = 0; i < 10; i++) coins.push({ x: (Math.random() * 2 - 1) * 0.8, z: 5 + i * 3, h: 0.3 + Math.random() * 0.5, v: 0, landed: 0 }); frame(performance.now()); }
   else start();
