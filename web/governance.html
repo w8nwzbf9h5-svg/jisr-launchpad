@@ -48,6 +48,7 @@ Every update ships as a new version of the contracts. Coins that already exist k
 <ul>
 <li><strong>The floor and the reserve of any coin.</strong> No vote can touch them, lower them or move them.</li>
 <li><strong>The launchpad's share is fixed at 2%.</strong> No vote can raise or lower it. Votes can only change how the rest of the fee is split between the coin's creator and the coin's own reserve.</li>
+<li><strong>The reserve's share can never fall below 2%.</strong> That share is what lifts the floor for every holder, so a vote can raise it but never cut it below today's level.</li>
 <li><strong>A hard cap on fees.</strong> The total fee on a trade can never be set above 7%: the fixed 2% for the launchpad plus at most 5% for the creator and the reserve together.</li>
 <li><strong>No treasury to vote away.</strong> There is no pool of shared money that a vote could send somewhere, which removes the main reason to attack a governance system.</li>
 <li><strong>No special powers for the team.</strong> The team votes with its own coins like anyone else.</li>
