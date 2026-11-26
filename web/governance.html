@@ -47,13 +47,14 @@ Every update ships as a new version of the contracts. Coins that already exist k
 <h2>What no vote can ever change</h2>
 <ul>
 <li><strong>The floor and the reserve of any coin.</strong> No vote can touch them, lower them or move them.</li>
-<li><strong>A hard cap on fees.</strong> The total fee on a trade can never be set above 5%.</li>
+<li><strong>The launchpad's share is fixed at 2%.</strong> No vote can raise or lower it. Votes can only change how the rest of the fee is split between the coin's creator and the coin's own reserve.</li>
+<li><strong>A hard cap on fees.</strong> The total fee on a trade can never be set above 7%: the fixed 2% for the launchpad plus at most 5% for the creator and the reserve together.</li>
 <li><strong>No treasury to vote away.</strong> There is no pool of shared money that a vote could send somewhere, which removes the main reason to attack a governance system.</li>
 <li><strong>No special powers for the team.</strong> The team votes with its own coins like anyone else.</li>
 </ul>
 
 <h2>Shared decisions need two houses to agree</h2>
-<p>Some decisions affect everyone going forward, such as the fee on new launches or adding a network. These need a two-thirds majority in both houses. Neither house can overrule the other.</p>
+<p>Some decisions affect everyone going forward, such as the creator and reserve shares of the fee on new launches (today 1% and 2%), or adding a network. These need a two-thirds majority in both houses. Neither house can overrule the other.</p>
 <div class="houses">
 <div><h3>Coin house</h3><p>One $LPAD = one vote. It represents the people who carry the financial risk. One-coin-one-vote is the only weighting that splitting coins across many wallets cannot game.</p></div>
 <div><h3>People house</h3><p>One verified person = one vote, whatever they hold. It protects small holders from being outvoted by large ones. Voters prove they are one unique human through a privacy-preserving check that does not reveal who they are.</p></div>
