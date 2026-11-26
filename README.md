@@ -31,6 +31,7 @@ Worked example: $1,000 buys 9,500,000 coins; selling them straight back returns 
 - **[Videos](https://landingpad.fun/videos.html)**: a 90-second explainer and six short clips on the reserve, the floor, the fee and the stress test. Free to share.
 - **[Learn](https://landingpad.fun/learn/)**: four plain-English guides (why meme coins crash, how the floor works, where the fee goes, a rug pull checklist).
 - **[Press kit](https://landingpad.fun/press.html)**: descriptions, press release, facts, logo, screenshots and a [one-page PDF](https://landingpad.fun/press/landing-pad-one-pager.pdf).
+- **[Governance](https://landingpad.fun/governance.html)**: how changes will be decided. No change is forced on anyone's money; shared decisions need both a coin house and a one-person-one-vote house.
 - **[Charts](https://landingpad.fun/markets.html)**: every coin with its price chart, trades and holders, read from the chain.
 - **[Launchpad on Solana devnet](https://landingpad.fun/solana.html)** (Phantom).
 - **[Launchpad on Ethereum Sepolia](https://landingpad.fun/app.html)** (MetaMask).

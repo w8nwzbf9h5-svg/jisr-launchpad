@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Governance: your money, your choice | Landing Pad</title>
+<meta name="description" content="How changes to Landing Pad will be decided: no change is ever forced on anyone's money, shared decisions need both coin holders and people with one equal vote each, and the floor and reserves are outside any vote.">
+<meta property="og:title" content="Governance: your money, your choice">
+<meta property="og:description" content="No change is ever forced on anyone's money. Shared decisions need two houses to agree. The floor and reserves are outside any vote.">
+<meta property="og:image" content="https://landingpad.fun/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@landingpadfun">
+<link rel="canonical" href="https://landingpad.fun/governance.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#0A0D14;--surface:#11151F;--line:#242B3B;--ink:#EAEEF6;--muted:#8C95A9;--now:#4C7DFF;--new:#F5A524}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.7 "Plus Jakarta Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:760px;margin:0 auto;padding:22px 18px 64px}
+a{color:var(--now)}.back{display:inline-block;margin:0 0 22px;font-weight:600;text-decoration:none;font-size:15px}
+h1{font-size:clamp(30px,6.5vw,44px);line-height:1.15;margin:0 0 14px;font-weight:800;letter-spacing:-.02em}
+h2{font-size:23px;line-height:1.3;margin:46px 0 12px;font-weight:700}
+h3{font-size:17px;margin:0 0 6px}
+p,ul,ol{margin:0 0 16px}li{margin:0 0 6px}
+.lede{color:#AAB2C4;font-size:19px}
+.rule{border:1px solid var(--line);border-left:4px solid var(--new);background:var(--surface);border-radius:12px;padding:18px 20px;margin:26px 0}
+.rule b{display:block;font-size:20px;margin-bottom:6px}
+.houses{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:8px 0 16px}
+.houses div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+.houses p{margin:0;color:#C3CADA;font-size:15.5px}
+@media(max-width:600px){.houses{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:15.5px;margin:6px 0 16px}td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:top}td:first-child{color:var(--muted);width:34%;padding-right:12px}
+ol.steps{padding-left:22px}
+.note{margin-top:40px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--muted);font-size:15px}
+</style>
+</head>
+<body>
+<main>
+<a class="back" href="./"><img src="favicon.svg" width="24" height="24" alt="" style="vertical-align:-6px;margin-right:8px">Back to Landing Pad</a>
+<h1>Governance: your money, your choice</h1>
+<p class="lede">How changes to Landing Pad will be decided, so that every person has an equal say and no vote can harm anyone who did not agree to it.</p>
+
+<div class="rule"><b>One rule above all others: no change is ever forced on anyone's money.</b>
+Every update ships as a new version of the contracts. Coins that already exist keep their rules forever, including their reserve and their floor. Anyone who prefers the new version can move to it. Anyone who doesn't, stays. A holder with $10 and a holder with $10 million have exactly the same right: each decides alone what happens to their own money.</div>
+
+<h2>What no vote can ever change</h2>
+<ul>
+<li><strong>The floor and the reserve of any coin.</strong> No vote can touch them, lower them or move them.</li>
+<li><strong>A hard cap on fees.</strong> The total fee on a trade can never be set above 5%.</li>
+<li><strong>No treasury to vote away.</strong> There is no pool of shared money that a vote could send somewhere, which removes the main reason to attack a governance system.</li>
+<li><strong>No special powers for the team.</strong> The team votes with its own coins like anyone else.</li>
+</ul>
+
+<h2>Shared decisions need two houses to agree</h2>
+<p>Some decisions affect everyone going forward, such as the fee on new launches or adding a network. These need a two-thirds majority in both houses. Neither house can overrule the other.</p>
+<div class="houses">
+<div><h3>Coin house</h3><p>One $LPAD = one vote. It represents the people who carry the financial risk. One-coin-one-vote is the only weighting that splitting coins across many wallets cannot game.</p></div>
+<div><h3>People house</h3><p>One verified person = one vote, whatever they hold. It protects small holders from being outvoted by large ones. Voters prove they are one unique human through a privacy-preserving check that does not reveal who they are.</p></div>
+</div>
+<p>So large holders cannot impose a change on everyone else, and a crowd cannot impose a change on the people whose money is at stake.</p>
+
+<h2>How a decision is made</h2>
+<ol class="steps">
+<li><strong>Public discussion, 7 days.</strong> The proposal is posted in full, with its effect on fees and holders spelled out.</li>
+<li><strong>Vote, 7 days, in both houses.</strong> Balances are counted at the moment the proposal is published, so buying coins after the announcement adds no votes. Votes are cast by signing with a wallet, cost nothing, and are public for anyone to check.</li>
+<li><strong>Waiting period, 14 days.</strong> Nothing happens until it ends, so everyone can review the result.</li>
+<li><strong>Release as an opt-in version.</strong> The change applies to new launches and to anyone who chooses to move. Nobody else is affected.</li>
+</ol>
+<table>
+<tr><td>Majority needed</td><td>Two thirds in each house</td></tr>
+<tr><td>Minimum turnout</td><td>Set after phase 1, from real participation numbers</td></tr>
+<tr><td>Who can propose</td><td>Any $LPAD holder above a small threshold, to keep out spam</td></tr>
+</table>
+
+<h2>Phases</h2>
+<table>
+<tr><td>Phase 1: now until mainnet</td><td>Advisory votes in both houses. Results are published, and the team follows what wins after the waiting period. This shows how many people really take part before anything becomes binding.</td></tr>
+<tr><td>Phase 2: after mainnet and audit</td><td>The two-house system becomes binding, with turnout and thresholds set from phase 1.</td></tr>
+<tr><td>Every phase</td><td>The floor and reserves stay outside any vote.</td></tr>
+</table>
+
+<h2>Why this design</h2>
+<p>We studied what went wrong elsewhere before writing this:</p>
+<ul>
+<li><strong>Whale capture.</strong> In token-weighted systems a few wallets often hold most of the voting power, and groups have bought tokens on the open market to push through proposals that most of the community opposed. Here, a coin-house win alone is never enough, and balances are counted before a proposal is announced.</li>
+<li><strong>Wallet splitting.</strong> Systems that try to soften whale power by weighting small wallets more can be undone by splitting one balance across many wallets. That is why the coin house uses one-coin-one-vote and fairness for small holders comes from the people house instead.</li>
+<li><strong>The right to leave.</strong> The strongest protection in any governance system is being able to walk away before a change affects you. On Landing Pad that right already exists: every holder can sell back to the reserve at the floor, any time, and no vote can change their coin's rules.</li>
+</ul>
+
+<h2>Honest limits</h2>
+<ul>
+<li>Most token holders in most projects don't vote. If turnout is low, proposals will not pass, and that is the safe failure.</li>
+<li>Proving you are one person is not perfect. Verification will be optional; anyone who prefers not to verify still votes in the coin house.</li>
+<li>Until $LPAD is widely held, a few wallets could carry the coin house. That is why phase 1 is advisory.</li>
+</ul>
+
+<p class="note">Landing Pad is a public test on Solana devnet and Ethereum Sepolia with test money. The contracts are not audited yet. Governance voting is planned and not live yet; the current rule vote is at <a href="./#vote">landingpad.fun/#vote</a>. $LPAD is a meme coin with no floor. Nothing here is financial advice or a promise of profit.</p>
+</main>
+<script src="visits.js"></script>
+</body>
+</html>
