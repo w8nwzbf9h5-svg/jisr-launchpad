@@ -40,6 +40,7 @@ ol.steps{padding-left:22px}
 <a class="back" href="./"><img src="favicon.svg" width="24" height="24" alt="" style="vertical-align:-6px;margin-right:8px">Back to Landing Pad</a>
 <h1>Governance: your money, your choice</h1>
 <p class="lede">How changes to Landing Pad will be decided, so that every person has an equal say and no vote can harm anyone who did not agree to it.</p>
+<p class="rule" style="border-left-color:var(--now)"><b>Planned for the real launch on mainnet. Not active during the public test.</b>During the test, the only vote is the <a href="./#vote">current rule vote</a> on three proposals. Everything on this page starts after mainnet.</p>
 
 <div class="rule"><b>One rule above all others: no change is ever forced on anyone's money.</b>
 Every update ships as a new version of the contracts. Coins that already exist keep their rules forever, including their reserve and their floor. Anyone who prefers the new version can move to it. Anyone who doesn't, stays. A holder with $10 and a holder with $10 million have exactly the same right: each decides alone what happens to their own money.</div>
@@ -81,16 +82,26 @@ Every update ships as a new version of the contracts. Coins that already exist k
 </ol>
 <table>
 <tr><td>Majority needed</td><td>Two thirds in each house</td></tr>
-<tr><td>Minimum turnout</td><td>Set after phase 1, from real participation numbers</td></tr>
+<tr><td>Minimum turnout</td><td>Set before mainnet and published on this page</td></tr>
 <tr><td>Who can propose</td><td>Any $LPAD holder above a small threshold, to keep out spam</td></tr>
 </table>
 
-<h2>Phases</h2>
+<h2>When it starts</h2>
 <table>
-<tr><td>Phase 1: now until mainnet</td><td>Advisory votes in both houses. Results are published, and the team follows what wins after the waiting period. This shows how many people really take part before anything becomes binding.</td></tr>
-<tr><td>Phase 2: after mainnet and audit</td><td>The two-house system becomes binding, with turnout and thresholds set from phase 1.</td></tr>
-<tr><td>Every phase</td><td>The floor and reserves stay outside any vote.</td></tr>
+<tr><td>Public test (now)</td><td>Only the current rule vote on three proposals. No governance system, no $LPAD utility.</td></tr>
+<tr><td>Mainnet launch</td><td>The two-house system and the $LPAD utility below go live together. Turnout and thresholds are set before launch and published here.</td></tr>
+<tr><td>Always</td><td>The floor and reserves stay outside any vote.</td></tr>
 </table>
+
+<h2>What $LPAD will be used for, after mainnet</h2>
+<ul>
+<li><strong>Launching stays free.</strong> Creating a coin costs nothing beyond the network fee, as on other launchpads.</li>
+<li><strong>Optional promotion, paid into a burn.</strong> Creators who want more visibility on landingpad.fun, such as a trending spot, a featured banner or a verified-creator badge, can pay in SOL or USDC. The contract uses every payment to buy $LPAD on the market and burn it. Nobody has to pay to launch or to trade.</li>
+<li><strong>Voting.</strong> $LPAD is the coin house in the two-house system above.</li>
+<li><strong>Rewards for testers and bug finders.</strong> Useful feedback and confirmed bugs are rewarded in $LPAD from the launchpad's own holdings.</li>
+<li><strong>A deposit to propose.</strong> Anyone submitting a proposal deposits $LPAD. It is returned if the proposal reaches minimum turnout and burned if it is spam.</li>
+</ul>
+<p>None of this touches the launchpad's fixed 2% share, and none of it promises holders any income. $LPAD remains a meme coin with no floor.</p>
 
 <h2>Why this design</h2>
 <p>We studied what went wrong elsewhere before writing this:</p>
@@ -104,10 +115,10 @@ Every update ships as a new version of the contracts. Coins that already exist k
 <ul>
 <li>Most token holders in most projects don't vote. If turnout is low, proposals will not pass, and that is the safe failure.</li>
 <li>Proving you are one person is not perfect. Verification will be optional; anyone who prefers not to verify still votes in the coin house.</li>
-<li>Until $LPAD is widely held, a few wallets could carry the coin house. That is why phase 1 is advisory.</li>
+<li>Until $LPAD is widely held, a few wallets could carry the coin house. That is why thresholds will be set from real participation before the system becomes binding.</li>
 </ul>
 
-<p class="note">Landing Pad is a public test on Solana devnet and Ethereum Sepolia with test money. The contracts are not audited yet. Governance voting is planned and not live yet; the current rule vote is at <a href="./#vote">landingpad.fun/#vote</a>. $LPAD is a meme coin with no floor. Nothing here is financial advice or a promise of profit.</p>
+<p class="note">Landing Pad is a public test on Solana devnet and Ethereum Sepolia with test money. The contracts are not audited yet. Governance and $LPAD utility are planned for mainnet and are not live; the only vote during the test is at <a href="./#vote">landingpad.fun/#vote</a>. $LPAD is a meme coin with no floor. Nothing here is financial advice or a promise of profit.</p>
 </main>
 <script src="visits.js"></script>
 </body>
