@@ -2,7 +2,8 @@
    Purely decorative (aria-hidden). Lights stream toward the viewer, coins land on the runway and
    turn into the amber floor line. Pauses off-screen and when the tab is hidden; still frame for
    prefers-reduced-motion.
-   Sound is off until the visitor presses the "Runway sound" button: a low engine hum that opens up as the
+   Sound is on by default and starts at the visitor's first touch of the page (browsers allow no sound
+   before that); the "Runway sound" button turns it off and the choice is remembered. A low engine hum that opens up as the
    floor line rises and follows the pointer, and a soft chime when a coin lands (louder when it lands near).
    Everything is synthesised with Web Audio, so there are no sound files to download. */
 (function () {
@@ -130,7 +131,11 @@
     if (!btn) return none;
     if (!Ctx || still) { btn.hidden = true; return none; }
     btn.hidden = false;
-    let ac = null, master, hum, humLow, lastChime = 0, on = false;
+    // On by default. A visitor who turns it off keeps it off on later visits.
+    const KEY = "jisr.sound";
+    let muted = false;
+    try { muted = localStorage.getItem(KEY) === "off"; } catch (_) {}
+    let ac = null, master, hum, humLow, lastChime = 0, on = !muted;
     const NOTES = [0, 3, 5, 7, 10, 12]; // a minor pentatonic run, so overlapping chimes never clash
 
     function build() {
@@ -148,18 +153,32 @@
       const lowGain = ac.createGain(); lowGain.gain.value = 0.06;
       humLow.connect(lowGain); lowGain.connect(master); humLow.start();
     }
-    function set(v) {
-      on = v;
+    // Fade the sound in or out to match `on`. Browsers keep the context suspended until the visitor has
+    // touched the page, so a call before that does nothing audible and the first touch calls it again.
+    function apply() {
       btn.setAttribute("aria-pressed", String(on));
       if (on && !ac) build();
       if (!ac) return;
-      if (on) ac.resume();
+      if (on && running) ac.resume();
       const now = ac.currentTime;
       master.gain.cancelScheduledValues(now);
       master.gain.setTargetAtTime(on ? 0.5 : 0, now, 0.25);
       if (!on) setTimeout(() => { if (!on && ac) ac.suspend(); }, 1200);
     }
-    btn.addEventListener("click", () => set(!on));
+    btn.addEventListener("click", () => {
+      on = !on;
+      try { localStorage.setItem(KEY, on ? "on" : "off"); } catch (_) {}
+      apply();
+    });
+    // Start on the first touch, click or key anywhere on the page (the button's own click is left to it).
+    const first = (e) => {
+      if (btn.contains(e.target)) return;
+      ["pointerdown", "keydown", "touchend"].forEach((t) => document.removeEventListener(t, first, true));
+      if (on) apply();
+    };
+    ["pointerdown", "keydown", "touchend"].forEach((t) => document.addEventListener(t, first, true));
+    btn.setAttribute("aria-pressed", String(on));
+    if (on) apply(); // some browsers allow sound straight away; the rest wait for the first touch
     return {
       land(x, z) {
         if (!on || !ac || ac.state !== "running") return;
