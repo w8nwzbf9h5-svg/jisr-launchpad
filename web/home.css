@@ -502,5 +502,5 @@ footer.end .f-social{justify-content:center}
 .cbar-head{flex:none;display:flex;flex-direction:column;justify-content:center;gap:6px;width:150px;padding:0 16px;border-inline-end:1px solid var(--line)}
 .cbar-head b{color:var(--gold-2);font-size:14px;line-height:1.25}
 .cbar-head a{color:var(--muted);font-size:12.5px}
-.cbar-w{flex:1;min-width:0;height:150px;overflow:hidden}
+.cbar-w{flex:1;min-width:0;height:200px;overflow:hidden}
 @media (max-width:640px){.cbar{flex-direction:column}.cbar-head{flex-direction:row;justify-content:space-between;align-items:center;width:auto;padding:8px 16px;border-inline-end:0;border-bottom:1px solid var(--line)}}
