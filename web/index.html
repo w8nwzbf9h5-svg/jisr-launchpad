@@ -18,13 +18,14 @@
 /* Addresses of the launchpad that used to live here (#board, #coin-0x…, #launch) now belong to app.html. */
 if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html" + location.hash);
 </script>
-<script src="i18n.js?v=cb98f8be"></script>
+<script src="i18n.js?v=1d762f80"></script>
 <script src="runway.js?v=b5110b80" defer></script>
+<script src="robot.js?v=efe15d7f" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=699e17dd">
-<link rel="stylesheet" href="home.css?v=5cb5801d">
+<link rel="stylesheet" href="home.css?v=f9ba7b69">
 </head>
 <body class="home">
 
@@ -376,6 +377,17 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
   </footer>
 </main>
 
+<aside class="bot" id="bot" aria-label="Guide" hidden>
+  <div class="bot-say" aria-live="polite">
+    <p data-for="hero">Hi, I'm your guide. Every coin here is backed by a reserve that holders can always sell back to, at the floor.</p>
+    <p data-for="model" hidden>Drag the chart. Every number is worked out by the same arithmetic the contracts run.</p>
+    <p data-for="road" hidden>Real money is switched on only after an independent audit. Until then, everything is test money.</p>
+    <p data-for="stress" hidden>The reserve is checked after every simulated trade. Passing is not proof that there are no bugs.</p>
+    <p data-for="proof" hidden>These checks are read live from Solana and Ethereum, not from our server.</p>
+    <div class="bot-ctl"><button type="button" class="bot-min">Smaller</button><button type="button" class="bot-x">Close</button></div>
+  </div>
+  <button type="button" class="bot-fig" aria-label="Guide"></button>
+</aside>
 <dialog id="welcome" class="welcome" aria-labelledby="wTitle">
   <form method="dialog"><button class="w-x" aria-label="Close">
     <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
