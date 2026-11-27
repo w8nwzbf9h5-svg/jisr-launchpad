@@ -27,7 +27,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=699e17dd">
-<link rel="stylesheet" href="home.css?v=a1a6bf6f">
+<link rel="stylesheet" href="home.css?v=bee926b2">
 </head>
 <body class="home">
 
@@ -57,13 +57,15 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
     </div>
   </div>
 </header>
-<div class="mbar" aria-label="Markets">
-  <div class="mbar-tape" id="mTape"></div>
-</div>
-<div class="cbar" aria-label="Economic calendar">
-  <div class="cbar-head"><b>Economic calendar</b><a href="#econ">Full calendar</a></div>
-  <div class="cbar-w" id="cBar"></div>
-</div>
+<div class="mbar" aria-label="Markets"><div class="wrap bar-row">
+  <span class="bar-tag">Markets</span>
+  <div class="bar-body" id="mTape"></div>
+</div></div>
+<div class="cbar" aria-label="Economic calendar"><div class="wrap bar-row">
+  <span class="bar-tag">Economic calendar</span>
+  <div class="bar-body cbar-w" id="cBar"></div>
+  <a class="bar-more" href="#econ">Full calendar</a>
+</div></div>
 <div class="abar"><div class="wrap"><b>Announcement</b> <span>LPAD, the project's meme coin, is live on pump.fun. It is a meme coin with no floor.</span> <a href="https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump" target="_blank" rel="noopener">Buy on pump.fun</a> <a href="#promo">Details</a></div></div>
 <div class="strip"><div class="wrap"><b>Public test.</b> Test networks only: the coins and the money here have no value. The contracts have not had an independent audit. <button type="button" class="linkbtn" id="wOpen">How to help test</button></div></div>
 

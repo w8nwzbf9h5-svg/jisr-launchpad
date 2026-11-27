@@ -483,24 +483,22 @@ body.drawer-open .bot{visibility:hidden}
 footer.end{text-align:center}
 footer.end p{max-width:760px;margin-inline:auto}
 footer.end .f-social{justify-content:center}
-/* Markets bar + announcement bar */
-.mbar{display:flex;align-items:center;min-height:50px;background:#060910;border-bottom:1px solid var(--line)}
-.mbar-tape{flex:1;min-width:0;height:50px;overflow:hidden}
+/* Markets bar + calendar bar: same height, aligned to the page edges */
+.mbar,.cbar{background:#060910;border-bottom:1px solid var(--line)}
+.bar-row{display:flex;align-items:center;gap:0;height:50px}
+.bar-tag{flex:none;width:138px;padding-inline-end:14px;margin-inline-end:14px;border-inline-end:1px solid var(--line);color:var(--gold-2);font-size:13px;font-weight:600;line-height:1.2}
+.bar-body{flex:1;min-width:0;height:50px;overflow:hidden;position:relative}
+.bar-body .tradingview-widget-copyright{display:none}
+.bar-more{flex:none;margin-inline-start:14px;padding-inline-start:14px;border-inline-start:1px solid var(--line);color:var(--muted);font-size:12.5px;white-space:nowrap}
+.bar-more:hover{color:var(--gold-2)}
+/* The calendar widget is a list: show it as one row, skipping its filter header. Scroll inside it for more. */
+.cbar-w iframe{margin-top:-46px}
 /* The widgets are their own documents: keep their canvas transparent on our dark page. */
 .tradingview-widget-container iframe{color-scheme:normal}
-.mbar-tape .tradingview-widget-copyright{display:none}
-.mbar-cal{flex:none;align-self:stretch;display:flex;align-items:center;padding:0 16px;border-inline-start:1px solid var(--line);color:var(--gold-2);font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap}
-.mbar-cal:hover{background:var(--surface)}
 .abar{background:linear-gradient(90deg,rgba(212,175,55,.14),rgba(212,175,55,.04));border-bottom:1px solid rgba(212,175,55,.28);font-size:13.5px;color:var(--ink)}
 .abar .wrap{padding-top:8px;padding-bottom:8px}
 .abar b{color:var(--gold-2);margin-inline-end:4px}
 .abar a{color:var(--gold-2);font-weight:600;margin-inline-start:8px}
 .econ-box{min-height:620px;border:1px solid var(--line);border-radius:14px;padding:6px;background:var(--surface)}
 .econ-wait{color:var(--muted);padding:20px}
-@media (max-width:519px){.mbar-cal{padding:0 10px;font-size:12px}.abar{font-size:13px}}
-.cbar{display:flex;align-items:stretch;background:#070B12;border-bottom:1px solid var(--line)}
-.cbar-head{flex:none;display:flex;flex-direction:column;justify-content:center;gap:6px;width:150px;padding:0 16px;border-inline-end:1px solid var(--line)}
-.cbar-head b{color:var(--gold-2);font-size:14px;line-height:1.25}
-.cbar-head a{color:var(--muted);font-size:12.5px}
-.cbar-w{flex:1;min-width:0;height:200px;overflow:hidden}
-@media (max-width:640px){.cbar{flex-direction:column}.cbar-head{flex-direction:row;justify-content:space-between;align-items:center;width:auto;padding:8px 16px;border-inline-end:0;border-bottom:1px solid var(--line)}}
+@media (max-width:640px){.bar-tag{width:auto;max-width:84px;font-size:12px}.bar-more{display:none}.abar{font-size:13px}}
