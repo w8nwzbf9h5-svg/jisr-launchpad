@@ -18,16 +18,16 @@
 /* Addresses of the launchpad that used to live here (#board, #coin-0x…, #launch) now belong to app.html. */
 if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html" + location.hash);
 </script>
-<script src="i18n.js?v=3555558a"></script>
+<script src="i18n.js?v=5cce8f02"></script>
 <script src="runway.js?v=f3830e09" defer></script>
 <script src="robot.js?v=39372c41" defer></script>
-<script src="ticker.js?v=3dab842c" defer></script>
+<script src="ticker.js?v=acc2b456" defer></script>
 <script src="nav.js?v=4d8e264b" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=699e17dd">
-<link rel="stylesheet" href="home.css?v=a194d888">
+<link rel="stylesheet" href="home.css?v=5052c079">
 </head>
 <body class="home">
 
@@ -59,7 +59,10 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 </header>
 <div class="mbar" aria-label="Markets">
   <div class="mbar-tape" id="mTape"></div>
-  <a class="mbar-cal" href="#econ">Economic calendar</a>
+</div>
+<div class="cbar" aria-label="Economic calendar">
+  <div class="cbar-head"><b>Economic calendar</b><a href="#econ">Full calendar</a></div>
+  <div class="cbar-w" id="cBar"></div>
 </div>
 <div class="abar"><div class="wrap"><b>Announcement</b> <span>LPAD, the project's meme coin, is live on pump.fun. It is a meme coin with no floor.</span> <a href="https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump" target="_blank" rel="noopener">Buy on pump.fun</a> <a href="#promo">Details</a></div></div>
 <div class="strip"><div class="wrap"><b>Public test.</b> Test networks only: the coins and the money here have no value. The contracts have not had an independent audit. <button type="button" class="linkbtn" id="wOpen">How to help test</button></div></div>

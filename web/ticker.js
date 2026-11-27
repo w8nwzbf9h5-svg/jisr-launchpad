@@ -30,11 +30,15 @@
         { proName: "BITSTAMP:ETHUSD", title: "Ether" },
         { proName: "COINBASE:SOLUSD", title: "Solana" }
       ],
-      showSymbolLogo: true, isTransparent: true, displayMode: "compact", colorTheme: "dark", locale: locale()
+      showSymbolLogo: true, isTransparent: true, displayMode: "regular", colorTheme: "dark", locale: locale()
     });
     // Load after the page itself is up, so the bar never slows the first paint.
-    if (document.readyState === "complete") setTimeout(start, 300);
-    else window.addEventListener("load", () => setTimeout(start, 300));
+    const bar = document.getElementById("cBar");
+    const go = () => { start(); if (bar) embed(bar, "events", {
+      colorTheme: "dark", isTransparent: true, width: "100%", height: 150, locale: locale(),
+      importanceFilter: "0,1", countryFilter: "us,eu,gb,jp,cn,ca,au,ch,de,ae,sa" }); };
+    if (document.readyState === "complete") setTimeout(go, 300);
+    else window.addEventListener("load", () => setTimeout(go, 300));
   }
 
   const cal = document.getElementById("econBox");
