@@ -8,10 +8,10 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:dark;--bg:#0A0D14;--surface:#11151F;--raise:#171C28;--line:#242B3B;--ink:#EAEEF6;--muted:#8C95A9;--now:#4C7DFF;--new:#F5A524;--good:#2EBD85;--bad:#F6465D;
-  --body:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace}
+:root{color-scheme:dark;--bg:#080B10;--surface:#11151F;--raise:#171C28;--line:#242B3B;--ink:#EAEEF6;--muted:#8C95A9;--now:#D4AF37;--new:#00E1B3;--good:#2EBD85;--bad:#F6465D;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:400 15.5px/1.6 var(--body);-webkit-font-smoothing:antialiased}
@@ -64,6 +64,7 @@ th.end{text-align:right;white-space:nowrap}
 .fine{color:var(--muted);font-size:13.5px;line-height:1.75}
 .fine li{margin-bottom:4px}
 @media (min-width:720px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}.ctl{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 28px}.ctl .wide{grid-column:1/-1}}
+h1,h2,h3{font-family:"Space Grotesk",system-ui,sans-serif;letter-spacing:-.025em}
 </style>
 </head>
 <body>
@@ -232,8 +233,8 @@ function simulate(o) {
     for (var e = a; e <= b; e++) g.push('<line class="grid" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(Math.pow(10, e)).toFixed(1) + '" y2="' + y(Math.pow(10, e)).toFixed(1) + '"/><text class="tick" x="' + (L - 8) + '" y="' + (y(Math.pow(10, e)) + 4).toFixed(1) + '" text-anchor="end">' + coin(Math.pow(10, e)).replace(/(\.\d*?[1-9])0+$/, "$1") + "</text>");
     var path = function (o) { return o.map(function (v, i) { return (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1); }).join(" "); };
     g.push('<text class="ax" x="' + L + '" y="' + (H - 12) + '" text-anchor="start">First to sell</text><text class="ax" x="' + (W - R) + '" y="' + (H - 12) + '" text-anchor="end">Last to sell</text>');
-    g.push('<path class="ln" stroke="#4C7DFF" d="' + path(base.out) + '"/><path class="ln" stroke="#F5A524" d="' + path(mine.out) + '"/>');
-    g.push('<g id="mark" visibility="hidden"><line class="cross" id="cross" y1="' + T + '" y2="' + (H - B) + '" x1="-9" x2="-9"/><circle id="cA" r="4" fill="#4C7DFF" stroke="#11151F" stroke-width="2" cx="-9" cy="-9"/><circle id="cB" r="4" fill="#F5A524" stroke="#11151F" stroke-width="2" cx="-9" cy="-9"/></g>');
+    g.push('<path class="ln" stroke="#D4AF37" d="' + path(base.out) + '"/><path class="ln" stroke="#00E1B3" d="' + path(mine.out) + '"/>');
+    g.push('<g id="mark" visibility="hidden"><line class="cross" id="cross" y1="' + T + '" y2="' + (H - B) + '" x1="-9" x2="-9"/><circle id="cA" r="4" fill="#D4AF37" stroke="#11151F" stroke-width="2" cx="-9" cy="-9"/><circle id="cB" r="4" fill="#00E1B3" stroke="#11151F" stroke-width="2" cx="-9" cy="-9"/></g>');
     svg.innerHTML = g.join("");
     last = { base: base, mine: mine, x: x, y: y, L: L, R: R, W: W };
   }

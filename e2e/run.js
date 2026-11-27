@@ -208,7 +208,7 @@ function waitFor(child, text, ms) {
     {
       const out = execFileSync("node", [path.join(ROOT, "scripts", "i18n.js"), "build"], { encoding: "utf8" });
       assert(!/not translated|marks differ|unknown code|appears twice/.test(out), "the translation files are complete and well formed:\n" + out);
-      const english = "Launch a coin whose floor is paid for in advance.";
+      const english = "Launch Beyond Limits.";
       for (const lang of ["ar", "zh", "es", "hi", "fr", "ru", "pt", "id", "tr"]) {
         const thrown = [], onErr = (e) => thrown.push(String(e));
         page.on("pageerror", onErr);
@@ -228,7 +228,7 @@ function waitFor(child, text, ms) {
       // choosing a language from the menu reloads the page in it and remembers the choice; English brings it back
       await page.select(".lang-pick", "es");
       await page.waitForFunction(() => document.documentElement.lang === "es" && window.JISR_HOME && !/[?&]lang=/.test(location.search));
-      assert.equal(await text("h1"), "Lanza una moneda cuyo mínimo está pagado por adelantado.");
+      assert.equal(await text("h1"), "Lanza sin límites.");
       await page.goto(WEB + "/", { waitUntil: "domcontentloaded" });
       await page.waitForFunction(() => window.JISR_HOME && document.documentElement.lang === "es");
       await page.select(".lang-pick", "en");

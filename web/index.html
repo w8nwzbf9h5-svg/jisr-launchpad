@@ -18,13 +18,13 @@
 /* Addresses of the launchpad that used to live here (#board, #coin-0x…, #launch) now belong to app.html. */
 if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html" + location.hash);
 </script>
-<script src="i18n.js?v=e0a4f5ec"></script>
-<script src="runway.js?v=e6751da3" defer></script>
+<script src="i18n.js?v=cb98f8be"></script>
+<script src="runway.js?v=b5110b80" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=56bfd4eb">
-<link rel="stylesheet" href="home.css?v=18ffa8cd">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=616b0dde">
+<link rel="stylesheet" href="home.css?v=5cb5801d">
 </head>
 <body class="home">
 
@@ -59,13 +59,15 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
   <section class="open">
     <div class="hero">
       <canvas id="runway" aria-hidden="true"></canvas>
-      <h1>Launch a coin whose floor is paid for in advance.</h1>
+      <h1>Launch Beyond Limits.</h1>
+      <p class="sub">A new token economy. Built on transparent reserves.</p>
       <p class="lede">Landing Pad sells every coin at one fixed price and keeps the money in a reserve that no person controls. Any holder can sell back to that reserve at the floor price, at any time. Move the handle on the chart and watch the reserve keep up.</p>
       <div class="doors">
         <a class="btn primary" href="solana.html">Open on Solana devnet</a>
         <a class="btn" href="app.html">Open on Ethereum Sepolia</a>
       </div>
       <button type="button" class="sound-btn" id="runwaySound" aria-pressed="false" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/><path class="mute" d="M16 9l5 6M21 9l-5 6"/></svg><span>Runway sound</span></button>
+      <div class="truth"><span class="chip ok"><i></i>Testnet only, test money</span><span class="chip wait"><i></i>Independent audit: not yet</span><span class="chip wait"><i></i>Mainnet: not open</span></div>
       <p class="fine">There is no cheap early round and the creator receives no coins. A wallet may hold 2.5% of a coin at most. The whole method is in the <a href="whitepaper.html">white paper</a>, in ten languages.</p>
     </div>
 
@@ -135,6 +137,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
   <section class="sec" id="road">
     <h2>The road to mainnet</h2>
     <p class="say">The launchpad opens with real money when the first of two marks is reached: 100 pieces of feedback from testers, or the project's meme coin LPAD at a $1M market cap.</p>
+    <p class="say">Reaching a mark does not make the contracts safe. Real money is switched on only after an independent security audit and a reviewed deployment, whichever mark comes first.</p>
     <div class="road">
       <div class="r-card">
         <div class="r-top"><span>Tester feedback</span><b class="num" id="rFb">counting…</b></div>

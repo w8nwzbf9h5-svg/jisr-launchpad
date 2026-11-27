@@ -1,4 +1,4 @@
-/* Landing Pad hero: a runway seen from the approach, drawn on a canvas behind the opening section.
+/* Landing Pad hero: a launch platform with a metallic sphere and orbital rings (file name kept for history), drawn on a canvas behind the opening section.
    Purely decorative (aria-hidden). Lights stream toward the viewer, coins land on the runway and
    turn into the amber floor line. Pauses off-screen and when the tab is hidden; still frame for
    prefers-reduced-motion.
@@ -11,12 +11,11 @@
   if (!cv || !cv.getContext) return;
   const ctx = cv.getContext("2d");
   const still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const BLUE = [76, 125, 255], AMBER = [245, 165, 36];
-  let W = 0, H = 0, DPR = 1, vpX = 0, vpY = 0, t0 = performance.now(), running = false, visible = true;
+  let W = 0, H = 0, DPR = 1, t0 = performance.now(), running = false, visible = true;
   let mx = 0, my = 0, tx = 0, ty = 0; // pointer parallax, eased
-  const coins = [];
   const sound = makeSound();
-  const rgba = (c, a) => "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + a + ")";
+  const parts = Array.from({ length: 64 }, () => ({ a: Math.random() * 6.283, r: 0.55 + Math.random() * 1.4, y: (Math.random() - 0.5) * 1.2, s: 0.0006 + Math.random() * 0.0018 }));
+  const lastSide = [0, 0, 0];
 
   function size() {
     const r = cv.getBoundingClientRect();
@@ -25,97 +24,71 @@
     cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   }
-  // world -> screen. x in runway half-widths, z depth (1 near .. 60 far)
-  function P(x, z) {
-    const s = 1 / z;
-    return [vpX + x * W * 0.42 * s, vpY + (H * 1.02 - vpY) * s];
-  }
-  function spawn(now) {
-    coins.push({ x: (Math.random() * 2 - 1) * 0.9, z: 6 + Math.random() * 30, h: 1, v: 0.35 + Math.random() * 0.4, born: now, landed: 0 });
+  function ring(x, y, R, tilt, rot, color, width, dash, from, to) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.strokeStyle = color; ctx.lineWidth = width; if (dash) ctx.setLineDash(dash);
+    ctx.beginPath(); ctx.ellipse(0, 0, R, R * tilt, 0, from || 0, to == null ? Math.PI * 2 : to); ctx.stroke(); ctx.restore();
   }
 
   function frame(now) {
-    const t = (now - t0) / 1000;
-    tx += (mx - tx) * 0.04; ty += (my - ty) * 0.04;
-    vpX = W * 0.5 + tx * 26;
-    vpY = H * 0.3 + ty * 14;
+    const t = now - t0;
+    tx += (mx - tx) * 0.05; ty += (my - ty) * 0.05;
+    const wide = W > 980, S = Math.min(W, H * 1.25);
+    const R = wide ? Math.min(S * 0.12, 150) : Math.min(W * 0.19, 78);
+    const X = W * (wide ? 0.73 : 0.5) + tx * 22, Y = (wide ? H * 0.44 : 150 + R * 1.45) + ty * 14;
     ctx.clearRect(0, 0, W, H);
 
-    // sky glow at the horizon
-    const g = ctx.createRadialGradient(vpX, vpY, 0, vpX, vpY, Math.max(W, H) * 0.7);
-    g.addColorStop(0, rgba(BLUE, 0.22)); g.addColorStop(0.35, rgba(BLUE, 0.06)); g.addColorStop(1, rgba(BLUE, 0));
+    let g = ctx.createRadialGradient(X, Y, 0, X, Y, S * 0.95);
+    g.addColorStop(0, "rgba(212,175,55,.16)"); g.addColorStop(0.4, "rgba(17,27,44,.5)"); g.addColorStop(1, "rgba(8,11,16,0)");
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = rgba([200, 215, 255], 0.18); ctx.fillRect(0, vpY - 0.5, W, 1);
 
-    // receding ground grid
-    const speed = still ? 0 : 0.9;
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 26; i++) {
-      const z = 1 + ((i * 2.3 - t * speed * 2.3) % 60 + 60) % 60;
-      const a = Math.max(0, 0.16 * (1 - z / 60));
-      const [, y] = P(0, z);
-      ctx.strokeStyle = rgba([140, 160, 220], a);
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    // launch platform: concentric discs under the sphere, and a light pulse travelling outward
+    const PY = Y + R * 1.55;
+    for (let i = 6; i >= 0; i--) {
+      const rr = R * (1.05 + i * 0.34), a = 0.5 - i * 0.06, pg = ctx.createLinearGradient(X - rr, 0, X + rr, 0);
+      pg.addColorStop(0, "rgba(212,175,55,0)"); pg.addColorStop(0.5, "rgba(212,175,55," + a + ")"); pg.addColorStop(1, "rgba(212,175,55,0)");
+      ring(X, PY + i * R * 0.05, rr, 0.2, 0, pg, i === 0 ? 2 : 1);
     }
-    for (let k = -8; k <= 8; k++) {
-      const [x1, y1] = P(k * 0.5, 1), [x2, y2] = P(k * 0.5, 60);
-      ctx.strokeStyle = rgba([140, 160, 220], k === 0 ? 0 : 0.07);
-      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-    }
+    const pulse = still ? 0.4 : (t * 0.00025) % 1;
+    ring(X, PY, R * (1.05 + pulse * 2.1), 0.2, 0, "rgba(0,225,179," + (0.55 * (1 - pulse)) + ")", 1.5);
+    const bg = ctx.createLinearGradient(0, Y, 0, PY);
+    bg.addColorStop(0, "rgba(241,214,122,0)"); bg.addColorStop(1, "rgba(241,214,122,.2)");
+    ctx.fillStyle = bg; ctx.beginPath(); ctx.moveTo(X - R * 0.55, Y); ctx.lineTo(X + R * 0.55, Y); ctx.lineTo(X + R * 1.05, PY); ctx.lineTo(X - R * 1.05, PY); ctx.closePath(); ctx.fill();
 
-    // runway surface and edges
-    const n1 = P(-1, 1), n2 = P(1, 1), f = P(0, 60);
-    const surf = ctx.createLinearGradient(0, f[1], 0, H);
-    surf.addColorStop(0, rgba([20, 26, 40], 0)); surf.addColorStop(1, rgba([20, 26, 40], 0.75));
-    ctx.fillStyle = surf; ctx.beginPath(); ctx.moveTo(n1[0], n1[1]); ctx.lineTo(f[0], f[1]); ctx.lineTo(n2[0], n2[1]); ctx.closePath(); ctx.fill();
+    const spin = still ? 0 : t * 0.00018;
+    const rings = [{ R: R * 1.75, t: 0.24, rot: -0.32, c: "rgba(0,225,179,.75)", w: 1.6 }, { R: R * 2.25, t: 0.18, rot: 0.18, c: "rgba(212,175,55,.55)", w: 1.2, d: [2, 7] }, { R: R * 1.35, t: 0.62, rot: 1.1, c: "rgba(228,232,237,.22)", w: 1 }];
+    rings.forEach((o) => ring(X, Y, o.R, o.t, o.rot, o.c, o.w, o.d, Math.PI, Math.PI * 2));
 
-    // edge lights and centre dashes streaming toward the viewer
-    for (let i = 0; i < 40; i++) {
-      const z = 1 + ((i * 1.5 - t * speed * 3) % 60 + 60) % 60;
-      const near = 1 - z / 60, r = Math.max(0.6, 3.2 / Math.sqrt(z));
-      for (const side of [-1, 1]) {
-        const [x, y] = P(side, z);
-        ctx.fillStyle = rgba(BLUE, 0.25 + 0.75 * near);
-        ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
-      }
-      if (i % 2 === 0) {
-        const [xa, ya] = P(0, z), [xb, yb] = P(0, z + 0.7);
-        ctx.strokeStyle = rgba([230, 236, 250], 0.05 + 0.12 * near); ctx.lineWidth = Math.max(1, 3 / Math.sqrt(z));
-        ctx.beginPath(); ctx.moveTo(xa, ya); ctx.lineTo(xb, yb); ctx.stroke();
-      }
-    }
+    // the metallic sphere, with rotating engraving and a specular sweep
+    const sg = ctx.createRadialGradient(X - R * 0.38, Y - R * 0.42, R * 0.05, X, Y, R);
+    sg.addColorStop(0, "#FFF6D6"); sg.addColorStop(0.18, "#F1D67A"); sg.addColorStop(0.5, "#C9A133"); sg.addColorStop(0.82, "#5E4712"); sg.addColorStop(1, "#1D1606");
+    ctx.save(); ctx.shadowColor = "rgba(212,175,55,.55)"; ctx.shadowBlur = R * 0.6; ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(X, Y, R, 0, 7); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.arc(X, Y, R, 0, 7); ctx.clip();
+    ctx.strokeStyle = "rgba(255,240,190,.22)"; ctx.lineWidth = 1;
+    for (let k = 0; k < 7; k++) { const w = Math.cos(spin * 3 + k * Math.PI / 7) * R; ctx.beginPath(); ctx.ellipse(X, Y, Math.abs(w), R, 0, 0, 7); ctx.stroke(); }
+    for (let k = -2; k <= 2; k++) { const yy = Y + k * R * 0.38, rr = Math.sqrt(Math.max(0, R * R - (k * R * 0.38) ** 2)); ctx.beginPath(); ctx.ellipse(X, yy, rr, rr * 0.16, 0, 0, 7); ctx.stroke(); }
+    const sx = X - R + ((spin * 120) % (R * 3)), sw = ctx.createLinearGradient(sx - R * 0.3, 0, sx + R * 0.3, 0);
+    sw.addColorStop(0, "rgba(255,255,255,0)"); sw.addColorStop(0.5, "rgba(255,255,255,.10)"); sw.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = sw; ctx.fillRect(X - R, Y - R, R * 2, R * 2); ctx.restore();
 
-    // the floor: an amber line across the runway threshold that slowly rises with "fees"
-    const lift = still ? 0.5 : (Math.sin(t * 0.35) * 0.5 + 0.5);
-    const fz = 2.6 - lift * 0.7, [fl, fy] = P(-1.15, fz), [fr] = P(1.15, fz);
-    const fg = ctx.createLinearGradient(fl, 0, fr, 0);
-    fg.addColorStop(0, rgba(AMBER, 0)); fg.addColorStop(0.15, rgba(AMBER, 0.95)); fg.addColorStop(0.85, rgba(AMBER, 0.95)); fg.addColorStop(1, rgba(AMBER, 0));
-    ctx.shadowColor = rgba(AMBER, 0.8); ctx.shadowBlur = 18;
-    ctx.strokeStyle = fg; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(fl, fy); ctx.lineTo(fr, fy); ctx.stroke();
-    ctx.shadowBlur = 0;
+    // front halves of the rings, with a satellite on each; a soft sound as each one passes in front
+    rings.forEach((o, i) => {
+      ring(X, Y, o.R, o.t, o.rot, o.c, o.w + 0.4, o.d, 0, Math.PI);
+      const a = spin * (i === 1 ? -1.6 : 2.2) + i * 2, px = Math.cos(a) * o.R, py = Math.sin(a) * o.R * o.t;
+      const rx = X + px * Math.cos(o.rot) - py * Math.sin(o.rot), ry = Y + px * Math.sin(o.rot) + py * Math.cos(o.rot);
+      const front = Math.sin(a) > -0.2 ? 1 : 0;
+      if (front && !lastSide[i] && !still) sound.land((rx - X) / (R * 2.2), 4 + i * 6);
+      lastSide[i] = front;
+      if (front) { ctx.fillStyle = i === 0 ? "#00E1B3" : "#F1D67A"; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 14; ctx.beginPath(); ctx.arc(rx, ry, i === 2 ? 2 : 3.4, 0, 7); ctx.fill(); ctx.shadowBlur = 0; }
+    });
 
-    // coins dropping onto the runway; each one that lands flashes amber
-    if (!still && coins.length < 26 && Math.random() < 0.08) spawn(now);
-    for (let i = coins.length - 1; i >= 0; i--) {
-      const c = coins[i];
-      if (!c.landed) { c.h -= c.v * 0.016; if (c.h <= 0) { c.h = 0; c.landed = now; sound.land(c.x, c.z); } }
-      const [gx, gy] = P(c.x, c.z);
-      const y = gy - c.h * (H * 0.5) / Math.sqrt(c.z);
-      const r = Math.max(1, 4 / Math.sqrt(c.z));
-      if (c.landed) {
-        const age = (now - c.landed) / 900;
-        if (age > 1) { coins.splice(i, 1); continue; }
-        ctx.strokeStyle = rgba(AMBER, 0.9 * (1 - age)); ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.ellipse(gx, gy, r * (1 + age * 5), r * (1 + age * 5) * 0.35, 0, 0, 7); ctx.stroke();
-      } else {
-        ctx.fillStyle = rgba([200, 214, 255], 0.9);
-        ctx.beginPath(); ctx.arc(gx, y, r, 0, 7); ctx.fill();
-        ctx.strokeStyle = rgba(BLUE, 0.35); ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(gx, y - r * 6); ctx.lineTo(gx, y - r); ctx.stroke();
-      }
-    }
+    parts.forEach((p) => {
+      if (!still) { p.a += p.s * 16; p.y -= 0.0009; if (p.y < -1.4) p.y = 0.6; }
+      const px = X + Math.cos(p.a) * p.r * R * 1.3, py = PY + p.y * R * 1.6 + Math.sin(p.a) * p.r * R * 0.25;
+      const al = Math.max(0, 0.6 - Math.abs(p.y) * 0.35) * (Math.sin(p.a) > 0 ? 1 : 0.45);
+      ctx.fillStyle = "rgba(241,214,122," + al + ")"; ctx.fillRect(px, py, 1.6, 1.6);
+    });
 
-    sound.tick(lift, tx);
+    sound.tick(pulse, tx);
     if (running) requestAnimationFrame(frame);
   }
 
@@ -207,7 +180,7 @@
     };
   }
   size();
-  if (still) { for (let i = 0; i < 10; i++) coins.push({ x: (Math.random() * 2 - 1) * 0.8, z: 5 + i * 3, h: 0.3 + Math.random() * 0.5, v: 0, landed: 0 }); frame(performance.now()); }
+  if (still) frame(performance.now());
   else start();
   window.addEventListener("resize", () => { size(); if (still) frame(performance.now()); });
   window.addEventListener("pointermove", (e) => { mx = (e.clientX / innerWidth) * 2 - 1; my = (e.clientY / innerHeight) * 2 - 1; }, { passive: true });

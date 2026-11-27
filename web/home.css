@@ -409,3 +409,22 @@ a.tile:hover .t-go{text-decoration:underline}
 .sound-btn[aria-pressed="true"] .wave{display:inline}
 .sound-btn[aria-pressed="true"] .mute{display:none}
 .sound-btn[hidden]{display:none}
+
+/* ---------- New identity: launch platform hero ---------- */
+.open>.hero{max-width:none;text-align:left;margin:0;padding:clamp(40px,10vh,120px) 0 clamp(50px,10vh,110px)}
+.hero::before{left:0;transform:none;width:min(760px,100%);background:radial-gradient(closest-side,rgba(8,11,16,.7),transparent)}
+.open h1{font-size:clamp(48px,9vw,128px);line-height:.92;letter-spacing:-.045em;max-width:9.5ch;margin:0 0 4px;font-weight:600;
+  background:linear-gradient(180deg,#fff,#C9CED6 60%,#8E96A3);-webkit-background-clip:text;background-clip:text;color:transparent}
+.open .sub{font:500 clamp(19px,2.2vw,26px)/1.35 var(--display);color:var(--gold-2);margin:22px 0 14px;max-width:30ch}
+.open .lede{margin-left:0;margin-right:0;max-width:44ch;color:#B6BEC9;opacity:1}
+.open .doors{justify-content:flex-start}
+.open .fine{margin:0;max-width:44em}
+.open .sound-btn{margin:0 0 16px}
+.truth{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 18px}
+.chip{display:inline-flex;align-items:center;gap:8px;font:500 12.5px var(--mono);color:#C7CED8;padding:7px 12px;border:1px solid rgba(228,232,237,.18);border-radius:999px;background:rgba(8,11,16,.6)}
+.chip i{width:6px;height:6px;border-radius:50%}.chip.ok i{background:var(--emerald)}.chip.wait i{background:#F0B44C}
+.open .doors .btn.primary{color:var(--on-accent);background:linear-gradient(180deg,var(--gold-2),var(--gold) 55%,#B8932A);border-color:transparent;box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 10px 30px -10px rgba(212,175,55,.6)}
+.machine::before{background:linear-gradient(140deg,rgba(212,175,55,.6),transparent 30%,transparent 70%,rgba(0,225,179,.4))}
+.sec>h2::before{background:linear-gradient(90deg,var(--gold),var(--emerald))}
+@media (max-width:980px){.open>.hero{padding-top:min(78vw,330px)}}
+[dir=rtl] .open>.hero{text-align:right}
