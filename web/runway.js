@@ -87,11 +87,6 @@
     const sx = X - R + ((spin * 120) % (R * 3)), sw = ctx.createLinearGradient(sx - R * 0.3, 0, sx + R * 0.3, 0);
     sw.addColorStop(0, "rgba(255,255,255,0)"); sw.addColorStop(0.5, "rgba(255,255,255,.10)"); sw.addColorStop(1, "rgba(255,255,255,0)");
     ctx.fillStyle = sw; ctx.fillRect(X - R, Y - R, R * 2, R * 2);
-    // the existing Landing Pad arch, as a dark engraved emblem with a gold edge
-    ctx.lineCap = "round"; ctx.lineWidth = R * 0.16; ctx.strokeStyle = "rgba(20,15,4,.82)";
-    ctx.beginPath(); ctx.arc(X, Y + R * 0.18, R * 0.42, Math.PI, 0); ctx.stroke();
-    ctx.lineWidth = R * 0.06; ctx.strokeStyle = "rgba(255,226,140,.55)"; ctx.beginPath(); ctx.arc(X, Y + R * 0.18, R * 0.42, Math.PI, 0); ctx.stroke();
-    ctx.fillStyle = "rgba(20,15,4,.82)"; ctx.fillRect(X - R * 0.56, Y + R * 0.26, R * 1.12, R * 0.1);
     ctx.restore();
 
     // front halves of the rings, with a satellite on each; a soft sound as each one passes in front

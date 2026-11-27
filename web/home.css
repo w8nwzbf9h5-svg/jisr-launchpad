@@ -455,3 +455,8 @@ a.tile:hover .t-go{text-decoration:underline}
 @media (min-width:1100px){.open>.hero{position:relative}.h-stats{position:absolute;right:0;bottom:clamp(50px,10vh,110px);grid-template-columns:1fr 1fr;width:340px;margin:0}}
 @media (max-width:560px){.h-stats{grid-template-columns:1fr 1fr}}
 [dir=rtl] .h-stats{right:auto;left:0}
+
+/* page-by-page navigation */
+main>section[hidden],.open>.hero[hidden]{display:none!important}
+.top a.on{color:var(--gold-2)}
+body[data-page]:not([data-page=home]) main>section:not([hidden]){padding-top:28px}

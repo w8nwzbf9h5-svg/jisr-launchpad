@@ -128,6 +128,7 @@ function waitFor(child, text, ms) {
       assert.equal(await page.$eval("#road a.btn.primary", (a) => a.href), "https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump");
       assert((await text("#lpad")).includes("Market cap") && (await text("#lpad")).includes("Volume, 24h"), "the coin's figures have their place on the page");
       // the contact form sends a message to the project's inbox through the form service, and says so when it cannot
+      await page.evaluate(() => { location.hash = "contact"; }); await page.waitForFunction(() => !document.querySelector("#contact").hidden);
       assert.equal(await page.$eval("#cSend", (b) => b.disabled), true, "nothing to send before a message is written");
       await page.type("#cMsg", "The sell button stays grey after I connect.");
       await page.type("#cEmail", "tester@example.org");
@@ -165,6 +166,7 @@ function waitFor(child, text, ms) {
       await page.waitForFunction(() => !window.JISR_HOME.live.busy && window.JISR_HOME.live.at > 0, { timeout: 30000 });
       const readAt = await page.evaluate(() => window.JISR_HOME.live.at);
       assert(/^(Live\. Read|The figures could not be read)/.test(await text("#nAgo")), "the line above the scoreboard says how fresh the figures are: " + (await text("#nAgo")));
+      await page.evaluate(() => { location.hash = "numbers"; }); await page.waitForFunction(() => !document.querySelector("#numbers").hidden);
       await page.click("#nRefresh");
       await page.waitForFunction((t) => !window.JISR_HOME.live.busy && window.JISR_HOME.live.at > t, { timeout: 30000 }, readAt);
       const setIn = (id, v) => page.evaluate((id, v) => { const e = document.querySelector(id); e.value = v; e.dispatchEvent(new Event("input", { bubbles: true })); }, id, v);
