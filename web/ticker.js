@@ -22,8 +22,7 @@
       symbols: [
         { proName: "FOREXCOM:SPXUSD", title: "S&P 500" },
         { proName: "FOREXCOM:NSXUSD", title: "Nasdaq 100" },
-        { proName: "TVC:DXY", title: "US dollar index" },
-        { proName: "TVC:US10Y", title: "US 10Y yield" },
+        { proName: "CAPITALCOM:DXY", title: "US dollar index" },
         { proName: "OANDA:XAUUSD", title: "Gold" },
         { proName: "TVC:USOIL", title: "WTI oil" },
         { proName: "FX:EURUSD", title: "EUR/USD" },
