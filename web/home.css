@@ -484,8 +484,8 @@ footer.end{text-align:center}
 footer.end p{max-width:760px;margin-inline:auto}
 footer.end .f-social{justify-content:center}
 /* Markets bar + announcement bar */
-.mbar{display:flex;align-items:center;min-height:56px;background:#060910;border-bottom:1px solid var(--line)}
-.mbar-tape{flex:1;min-width:0;height:56px;overflow:hidden}
+.mbar{display:flex;align-items:center;min-height:68px;background:#060910;border-bottom:1px solid var(--line)}
+.mbar-tape{flex:1;min-width:0;height:68px;overflow:hidden}
 /* The widgets are their own documents: keep their canvas transparent on our dark page. */
 .tradingview-widget-container iframe{color-scheme:normal}
 .mbar-tape .tradingview-widget-copyright{display:none}
