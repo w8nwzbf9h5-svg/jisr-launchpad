@@ -496,7 +496,7 @@ footer.end .f-social{justify-content:center}
 .abar{background:linear-gradient(90deg,rgba(212,175,55,.14),rgba(212,175,55,.04));border-bottom:1px solid rgba(212,175,55,.28);font-size:13.5px;color:var(--ink)}
 .abar .wrap{padding-top:8px;padding-bottom:8px}
 .abar b{color:var(--gold-2);margin-inline-end:4px}
-.abar a{color:var(--gold-2);font-weight:600;margin-inline-start:8px}
+.abar a{color:var(--gold-2);font-weight:600;margin-inline-end:6px}
 .econ-box{min-height:620px;border:1px solid var(--line);border-radius:14px;padding:6px;background:var(--surface)}
 .econ-wait{color:var(--muted);padding:20px}
 @media (max-width:640px){.bar-tag{width:auto;max-width:84px;font-size:12px}.bar-more{display:none}.abar{font-size:13px}}
@@ -505,3 +505,6 @@ footer.end .f-social{justify-content:center}
 .abar .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px}
 .abar-ico{flex:none;color:var(--gold-2);margin-inline-end:2px}
 [dir="rtl"] .abar-ico{transform:scaleX(-1)}
+/* Less empty space between the bars and the hero, so the sphere is in view on first load */
+.open{padding-top:8px}
+@media (min-width:980px){.open{padding-top:12px}.open>.hero{padding-top:clamp(16px,3vh,36px)}}
