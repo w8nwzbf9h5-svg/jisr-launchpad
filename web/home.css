@@ -479,3 +479,7 @@ body.drawer-open .top{z-index:32}
 body.drawer-open{overflow:hidden}
 @media (prefers-reduced-motion:reduce){.burger i{transition:none}}
 body.drawer-open .bot{visibility:hidden}
+/* Footer: centred */
+footer.end{text-align:center}
+footer.end p{max-width:760px;margin-inline:auto}
+footer.end .f-social{justify-content:center}
