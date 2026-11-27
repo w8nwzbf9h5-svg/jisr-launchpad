@@ -3,7 +3,7 @@
    around it stays quiet. Chart hues are the white paper's: blue for price, yellow for the floor and
    the reserve, aqua for the creator, checked for colour-blind separation on this surface. */
 .home{--f-floor:#c98500;--f-plat:#3987e5;--f-crea:#199e70;--f-you:#aeb7c9}
-.home .wrap{max-width:1120px}
+.home .wrap{max-width:none;width:min(1240px,calc(100% - 2 * clamp(20px,5vw,80px)));padding:0}
 .home nav a{padding:10px 12px}
 .home .right .btn{padding:8px 13px;font-size:13.5px}
 @media (min-width:820px){.home nav a{padding:19px 14px 17px}}
@@ -502,3 +502,5 @@ footer.end .f-social{justify-content:center}
 .econ-box{min-height:620px;border:1px solid var(--line);border-radius:14px;padding:6px;background:var(--surface)}
 .econ-wait{color:var(--muted);padding:20px}
 @media (max-width:640px){.bar-tag{width:auto;max-width:84px;font-size:12px}.bar-more{display:none}.abar{font-size:13px}}
+/* Menu row spans the full page width, edge to edge with the logo and the buttons */
+@media (min-width:1100px){.home .top nav{justify-content:space-between;margin:0;width:100%;-webkit-mask-image:none;mask-image:none}.home .top nav a{padding-inline:0}}
