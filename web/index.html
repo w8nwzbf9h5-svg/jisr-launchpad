@@ -18,23 +18,24 @@
 /* Addresses of the launchpad that used to live here (#board, #coin-0x…, #launch) now belong to app.html. */
 if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html" + location.hash);
 </script>
-<script src="i18n.js?v=0b5760aa"></script>
+<script src="i18n.js?v=06d735ee"></script>
 <script src="runway.js?v=f3830e09" defer></script>
 <script src="robot.js?v=39372c41" defer></script>
-<script src="nav.js?v=af7809ba" defer></script>
+<script src="nav.js?v=92540846" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=699e17dd">
-<link rel="stylesheet" href="home.css?v=b9c9eece">
+<link rel="stylesheet" href="home.css?v=3de12443">
 </head>
 <body class="home">
 
 <header class="top">
   <div class="wrap">
+    <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="drawer"><i></i><i></i><i></i></button>
     <a class="brand" href="./" aria-label="Landing Pad, home"><b translate="no">LANDING</b><i></i><span translate="no">pad</span></a>
     <nav aria-label="Main">
-      <a href="learn/">Learn</a>
+      <a href="./" data-home>Home</a>
       <a href="#machine">The model</a>
       <a href="videos.html">Videos</a>
       <a href="#stress">Stress test</a>
@@ -46,6 +47,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
       <a href="#lpad">LPAD coin</a>
       <a href="#contact">Contact</a>
       <a href="whitepaper.html">White paper</a>
+      <a href="learn/" class="in-drawer">Learn</a>
     </nav>
     <div class="right">
       <span class="lang-spot" data-lang-pick></span>

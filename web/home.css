@@ -460,3 +460,22 @@ a.tile:hover .t-go{text-decoration:underline}
 main>section[hidden],.open>.hero[hidden]{display:none!important}
 .top a.on{color:var(--gold-2)}
 body[data-page]:not([data-page=home]) main>section:not([hidden]){padding-top:28px}
+/* Menu button + drawer */
+.burger{display:inline-flex;flex-direction:column;justify-content:center;gap:5px;width:42px;height:42px;padding:0 10px;margin-inline-end:-6px;background:transparent;border:1px solid var(--line);border-radius:10px;cursor:pointer;flex:none}
+.burger i{display:block;height:2px;background:var(--ink);border-radius:2px;transition:transform .2s,opacity .2s}
+.burger:hover{border-color:var(--accent)}
+.burger:focus-visible{outline:2px solid var(--gold-2);outline-offset:2px}
+.burger.x i:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger.x i:nth-child(2){opacity:0}
+.burger.x i:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.top nav a.in-drawer{display:none}
+.drawer-shade{position:fixed;inset:0;z-index:30;background:rgba(4,6,10,.55)}
+.drawer{position:fixed;top:0;bottom:0;inset-inline-start:0;z-index:31;width:min(300px,84vw);background:var(--surface);border-inline-end:1px solid var(--line);padding:14px 14px 24px;overflow-y:auto;box-shadow:0 0 40px rgba(0,0,0,.5)}
+.drawer nav{display:flex;flex-direction:column;gap:2px;width:auto;overflow:visible;order:0;mask-image:none;-webkit-mask-image:none}
+.drawer nav a{display:block;padding:12px 14px;border:0;font-size:16px;white-space:normal;border-radius:10px;color:var(--ink);text-decoration:none;font-weight:500}
+.drawer nav a:hover,.drawer nav a:focus-visible{background:var(--raise)}
+.drawer nav a.on{color:var(--gold-2);background:var(--raise)}
+body.drawer-open .top{z-index:32}
+body.drawer-open{overflow:hidden}
+@media (prefers-reduced-motion:reduce){.burger i{transition:none}}
+body.drawer-open .bot{visibility:hidden}
