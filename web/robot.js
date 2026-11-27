@@ -84,3 +84,14 @@
   if (still) frame(performance.now()); else requestAnimationFrame(frame);
   document.addEventListener("visibilitychange", () => { if (still) return; if (document.hidden) running = false; else if (!running && box.isConnected) { running = true; requestAnimationFrame(frame); } });
 })();
+
+/* Hero numbers: copies of the live scoreboard figures further down the page (read from the networks by
+   home.js), so the top of the page shows the same real numbers and never a number of its own. */
+(function () {
+  const outs = document.querySelectorAll("[data-mirror]");
+  if (!outs.length) return;
+  const copy = () => outs.forEach((o) => { const src = document.getElementById(o.dataset.mirror); if (!src) return; const v = src.textContent.trim(); o.textContent = /\d/.test(v) ? v : "–"; });
+  copy();
+  const mo = new MutationObserver(copy);
+  outs.forEach((o) => { const src = document.getElementById(o.dataset.mirror); if (src) mo.observe(src, { childList: true, characterData: true, subtree: true }); });
+})();

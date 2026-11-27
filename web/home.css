@@ -415,7 +415,7 @@ a.tile:hover .t-go{text-decoration:underline}
 .hero::before{left:0;transform:none;width:min(760px,100%);background:radial-gradient(closest-side,rgba(8,11,16,.7),transparent)}
 .open h1{font-size:clamp(48px,9vw,128px);line-height:.92;letter-spacing:-.045em;max-width:9.5ch;margin:0 0 4px;font-weight:600;
   background:linear-gradient(180deg,#fff,#C9CED6 60%,#8E96A3);-webkit-background-clip:text;background-clip:text;color:transparent}
-.open .sub{font:500 clamp(19px,2.2vw,26px)/1.35 var(--display);color:var(--gold-2);margin:22px 0 14px;max-width:30ch}
+.hero .sub{font:500 clamp(19px,2.2vw,26px)/1.35 var(--display);color:var(--gold-2);margin:22px 0 14px;max-width:30ch}
 .open .lede{margin-left:0;margin-right:0;max-width:44ch;color:#B6BEC9;opacity:1}
 .open .doors{justify-content:flex-start}
 .open .fine{margin:0;max-width:44em}
@@ -445,3 +445,13 @@ a.tile:hover .t-go{text-decoration:underline}
 @media (max-width:640px){.bot{right:8px;bottom:8px}.bot-fig{width:66px;height:84px}.bot-say{max-width:200px;font-size:13px}}
 [dir=rtl] .bot{right:auto;left:16px;flex-direction:row-reverse}[dir=rtl] .bot-say{border-radius:16px 16px 16px 4px}
 @media print{.bot{display:none}}
+
+/* ---------- live numbers beside the headline ---------- */
+.h-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;max-width:640px;margin:0 0 18px;border:1px solid rgba(212,175,55,.28);border-radius:16px;overflow:hidden;background:rgba(212,175,55,.16);backdrop-filter:blur(10px)}
+.h-stat{display:flex;flex-direction:column;gap:4px;padding:12px 14px;background:rgba(10,15,24,.78);color:var(--ink);text-decoration:none;transition:background .2s}
+.h-stat:hover{background:rgba(21,34,56,.9)}
+.h-stat .t-name{font-size:12px;color:var(--muted);line-height:1.3}
+.h-stat b{font:600 19px var(--mono);color:var(--gold-2);letter-spacing:-.01em}
+@media (min-width:1100px){.open>.hero{position:relative}.h-stats{position:absolute;right:0;bottom:clamp(50px,10vh,110px);grid-template-columns:1fr 1fr;width:340px;margin:0}}
+@media (max-width:560px){.h-stats{grid-template-columns:1fr 1fr}}
+[dir=rtl] .h-stats{right:auto;left:0}

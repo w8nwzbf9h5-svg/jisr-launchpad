@@ -20,12 +20,12 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 </script>
 <script src="i18n.js?v=1d762f80"></script>
 <script src="runway.js?v=56d69bf2" defer></script>
-<script src="robot.js?v=efe15d7f" defer></script>
+<script src="robot.js?v=39372c41" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=699e17dd">
-<link rel="stylesheet" href="home.css?v=f9ba7b69">
+<link rel="stylesheet" href="home.css?v=ff0e9c80">
 </head>
 <body class="home">
 
@@ -68,6 +68,12 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
         <a class="btn" href="app.html">Open on Ethereum Sepolia</a>
       </div>
       <button type="button" class="sound-btn" id="runwaySound" aria-pressed="false" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/><path class="mute" d="M16 9l5 6M21 9l-5 6"/></svg><span>Runway sound</span></button>
+      <div class="h-stats" aria-label="Live numbers">
+        <a class="h-stat" href="markets.html"><span class="t-name">Coins launched</span><b data-mirror="rCoins">–</b></a>
+        <a class="h-stat" href="#numbers"><span class="t-name">Visits to the site</span><b data-mirror="rVisits">–</b></a>
+        <a class="h-stat" href="#contact"><span class="t-name">Tester feedback</span><b data-mirror="nFb">–</b></a>
+        <a class="h-stat" href="#lpad"><span class="t-name">LPAD market cap</span><b data-mirror="nCap">–</b></a>
+      </div>
       <div class="truth"><span class="chip ok"><i></i>Testnet only, test money</span><span class="chip wait"><i></i>Independent audit: not yet</span><span class="chip wait"><i></i>Mainnet: not open</span></div>
       <p class="fine">There is no cheap early round and the creator receives no coins. A wallet may hold 2.5% of a coin at most. The whole method is in the <a href="whitepaper.html">white paper</a>, in ten languages.</p>
     </div>
