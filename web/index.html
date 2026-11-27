@@ -18,7 +18,7 @@
 /* Addresses of the launchpad that used to live here (#board, #coin-0x…, #launch) now belong to app.html. */
 if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html" + location.hash);
 </script>
-<script src="i18n.js?v=996a74df"></script>
+<script src="i18n.js?v=aad6e08a"></script>
 <script src="runway.js?v=f3830e09" defer></script>
 <script src="robot.js?v=39372c41" defer></script>
 <script src="ticker.js?v=c2519743" defer></script>
@@ -27,7 +27,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=699e17dd">
-<link rel="stylesheet" href="home.css?v=676d9c73">
+<link rel="stylesheet" href="home.css?v=32532305">
 </head>
 <body class="home">
 
@@ -43,6 +43,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
       <a href="#proof">Live checks</a>
       <a href="#try">Try it</a>
       <a href="markets.html">Charts</a>
+      <a href="#econ">Calendar</a>
       <a href="#vote">Vote</a>
       <a href="governance.html">Governance</a>
       <a href="#lpad">LPAD coin</a>
@@ -61,12 +62,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
   <span class="bar-tag">Markets</span>
   <div class="bar-body" id="mTape"></div>
 </div></div>
-<div class="cbar" aria-label="Economic calendar"><div class="wrap bar-row">
-  <span class="bar-tag">Economic calendar</span>
-  <a class="bar-body cbar-line" href="#econ">This week's releases, with forecasts and actual figures</a>
-  <a class="bar-more" href="#econ">Open calendar</a>
-</div></div>
-<div class="abar"><div class="wrap"><b>Announcement</b> <span>LPAD, the project's meme coin, is live on pump.fun. It is a meme coin with no floor.</span> <a href="https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump" target="_blank" rel="noopener">Buy on pump.fun</a> <a href="#promo">Details</a></div></div>
+<div class="abar"><div class="wrap"><svg class="abar-ico" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11v2a1 1 0 0 0 1 1h3l9 5V5L7 10H4a1 1 0 0 0-1 1z"/><path d="M7 14l1.6 5h2.6L9.6 14"/><path d="M19.4 9a4 4 0 0 1 0 6"/></svg><b>Announcement</b> <span>LPAD, the project's meme coin, is live on pump.fun. It is a meme coin with no floor.</span> <a href="https://pump.fun/coin/GaWqCRMjHVZD6JNG9yDt9c9eLN1nZnQRJmR4w2zEpump" target="_blank" rel="noopener">Buy on pump.fun</a> <a href="#promo">Details</a></div></div>
 <div class="strip"><div class="wrap"><b>Public test.</b> Test networks only: the coins and the money here have no value. The contracts have not had an independent audit. <button type="button" class="linkbtn" id="wOpen">How to help test</button></div></div>
 
 <main class="wrap">

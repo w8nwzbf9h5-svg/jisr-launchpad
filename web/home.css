@@ -484,15 +484,13 @@ footer.end{text-align:center}
 footer.end p{max-width:760px;margin-inline:auto}
 footer.end .f-social{justify-content:center}
 /* Markets bar + calendar bar: same height, aligned to the page edges */
-.mbar,.cbar{background:#060910;border-bottom:1px solid var(--line)}
+.mbar{background:#060910;border-bottom:1px solid var(--line)}
 .bar-row{display:flex;align-items:center;gap:0;height:50px}
 .bar-tag{flex:none;width:138px;padding-inline-end:14px;margin-inline-end:14px;border-inline-end:1px solid var(--line);color:var(--gold-2);font-size:13px;font-weight:600;line-height:1.2}
 .bar-body{flex:1;min-width:0;height:50px;overflow:hidden;position:relative}
 .bar-body .tradingview-widget-copyright{display:none}
 .bar-more{flex:none;margin-inline-start:14px;padding-inline-start:14px;border-inline-start:1px solid var(--line);color:var(--muted);font-size:12.5px;white-space:nowrap}
 .bar-more:hover{color:var(--gold-2)}
-.cbar-line{display:flex;align-items:center;color:var(--ink);font-size:14px;text-decoration:none}
-.cbar-line:hover{color:var(--gold-2)}
 /* The widgets are their own documents: keep their canvas transparent on our dark page. */
 .tradingview-widget-container iframe{color-scheme:normal}
 .abar{background:linear-gradient(90deg,rgba(212,175,55,.14),rgba(212,175,55,.04));border-bottom:1px solid rgba(212,175,55,.28);font-size:13.5px;color:var(--ink)}
@@ -504,3 +502,6 @@ footer.end .f-social{justify-content:center}
 @media (max-width:640px){.bar-tag{width:auto;max-width:84px;font-size:12px}.bar-more{display:none}.abar{font-size:13px}}
 /* Menu row spans the full page width, edge to edge with the logo and the buttons */
 @media (min-width:1100px){.home .top nav{justify-content:space-between;margin:0;width:100%;-webkit-mask-image:none;mask-image:none}.home .top nav a{padding-inline:0}}
+.abar .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px}
+.abar-ico{flex:none;color:var(--gold-2);margin-inline-end:2px}
+[dir="rtl"] .abar-ico{transform:scaleX(-1)}
