@@ -491,9 +491,8 @@ footer.end .f-social{justify-content:center}
 .bar-body .tradingview-widget-copyright{display:none}
 .bar-more{flex:none;margin-inline-start:14px;padding-inline-start:14px;border-inline-start:1px solid var(--line);color:var(--muted);font-size:12.5px;white-space:nowrap}
 .bar-more:hover{color:var(--gold-2)}
-/* The calendar widget is a list: show it as one row, skipping its filter header. Scroll inside it for more. */
-.bar-body.cbar-w{height:36px}
-.cbar-w iframe{margin-top:-75px;width:calc(100% + 18px)!important}
+.cbar-line{display:flex;align-items:center;color:var(--ink);font-size:14px;text-decoration:none}
+.cbar-line:hover{color:var(--gold-2)}
 /* The widgets are their own documents: keep their canvas transparent on our dark page. */
 .tradingview-widget-container iframe{color-scheme:normal}
 .abar{background:linear-gradient(90deg,rgba(212,175,55,.14),rgba(212,175,55,.04));border-bottom:1px solid rgba(212,175,55,.28);font-size:13.5px;color:var(--ink)}
