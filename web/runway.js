@@ -16,6 +16,7 @@
   const sound = makeSound();
   const parts = Array.from({ length: 64 }, () => ({ a: Math.random() * 6.283, r: 0.55 + Math.random() * 1.4, y: (Math.random() - 0.5) * 1.2, s: 0.0006 + Math.random() * 0.0018 }));
   const lastSide = [0, 0, 0];
+  const stars = Array.from({ length: 140 }, () => ({ x: Math.random(), y: Math.random() * 0.9, r: Math.random() < 0.15 ? 1.6 : 1, a: 0.25 + Math.random() * 0.6, s: 0.5 + Math.random() * 2, p: Math.random() * 6 }));
 
   function size() {
     const r = cv.getBoundingClientRect();
@@ -34,19 +35,36 @@
     tx += (mx - tx) * 0.05; ty += (my - ty) * 0.05;
     const wide = W > 980, S = Math.min(W, H * 1.25);
     const R = wide ? Math.min(S * 0.12, 150) : Math.min(W * 0.19, 78);
-    const X = W * (wide ? 0.73 : 0.5) + tx * 22, Y = (wide ? H * 0.44 : 150 + R * 1.45) + ty * 14;
+    const X = W * (wide ? 0.73 : 0.5) + tx * 22, Y = (wide ? H * 0.36 : 150 + R * 1.45) + ty * 14;
     ctx.clearRect(0, 0, W, H);
 
     let g = ctx.createRadialGradient(X, Y, 0, X, Y, S * 0.95);
     g.addColorStop(0, "rgba(212,175,55,.16)"); g.addColorStop(0.4, "rgba(17,27,44,.5)"); g.addColorStop(1, "rgba(8,11,16,0)");
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 
+    // deep space: fixed stars that twinkle, and the curve of a planet at the bottom
+    for (let i = 0; i < stars.length; i++) {
+      const st = stars[i], tw = still ? 0.6 : 0.45 + 0.55 * Math.abs(Math.sin(t * 0.0012 * st.s + st.p));
+      ctx.fillStyle = "rgba(228,232,237," + (st.a * tw).toFixed(3) + ")"; ctx.fillRect(st.x * W + tx * 6 * st.a, st.y * H + ty * 4 * st.a, st.r, st.r);
+    }
+    const pr = Math.max(W, H) * 1.6, pg0 = ctx.createRadialGradient(W * 0.5, H + pr * 0.86, pr * 0.9, W * 0.5, H + pr * 0.86, pr);
+    pg0.addColorStop(0, "rgba(17,27,44,0)"); pg0.addColorStop(0.9, "rgba(0,225,179,.10)"); pg0.addColorStop(1, "rgba(0,225,179,0)");
+    ctx.fillStyle = pg0; ctx.fillRect(0, 0, W, H);
+
     // launch platform: concentric discs under the sphere, and a light pulse travelling outward
     const PY = Y + R * 1.55;
-    for (let i = 6; i >= 0; i--) {
-      const rr = R * (1.05 + i * 0.34), a = 0.5 - i * 0.06, pg = ctx.createLinearGradient(X - rr, 0, X + rr, 0);
-      pg.addColorStop(0, "rgba(212,175,55,0)"); pg.addColorStop(0.5, "rgba(212,175,55," + a + ")"); pg.addColorStop(1, "rgba(212,175,55,0)");
-      ring(X, PY + i * R * 0.05, rr, 0.2, 0, pg, i === 0 ? 2 : 1);
+    for (let i = 4; i >= 0; i--) {
+      const rr = R * (1.2 + i * 0.32), yy = PY + i * R * 0.035;
+      ctx.save(); ctx.shadowColor = "rgba(255,201,74,.55)"; ctx.shadowBlur = 16 - i * 2;
+      ring(X, yy, rr, 0.22, 0, "rgba(255,201,74," + (0.75 - i * 0.12).toFixed(2) + ")", i === 1 ? 5 : 2);
+      ctx.restore();
+      // lights travelling around each ring: emerald on the inner rings, gold outside
+      for (let k = 0; k < 4; k++) {
+        const a = (still ? k * 1.6 : t * (0.0004 + i * 0.00012) * (i % 2 ? -1 : 1)) + k * Math.PI / 2 + i;
+        const lx = X + Math.cos(a) * rr, ly = yy + Math.sin(a) * rr * 0.22;
+        ctx.fillStyle = i < 2 ? "#00E1B3" : "#FFE7A3"; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 10;
+        ctx.beginPath(); ctx.arc(lx, ly, Math.sin(a) > 0 ? 2.6 : 1.6, 0, 7); ctx.fill(); ctx.shadowBlur = 0;
+      }
     }
     const pulse = still ? 0.4 : (t * 0.00025) % 1;
     ring(X, PY, R * (1.05 + pulse * 2.1), 0.2, 0, "rgba(0,225,179," + (0.55 * (1 - pulse)) + ")", 1.5);
@@ -68,7 +86,13 @@
     for (let k = -2; k <= 2; k++) { const yy = Y + k * R * 0.38, rr = Math.sqrt(Math.max(0, R * R - (k * R * 0.38) ** 2)); ctx.beginPath(); ctx.ellipse(X, yy, rr, rr * 0.16, 0, 0, 7); ctx.stroke(); }
     const sx = X - R + ((spin * 120) % (R * 3)), sw = ctx.createLinearGradient(sx - R * 0.3, 0, sx + R * 0.3, 0);
     sw.addColorStop(0, "rgba(255,255,255,0)"); sw.addColorStop(0.5, "rgba(255,255,255,.10)"); sw.addColorStop(1, "rgba(255,255,255,0)");
-    ctx.fillStyle = sw; ctx.fillRect(X - R, Y - R, R * 2, R * 2); ctx.restore();
+    ctx.fillStyle = sw; ctx.fillRect(X - R, Y - R, R * 2, R * 2);
+    // the existing Landing Pad arch, as a dark engraved emblem with a gold edge
+    ctx.lineCap = "round"; ctx.lineWidth = R * 0.16; ctx.strokeStyle = "rgba(20,15,4,.82)";
+    ctx.beginPath(); ctx.arc(X, Y + R * 0.18, R * 0.42, Math.PI, 0); ctx.stroke();
+    ctx.lineWidth = R * 0.06; ctx.strokeStyle = "rgba(255,226,140,.55)"; ctx.beginPath(); ctx.arc(X, Y + R * 0.18, R * 0.42, Math.PI, 0); ctx.stroke();
+    ctx.fillStyle = "rgba(20,15,4,.82)"; ctx.fillRect(X - R * 0.56, Y + R * 0.26, R * 1.12, R * 0.1);
+    ctx.restore();
 
     // front halves of the rings, with a satellite on each; a soft sound as each one passes in front
     rings.forEach((o, i) => {
@@ -81,6 +105,13 @@
       if (front) { ctx.fillStyle = i === 0 ? "#00E1B3" : "#F1D67A"; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 14; ctx.beginPath(); ctx.arc(rx, ry, i === 2 ? 2 : 3.4, 0, 7); ctx.fill(); ctx.shadowBlur = 0; }
     });
 
+    if (!still) {
+      const sa = t * 0.00012, sxp = X + Math.cos(sa) * R * 3.1, syp = Y - R * 0.9 + Math.sin(sa) * R * 0.5, dir = -Math.sin(sa) >= 0 ? 1 : -1;
+      ctx.save(); ctx.translate(sxp, syp); ctx.scale(dir, 1);
+      ctx.fillStyle = "#C9CED6"; ctx.beginPath(); ctx.moveTo(9, 0); ctx.lineTo(-6, -3.5); ctx.lineTo(-3, 0); ctx.lineTo(-6, 3.5); ctx.closePath(); ctx.fill();
+      const fl = ctx.createLinearGradient(-6, 0, -22, 0); fl.addColorStop(0, "rgba(0,225,179,.9)"); fl.addColorStop(1, "rgba(0,225,179,0)");
+      ctx.strokeStyle = fl; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-4, 0); ctx.lineTo(-22, 0); ctx.stroke(); ctx.restore();
+    }
     parts.forEach((p) => {
       if (!still) { p.a += p.s * 16; p.y -= 0.0009; if (p.y < -1.4) p.y = 0.6; }
       const px = X + Math.cos(p.a) * p.r * R * 1.3, py = PY + p.y * R * 1.6 + Math.sin(p.a) * p.r * R * 0.25;
