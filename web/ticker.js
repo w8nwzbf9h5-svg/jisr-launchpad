@@ -17,7 +17,7 @@
     // Keep the widget invisible until it has drawn, so its grey loading frame never shows.
     new MutationObserver((_, mo) => { const f = box.querySelector("iframe"); if (!f) return; mo.disconnect();
       f.style.opacity = "0"; f.style.transition = "opacity .3s";
-      f.addEventListener("load", () => setTimeout(() => { f.style.opacity = "1"; }, 700)); }).observe(box, { childList: true, subtree: true });
+      f.addEventListener("load", () => setTimeout(() => { f.style.opacity = "1"; }, 2200)); }).observe(box, { childList: true, subtree: true });
   }
 
   const tape = document.getElementById("mTape");
