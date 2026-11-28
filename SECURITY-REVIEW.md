@@ -42,6 +42,27 @@ Not done here: Sec3's X-ray scanner for Solana could not be run in this environm
 open source and is designed to run in GitHub Actions; adding it to `.github/workflows/solana.yml` is
 recommended (R3).
 
+### How the checks were done, in plain words
+
+**Step 1: scanners.** The tools read the code and flag known dangerous patterns, such as a contract
+that can be re-entered in the middle of a payment, an address that is never checked, or a library with
+a published flaw. Every warning was then read by hand and either fixed or explained in section 4.
+
+**Step 2: trying to break each promise.** The launchpad makes a few promises to its users. Each one was
+turned into a question, and the code was read line by line looking for a way to make the answer "yes":
+
+| Promise | Question asked | Result |
+|---|---|---|
+| The reserve can always buy back every coin at the floor price | Can any series of buys, sells, fee payouts or gifts leave the reserve short? | No: every trade's bookkeeping balances, and every rounding goes the reserve's way |
+| The floor price never falls and cannot be gamed | Can someone buy, gift money to the reserve to lift the floor, then sell at a profit? | No: the most they can win back is what they gave, before the 5% fee on the sale |
+| Small traders cannot be drained | Can thousands of tiny trades pull out rounding dust? | No: each tiny trade leaves a little extra in the reserve |
+| Nobody controls the money | Can the admin, the creator, or anyone else move reserve money or change prices? | No: the admin can only change the wallet that receives the 2% platform fee |
+| Launches cannot be blocked | Can someone prepare accounts in advance to stop the next coin from launching? | No: every such account is checked or accepted safely (see AUDIT.md, S1) |
+| Every Solana account is the right one | Can a trade be sent with a fake vault, a fake market or someone else's account? | No: every account is tied to the market by its address, its owner or its token |
+
+**Step 3: tests.** All existing test suites were run. For every fix, a new test was written that fails
+without the fix and passes with it.
+
 ## 3. Summary
 
 **No critical or high-severity issue was found.** No path was found that lets anyone take reserve
