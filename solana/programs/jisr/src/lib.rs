@@ -51,7 +51,9 @@ pub mod jisr {
     use super::*;
 
     /// One-time setup. Records the stablecoin, the platform wallet and the admin.
-    /// Send this in the same transaction that deploys the program, so nobody else can call it first.
+    /// Anyone may send it, once. A deployment takes many transactions, so it cannot share one with this call;
+    /// `scripts/solana-deploy.sh` sends it, checks every recorded setting, and only then removes the upgrade
+    /// authority (it closes the program instead if someone else got here first). See AUDIT.md, S2.
     pub fn initialize(ctx: Context<Initialize>, platform_wallet: Pubkey) -> Result<()> {
         let sale_price = jisr_math::sale_price(ctx.accounts.stable_mint.decimals).ok_or(JisrError::Overflow)?;
         require!(sale_price > 0, JisrError::UnsupportedStablecoin);
@@ -68,6 +70,8 @@ pub mod jisr {
 
     /// Change the wallet that receives the launchpad's 2% fee. Admin only.
     pub fn set_platform_wallet(ctx: Context<AdminOnly>, new_wallet: Pubkey) -> Result<()> {
+        // The empty address has no token account, so fees would wait in every market until it is changed back.
+        require!(new_wallet != Pubkey::default(), JisrError::EmptyAddress);
         ctx.accounts.config.platform_wallet = new_wallet;
         emit!(PlatformWalletChanged { new_wallet });
         Ok(())
@@ -593,6 +597,9 @@ pub enum JisrError {
     UnsupportedStablecoin,
     #[msg("Arithmetic overflow")]
     Overflow,
+    // New variants go last, so the codes above keep their numbers.
+    #[msg("The empty address cannot be used here")]
+    EmptyAddress,
 }
 
 impl From<MathError> for JisrError {

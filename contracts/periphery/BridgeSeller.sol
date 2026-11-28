@@ -71,6 +71,7 @@ contract BridgeSeller is ReentrancyGuard {
         bool forwarded
     );
     event Flushed(address indexed coin, uint256 coins, uint256 addedToFloor);
+    event StableFlushed(address indexed coin, uint256 amount, uint256 addedToFloor);
 
     error ZeroAddress();
     error ZeroAmount();
@@ -138,6 +139,19 @@ contract BridgeSeller is ReentrancyGuard {
         address market = factory.marketOf(coin);
         if (market == address(0)) revert UnknownCoin();
         added = _flush(coin, market, block.timestamp);
+    }
+
+    /// @notice Give any USDC left in this contract to `coin`'s floor reserve. Anyone may call it.
+    ///         A sale through this contract hands the bridge exactly what the sale paid, so USDC can only
+    ///         be here if somebody sent it directly. Without this it would stay here for good.
+    function flushStable(address coin) external nonReentrant returns (uint256 added) {
+        address market = factory.marketOf(coin);
+        if (market == address(0)) revert UnknownCoin();
+        uint256 stray = stable.balanceOf(address(this));
+        if (stray == 0) return 0;
+        stable.safeTransfer(market, stray);
+        added = ICoinMarketSell(market).reinforce();
+        emit StableFlushed(coin, stray, added);
     }
 
     function _flush(address coin, address market, uint256 deadline) private returns (uint256 added) {

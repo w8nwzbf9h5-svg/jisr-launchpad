@@ -327,6 +327,8 @@ async fn full_lifecycle_of_a_coin() {
     };
     let ix = set(bob.pubkey(), bob.pubkey(), &env);
     assert!(env.send(vec![ix], &[&bob]).await.is_err(), "a stranger cannot change the platform wallet");
+    let ix = set(admin.pubkey(), Pubkey::default(), &env);
+    assert!(env.send(vec![ix], &[&admin]).await.is_err(), "not even the admin can set the empty address");
     let ix = set(admin.pubkey(), bob.pubkey(), &env);
     env.send(vec![ix], &[&admin]).await.unwrap();
     let cfg: jisr::Config = env.load(env.config).await;

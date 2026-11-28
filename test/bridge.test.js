@@ -136,7 +136,23 @@ describe("BridgeSeller: sell here, receive on another network", function () {
     expect(await c.usdc.balanceOf(b.address)).to.equal(balB);
     expect(await c.coin.balanceOf(c.seller.target)).to.equal(0n);
     expect((await c.market.floorReserve()) >= (await c.market.floorLiability())).to.equal(true);
-    await expect(c.seller.flush(c.usdc.target), "UnknownCoin");
+    await reverts(c.seller.flush(c.usdc.target), "UnknownCoin");
+  });
+
+  it("anyone can move USDC sent to it straight into the coin's floor reserve, and nobody is paid for it", async function () {
+    const c = await setup(), [a, b] = c.users;
+    await c.market.connect(a).buy(5n * M, MAXU, FAR);
+    await c.usdc.connect(a).transfer(c.seller.target, 123n * U); // sent here by mistake
+    const reserveBefore = await c.market.floorReserve();
+    const balB = await c.usdc.balanceOf(b.address);
+    const ev = await eventOf(c.seller.connect(b).flushStable(c.coin.target), c.seller, "StableFlushed");
+    expect(ev.amount).to.equal(123n * U);
+    expect(ev.addedToFloor).to.equal(123n * U);
+    expect(await c.usdc.balanceOf(c.seller.target)).to.equal(0n);
+    expect(await c.usdc.balanceOf(b.address)).to.equal(balB);
+    expect((await c.market.floorReserve()) - reserveBefore).to.equal(123n * U);
+    expect(await c.seller.flushStable.staticCall(c.coin.target)).to.equal(0n); // nothing left: a no-op
+    await reverts(c.seller.flushStable(c.usdc.target), "UnknownCoin");
   });
 
   it("works after graduation and on the curve, where a sale returns premium too", async function () {
@@ -155,7 +171,7 @@ describe("BridgeSeller: sell here, receive on another network", function () {
   it("has no owner and no way to change or withdraw anything", async function () {
     const f = await ethers.getContractFactory("BridgeSeller");
     const changing = f.interface.fragments.filter((x) => x.type === "function" && x.stateMutability !== "view" && x.stateMutability !== "pure").map((x) => x.name).sort();
-    expect(changing).to.deep.equal(["flush", "sellAndBridge"]);
+    expect(changing).to.deep.equal(["flush", "flushStable", "sellAndBridge"]);
     const views = f.interface.fragments.filter((x) => x.type === "function" && (x.stateMutability === "view" || x.stateMutability === "pure")).map((x) => x.name).sort();
     expect(views).to.deep.equal(["FORWARD_HOOK", "factory", "messenger", "stable"]);
     await reverts(f.deploy(ethers.ZeroAddress, ethers.ZeroAddress), "ZeroAddress");
