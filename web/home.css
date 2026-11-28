@@ -508,3 +508,4 @@ footer.end .f-social{justify-content:center}
 /* Less empty space between the bars and the hero, so the sphere is in view on first load */
 .open{padding-top:8px}
 @media (min-width:980px){.open{padding-top:12px}.open>.hero{padding-top:clamp(16px,3vh,36px)}}
+.dexpaid{display:inline-block;margin-inline-start:6px;padding:1px 7px;border-radius:999px;background:rgba(0,225,179,.14);color:var(--floor);font-size:11.5px;font-weight:700;vertical-align:1px}
