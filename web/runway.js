@@ -34,8 +34,8 @@
     const t = now - t0;
     tx += (mx - tx) * 0.05; ty += (my - ty) * 0.05;
     const wide = W > 980, S = Math.min(W, H * 1.25);
-    const R = wide ? Math.min(S * 0.12, 150) : Math.min(W * 0.19, 78);
-    const X = W * (wide ? 0.73 : 0.5) + tx * 22, Y = (wide ? H * 0.36 : 150 + R * 1.45) + ty * 14;
+    const R = wide ? Math.min(S * 0.09, 112) : Math.min(W * 0.16, 64);
+    const X = W * (wide ? 0.73 : 0.5) + tx * 22, Y = (wide ? H * 0.31 : 128 + R * 1.45) + ty * 14;
     ctx.clearRect(0, 0, W, H);
 
     let g = ctx.createRadialGradient(X, Y, 0, X, Y, S * 0.95);

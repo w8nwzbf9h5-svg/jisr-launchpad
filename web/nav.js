@@ -7,8 +7,8 @@
   if (!main) return;
   const sections = [...main.children].filter((el) => el.tagName === "SECTION");
   const open = main.querySelector("section.open"), hero = open && open.querySelector(".hero");
-  const PAGES = new Set(["vote", "stress", "proof", "try", "contact", "econ"]);
-  const HOME = (s) => !s.id || ["promo", "road", "numbers"].includes(s.id) || s === open;
+  const PAGES = new Set(["vote", "stress", "proof", "try", "contact", "econ", "promo"]);
+  const HOME = (s) => !s.id || ["road", "numbers"].includes(s.id) || s === open;
 
   function pageOf(id) {
     if (!id) return null;

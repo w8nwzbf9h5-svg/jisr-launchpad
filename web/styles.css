@@ -11,13 +11,13 @@
   --r:14px;
 }
 *{box-sizing:border-box}
-html{overflow-x:hidden}
+html{overflow-x:clip}
 /* One-column layouts never grow wider than the screen. Phone browsers size a menu, a file picker or a
    text box by its content, and without this one wide control stretches the whole column off the page. */
 .hero,.about,.cgrid,.col,.trades,.field,.stack,.page,.form,.lgrid,.how{grid-template-columns:minmax(0,1fr)}
 .form>*,.field>*{min-width:0;max-width:100%}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:clip}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer}
 a{color:var(--accent)}

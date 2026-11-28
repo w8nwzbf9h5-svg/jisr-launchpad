@@ -61,6 +61,8 @@ function waitFor(child, text, ms) {
 
     browser = await puppeteer.launch({ executablePath: process.env.CHROME_PATH || "/usr/bin/google-chrome", headless: true, args: ["--no-sandbox", "--disable-gpu"] });
     const page = await browser.newPage();
+    // the menu bar stays on top of the page, so bring each button to the middle of the screen before clicking it, as a person would
+    { const click = page.click.bind(page); page.click = async (sel, o) => { await page.$eval(sel, (e) => e.scrollIntoView({ block: "center" })).catch(() => {}); return click(sel, o); }; }
     await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
     const pageErrors = [];
     page.on("pageerror", (e) => pageErrors.push(e.message));
