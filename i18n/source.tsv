@@ -36,6 +36,7 @@ qnww2x	Coins launched
 asgae1	Tester feedback
 1pkcn7g	LPAD market cap
 1y4u334	<1/>Testnet only, test money
+1jfvule	<1/>Internal security review: done
 xf6nxp	<1/>Independent audit: not yet
 14gq6mc	<1/>Mainnet: not open
 dbuqfm	There is no cheap early round and the creator receives no coins. A wallet may hold 2.5% of a coin at most. The whole method is in the <1>white paper</1>, in ten languages.
@@ -136,6 +137,8 @@ btutcn	A plain account, including what is not done.
 1dnrzl0	47 automated contract tests and 26 browser test steps. Markets have no owner, no pause and no withdrawal.
 ej8700	Fees
 173t4gs	5% of each trade: 1% to the coin's creator, 2% to the launchpad, 2% into the coin's own reserve. Paid out automatically as the coin trades.
+jf0dkt	Security review
+154ibsr	Done internally in November 2026: no critical or high-severity issues found. <1>Read the report</1>.
 135p1au	Independent audit
 1m7wk5e	Not done yet.
 jfevx	Real money

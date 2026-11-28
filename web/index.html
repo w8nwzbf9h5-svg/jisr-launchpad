@@ -18,7 +18,7 @@
 /* Addresses of the launchpad that used to live here (#board, #coin-0x…, #launch) now belong to app.html. */
 if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html" + location.hash);
 </script>
-<script src="i18n.js?v=68a3bfa9"></script>
+<script src="i18n.js?v=118658c7"></script>
 <script src="runway.js?v=c2b18b8e" defer></script>
 <script src="robot.js?v=39372c41" defer></script>
 <script src="ticker.js?v=c2519743" defer></script>
@@ -27,7 +27,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=c9dec353">
-<link rel="stylesheet" href="home.css?v=d1ceeaf8">
+<link rel="stylesheet" href="home.css?v=8f9cf193">
 </head>
 <body class="home">
 
@@ -84,7 +84,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
         <a class="h-stat" href="#contact"><span class="t-name">Tester feedback</span><b data-mirror="nFb">–</b></a>
         <a class="h-stat" href="#lpad"><span class="t-name">LPAD market cap</span><b data-mirror="nCap">–</b></a>
       </div>
-      <div class="truth"><span class="chip ok"><i></i>Testnet only, test money</span><span class="chip wait"><i></i>Independent audit: not yet</span><span class="chip wait"><i></i>Mainnet: not open</span></div>
+      <div class="truth"><span class="chip ok"><i></i>Testnet only, test money</span><a class="chip ok" href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad/blob/main/SECURITY-REVIEW.md" target="_blank" rel="noopener"><i></i>Internal security review: done</a><span class="chip wait"><i></i>Independent audit: not yet</span><span class="chip wait"><i></i>Mainnet: not open</span></div>
       <p class="fine">There is no cheap early round and the creator receives no coins. A wallet may hold 2.5% of a coin at most. The whole method is in the <a href="whitepaper.html">white paper</a>, in ten languages.</p>
     </div>
 
@@ -281,6 +281,7 @@ if (/^#(board|launch|how|coin-)/.test(location.hash)) location.replace("app.html
       <div><dt>Solana program</dt><dd>Deployed with its upgrade authority removed, so nobody can change it. The check above reads that from the network.</dd></div>
       <div><dt>Ethereum contracts</dt><dd>47 automated contract tests and 26 browser test steps. Markets have no owner, no pause and no withdrawal.</dd></div>
       <div><dt>Fees</dt><dd>5% of each trade: 1% to the coin's creator, 2% to the launchpad, 2% into the coin's own reserve. Paid out automatically as the coin trades.</dd></div>
+      <div><dt>Security review</dt><dd>Done internally in November 2026: no critical or high-severity issues found. <a href="https://github.com/w8nwzbf9h5-svg/jisr-launchpad/blob/main/SECURITY-REVIEW.md" target="_blank" rel="noopener">Read the report</a>.</dd></div>
       <div><dt>Independent audit</dt><dd class="no">Not done yet.</dd></div>
       <div><dt>Real money</dt><dd class="no">Not yet. Nothing is deployed on a real network.</dd></div>
     </dl>
