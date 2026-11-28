@@ -3,6 +3,7 @@
 This file is for an outside reviewer. It says what to review, what the code promises, who can do
 what, what was already checked and how, and what is known to be weak. It is written by the builders.
 **It is not an audit, and no independent audit has been done yet.**
+The builders' own security review of November 2026 is in [SECURITY-REVIEW.md](SECURITY-REVIEW.md).
 
 The plain-language description of the product is in [WHITEPAPER.md](WHITEPAPER.md).
 
