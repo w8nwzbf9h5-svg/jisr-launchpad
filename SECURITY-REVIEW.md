@@ -183,4 +183,7 @@ and `max_stable_in` / `min_stable_out` bound the price. Accepted.
 |---|---|
 | EVM contracts (Hardhat) | 48 passing (47 before, plus the new `flushStable` test) |
 | Solana math (`jisr-math`) | 7 passing |
-| Solana program, in-process | compiles; runs in GitHub Actions, which fetches the Metaplex program it needs |
+| Solana program, in-process, client, page and deployment rehearsal | all passing in GitHub Actions on the fixes branch ([run](https://github.com/w8nwzbf9h5-svg/jisr-launchpad/actions/runs/46131884335)) |
+
+The fixes are on branch `security-review-2026-11` and are not deployed. The test-network contracts
+keep running the reviewed code; the fixes go out with the next deployment.
